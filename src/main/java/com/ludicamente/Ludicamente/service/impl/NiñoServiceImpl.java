@@ -1,13 +1,15 @@
 package com.ludicamente.Ludicamente.service.impl;
 
 import com.ludicamente.Ludicamente.model.Niño;
-import com.ludicamente.Ludicamente.model.Repository.NiñoRepository;
+import com.ludicamente.Ludicamente.repository.NiñoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.ludicamente.Ludicamente.service.NiñoService;
+
 
 import java.util.List;
 import java.util.Optional;

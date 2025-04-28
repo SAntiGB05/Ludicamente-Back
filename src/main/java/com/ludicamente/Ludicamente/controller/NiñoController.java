@@ -1,4 +1,4 @@
-package com.ludicamente.Ludicamente.Controler;
+package com.ludicamente.Ludicamente.controller;
 
 import com.ludicamente.Ludicamente.model.Niño;
 import com.ludicamente.Ludicamente.service.NiñoService;
@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/niños")
-public class NiñoControler {
+public class NiñoController {
 
     @Autowired
     private NiñoService niñoService;
