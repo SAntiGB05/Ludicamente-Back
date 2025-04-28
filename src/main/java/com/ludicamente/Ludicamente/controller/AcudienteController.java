@@ -17,7 +17,7 @@ public class AcudienteController {
     @Autowired
     private AcudienteService acudienteService;
 
-    @Operation(summary = "Listar todos los acudientes")
+    @Operation(summary = "Listar acudientes")
     @GetMapping
     public List<Acudiente> listarAcudientes() {
         return acudienteService.listarAcudientes();
