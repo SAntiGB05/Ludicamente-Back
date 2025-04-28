@@ -4,47 +4,42 @@ import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "niño")
 public class Niño {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_niño")
     private Integer idNiño;
 
     @Column(nullable = false, length = 50)
     private String nombre;
 
-    @Column(length = 1)
-    private String sexo; // 'M' o 'F'
+    @Column(nullable = false, length = 50)
+    private String apellido;
 
-    @Column(name = "fecha_nacimiento", nullable = false)
+    @Column(nullable = false, length = 10)
+    private String sexo;
+
     @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
     private Date fechaNacimiento;
 
-    @Column(columnDefinition = "TEXT")
+    private String alergias;
+
     private String observaciones;
 
-    @Column(length = 255)
-    private String foto; // URL de la imagen
+    private String foto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "fkid_acudiente", nullable = false)
     private Acudiente acudiente;
 
-    public Niño(){
+    @Temporal(TemporalType.DATE)
+    @Column(nullable = false)
+    private Date fechaIngreso;
 
-    }
+    private String grupoSanguineo;
 
-    public Niño(Integer idNiño, String nombre, String sexo, Date fechaNacimiento, String observaciones, String foto, Acudiente acudiente) {
-        this.idNiño = idNiño;
-        this.nombre = nombre;
-        this.sexo = sexo;
-        this.fechaNacimiento = fechaNacimiento;
-        this.observaciones = observaciones;
-        this.foto = foto;
-        this.acudiente = acudiente;
-    }
+    // Getters y setters...
 
     public Integer getIdNiño() {
         return idNiño;
@@ -62,6 +57,14 @@ public class Niño {
         this.nombre = nombre;
     }
 
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
     public String getSexo() {
         return sexo;
     }
@@ -76,6 +79,14 @@ public class Niño {
 
     public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public String getAlergias() {
+        return alergias;
+    }
+
+    public void setAlergias(String alergias) {
+        this.alergias = alergias;
     }
 
     public String getObservaciones() {
@@ -102,6 +113,19 @@ public class Niño {
         this.acudiente = acudiente;
     }
 
-    // Getters y setters
-    // Constructor(es)
+    public Date getFechaIngreso() {
+        return fechaIngreso;
+    }
+
+    public void setFechaIngreso(Date fechaIngreso) {
+        this.fechaIngreso = fechaIngreso;
+    }
+
+    public String getGrupoSanguineo() {
+        return grupoSanguineo;
+    }
+
+    public void setGrupoSanguineo(String grupoSanguineo) {
+        this.grupoSanguineo = grupoSanguineo;
+    }
 }
