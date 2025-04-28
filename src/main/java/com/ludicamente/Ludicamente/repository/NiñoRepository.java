@@ -1,7 +1,10 @@
-package com.ludicamente.Ludicamente.Repository;
+package com.ludicamente.Ludicamente.repository;
 
 import com.ludicamente.Ludicamente.model.Niño;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface NiñoRepository extends JpaRepository<Niño, Long> {
+import java.util.List;
+
+public interface NiñoRepository extends JpaRepository<Niño, Integer> {
+    List<Niño> findByAcudiente_IdAcudiente(Integer idAcudiente);
 }
