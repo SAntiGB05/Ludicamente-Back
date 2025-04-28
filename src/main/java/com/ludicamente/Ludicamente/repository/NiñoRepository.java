@@ -1,4 +1,4 @@
-package com.ludicamente.Ludicamente.model.Repository;
+package com.ludicamente.Ludicamente.Repository;
 
 import com.ludicamente.Ludicamente.model.Niño;
 import org.springframework.data.jpa.repository.JpaRepository;

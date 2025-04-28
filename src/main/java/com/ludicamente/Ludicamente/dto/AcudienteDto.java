@@ -1,7 +1,7 @@
 package com.ludicamente.Ludicamente.dto;
 
 public class AcudienteDto {
-    private Long idAcudiente;
+    private Integer idAcudiente;
     private String cedula;
     private String nombre;
     private String correo;
@@ -10,7 +10,7 @@ public class AcudienteDto {
     private String parentesco;
     private String direccion;
 
-    public AcudienteDto(Long idAcudiente, String direccion, String parentesco, String telefono, String contraseña, String correo, String nombre, String cedula) {
+    public AcudienteDto(Integer idAcudiente, String direccion, String parentesco, String telefono, String contraseña, String correo, String nombre, String cedula) {
         this.idAcudiente = idAcudiente;
         this.direccion = direccion;
         this.parentesco = parentesco;
@@ -21,11 +21,11 @@ public class AcudienteDto {
         this.cedula = cedula;
     }
 
-    public Long getIdAcudiente() {
+    public Integer getIdAcudiente() {
         return idAcudiente;
     }
 
-    public void setIdAcudiente(Long idAcudiente) {
+    public void setIdAcudiente(Integer idAcudiente) {
         this.idAcudiente = idAcudiente;
     }
 
