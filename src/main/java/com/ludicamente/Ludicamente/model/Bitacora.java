@@ -1,44 +1,110 @@
 package com.ludicamente.Ludicamente.model;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "bitacora")
 public class Bitacora {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_bitacora")
     private Integer idBitacora;
 
-    @Column(name = "accion", nullable = false, length = 50)
+    @Column(nullable = false, length = 50)
     private String accion;
 
-    @Column(name = "tabla_afectada", nullable = false, length = 50)
+    @Column(nullable = false, length = 50)
     private String tablaAfectada;
 
-    @Column(name = "id_registro_afectado")
     private Integer idRegistroAfectado;
 
-    @Column(name = "datos_anteriores", columnDefinition = "json")
+    @Lob
     private String datosAnteriores;
 
-    @Column(name = "datos_nuevos", columnDefinition = "json")
+    @Lob
     private String datosNuevos;
 
-    @Column(name = "fecha_hora", nullable = false)
-    private LocalDateTime fechaHora;
+    @Column(nullable = false)
+    private LocalDateTime fechaHora = LocalDateTime.now();
 
-    @Column(name = "ip_conexion", length = 45)
-    private String ipConexion;
-
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "fkid_empleado")
     private Empleado empleado;
 
-    public Bitacora() {
-        this.fechaHora = LocalDateTime.now();
+    @Column(length = 45)
+    private String ipConexion;
+
+    // Getters y setters...
+
+    public Integer getIdBitacora() {
+        return idBitacora;
+    }
+
+    public void setIdBitacora(Integer idBitacora) {
+        this.idBitacora = idBitacora;
+    }
+
+    public String getAccion() {
+        return accion;
+    }
+
+    public void setAccion(String accion) {
+        this.accion = accion;
+    }
+
+    public String getTablaAfectada() {
+        return tablaAfectada;
+    }
+
+    public void setTablaAfectada(String tablaAfectada) {
+        this.tablaAfectada = tablaAfectada;
+    }
+
+    public Integer getIdRegistroAfectado() {
+        return idRegistroAfectado;
+    }
+
+    public void setIdRegistroAfectado(Integer idRegistroAfectado) {
+        this.idRegistroAfectado = idRegistroAfectado;
+    }
+
+    public String getDatosAnteriores() {
+        return datosAnteriores;
+    }
+
+    public void setDatosAnteriores(String datosAnteriores) {
+        this.datosAnteriores = datosAnteriores;
+    }
+
+    public String getDatosNuevos() {
+        return datosNuevos;
+    }
+
+    public void setDatosNuevos(String datosNuevos) {
+        this.datosNuevos = datosNuevos;
+    }
+
+    public LocalDateTime getFechaHora() {
+        return fechaHora;
+    }
+
+    public void setFechaHora(LocalDateTime fechaHora) {
+        this.fechaHora = fechaHora;
+    }
+
+    public Empleado getEmpleado() {
+        return empleado;
+    }
+
+    public void setEmpleado(Empleado empleado) {
+        this.empleado = empleado;
+    }
+
+    public String getIpConexion() {
+        return ipConexion;
+    }
+
+    public void setIpConexion(String ipConexion) {
+        this.ipConexion = ipConexion;
     }
 }
