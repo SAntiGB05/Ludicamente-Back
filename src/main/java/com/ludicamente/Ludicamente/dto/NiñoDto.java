@@ -3,18 +3,18 @@ package com.ludicamente.Ludicamente.dto;
 import java.util.Date;
 
 public class NiñoDto {
-    private Long idNiño;
+    private Integer idNiño;
     private String nombre;
     private String sexo;
     private Date fechaNacimiento;
     private String observaciones;
     private String foto;
-    private Long idAcudiente;
+    private Integer idAcudiente;
 
     // Getters y setters
     // Constructor(es)
 
-    public NiñoDto(Long idNiño, String nombre, String sexo, Date fechaNacimiento, String observaciones, String foto, Long idAcudiente) {
+    public NiñoDto(Integer idNiño, String nombre, String sexo, Date fechaNacimiento, String observaciones, String foto, Integer idAcudiente) {
         this.idNiño = idNiño;
         this.nombre = nombre;
         this.sexo = sexo;
@@ -24,11 +24,11 @@ public class NiñoDto {
         this.idAcudiente = idAcudiente;
     }
 
-    public Long getIdNiño() {
+    public Integer getIdNiño() {
         return idNiño;
     }
 
-    public void setIdNiño(Long idNiño) {
+    public void setIdNiño(Integer idNiño) {
         this.idNiño = idNiño;
     }
 
@@ -72,11 +72,11 @@ public class NiñoDto {
         this.foto = foto;
     }
 
-    public Long getIdAcudiente() {
+    public Integer getIdAcudiente() {
         return idAcudiente;
     }
 
-    public void setIdAcudiente(Long idAcudiente) {
+    public void setIdAcudiente(Integer idAcudiente) {
         this.idAcudiente = idAcudiente;
     }
 }
