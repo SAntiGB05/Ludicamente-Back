@@ -18,6 +18,9 @@ public class DetalleFactura {
     @Column(name = "precio_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal precioUnitario;
 
+    @Column(name = "descuento_unitario", nullable = false, precision = 10, scale = 2)
+    private BigDecimal descuentoUnitario = BigDecimal.ZERO;
+
     @Column(name = "subtotal_item", precision = 10, scale = 2, insertable = false, updatable = false)
     private BigDecimal subtotalItem;
 
@@ -29,13 +32,17 @@ public class DetalleFactura {
     @JoinColumn(name = "FKcod_servicio", nullable = false)
     private Servicio servicio;
 
+    @Column(name = "observaciones", columnDefinition = "TEXT")
+    private String observaciones;
+
     // Constructor vacío
     public DetalleFactura() {}
 
     // Constructor con parámetros (opcional)
-    public DetalleFactura(int cantidad, BigDecimal precioUnitario, Factura factura, Servicio servicio) {
+    public DetalleFactura(int cantidad, BigDecimal precioUnitario, BigDecimal descuentoUnitario, Factura factura, Servicio servicio) {
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
+        this.descuentoUnitario = descuentoUnitario;
         this.factura = factura;
         this.servicio = servicio;
     }
@@ -65,6 +72,14 @@ public class DetalleFactura {
         this.precioUnitario = precioUnitario;
     }
 
+    public BigDecimal getDescuentoUnitario() {
+        return descuentoUnitario;
+    }
+
+    public void setDescuentoUnitario(BigDecimal descuentoUnitario) {
+        this.descuentoUnitario = descuentoUnitario;
+    }
+
     public BigDecimal getSubtotalItem() {
         return subtotalItem;
     }
@@ -83,5 +98,13 @@ public class DetalleFactura {
 
     public void setServicio(Servicio servicio) {
         this.servicio = servicio;
+    }
+
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
     }
 }
