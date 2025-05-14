@@ -56,6 +56,89 @@ public class Acudiente {
         this.cedula = cedula;
     }
 
+
+    // Constructor privado para el Builder
+    private Acudiente(Builder builder) {
+        this.idAcudiente = builder.idAcudiente;
+        this.cedula = builder.cedula;
+        this.nombre = builder.nombre;
+        this.correo = builder.correo;
+        this.contraseña = builder.contraseña;
+        this.telefono = builder.telefono;
+        this.parentesco = builder.parentesco;
+        this.direccion = builder.direccion;
+        this.niños = builder.niños;
+    }
+
+    // Método estático para crear el Builder
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    // Clase Builder interna
+    public static final class Builder {
+        private Integer idAcudiente;
+        private String cedula;
+        private String nombre;
+        private String correo;
+        private String contraseña;
+        private String telefono;
+        private String parentesco;
+        private String direccion;
+        private List<Niño> niños;
+
+        private Builder() {}
+
+        public Builder idAcudiente(Integer idAcudiente) {
+            this.idAcudiente = idAcudiente;
+            return this;
+        }
+
+        public Builder cedula(String cedula) {
+            this.cedula = cedula;
+            return this;
+        }
+
+        public Builder nombre(String nombre) {
+            this.nombre = nombre;
+            return this;
+        }
+
+        public Builder correo(String correo) {
+            this.correo = correo;
+            return this;
+        }
+
+        public Builder contraseña(String contraseña) {
+            this.contraseña = contraseña;
+            return this;
+        }
+
+        public Builder telefono(String telefono) {
+            this.telefono = telefono;
+            return this;
+        }
+
+        public Builder parentesco(String parentesco) {
+            this.parentesco = parentesco;
+            return this;
+        }
+
+        public Builder direccion(String direccion) {
+            this.direccion = direccion;
+            return this;
+        }
+
+        public Builder niños(List<Niño> niños) {
+            this.niños = niños;
+            return this;
+        }
+
+        public Acudiente build() {
+            return new Acudiente(this);
+        }
+    }
+
     public Integer getIdAcudiente() {
         return idAcudiente;
     }
