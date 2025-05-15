@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/auth/**",
             "/api/empleados/**",
             "/api/acudiente/**",
-            "//api/servicios/**",
+            "/api/servicios/**",
             "/v3/api-docs/**"
     );
 
