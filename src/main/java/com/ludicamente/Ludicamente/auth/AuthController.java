@@ -1,12 +1,18 @@
 package com.ludicamente.Ludicamente.auth;
 
+import com.ludicamente.Ludicamente.auth.passwordReset.PasswordResetService;
+import com.ludicamente.Ludicamente.model.PasswordResetToken;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @RestController
@@ -73,5 +79,30 @@ public class AuthController {
             // Maneja el error cuando ya existe un correo
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(e.getMessage()));
         }
+    }
+
+    // Endpoint para recuperar contraseña
+    @Autowired
+    private PasswordResetService passwordResetService;
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        PasswordResetToken token = passwordResetService.enviarToken(email);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.");
+        response.put("token", token.getToken()); // Solo para desarrollo
+
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
+
+        passwordResetService.resetPassword(token, newPassword);
+        return ResponseEntity.ok("Contraseña restablecida correctamente.");
     }
 }
