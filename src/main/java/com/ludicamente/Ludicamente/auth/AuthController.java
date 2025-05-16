@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -32,9 +33,13 @@ public class AuthController {
             AuthResponse response = authenticationService.authenticate(request);
             return ResponseEntity.ok(response);
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AuthResponse("Usuario no encontrado"));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new AuthResponse("Correo no registrado"));
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse("Contraseña incorrecta"));
         } catch (Exception e) {
-            e.printStackTrace(); // Ver el error real en la consola
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new AuthResponse("Error en la autenticación: " + e.getMessage()));
         }

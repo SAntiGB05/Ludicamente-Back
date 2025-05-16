@@ -111,26 +111,42 @@ public class AuthenticationService {
     }
 
     public AuthResponse authenticate(AuthRequest request) {
-        // 1. Autenticar credenciales
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+        // Buscar usuario primero
+        boolean userExists = empleadoRepository.findByCorreo(request.getEmail()).isPresent() ||
+                acudienteRepository.findByCorreo(request.getEmail()).isPresent();
 
-        // 2. Buscar como Empleado
+        if (!userExists) {
+            throw new UsernameNotFoundException("Correo no registrado");
+        }
+
+        try {
+            // Solo autenticar si usuario existe
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+        } catch (org.springframework.security.authentication.BadCredentialsException e) {
+            // Contraseña incorrecta
+            throw new org.springframework.security.authentication.BadCredentialsException("Contraseña incorrecta");
+        }
+
+        // Si autenticación exitosa, generar token
         Optional<Empleado> empleadoOpt = empleadoRepository.findByCorreo(request.getEmail());
         if (empleadoOpt.isPresent()) {
             EmpleadoUserDetails empleadoUserDetails = new EmpleadoUserDetails(empleadoOpt.get());
             return new AuthResponse(jwtService.generateToken(empleadoUserDetails));
         }
 
-        // 3. Buscar como Acudiente
         Optional<Acudiente> acudienteOpt = acudienteRepository.findByCorreo(request.getEmail());
         if (acudienteOpt.isPresent()) {
             AcudienteUserDetails acudienteUserDetails = new AcudienteUserDetails(acudienteOpt.get());
             return new AuthResponse(jwtService.generateToken(acudienteUserDetails));
         }
 
-        // 4. Si no existe en ninguna tabla
-        throw new UsernameNotFoundException("Usuario no encontrado");
+        // En caso improbable, si no encontró usuario
+        throw new UsernameNotFoundException("Correo no registrado");
     }
+
+
+
+
 }

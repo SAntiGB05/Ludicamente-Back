@@ -17,7 +17,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.*;
 
-
 import java.util.List;
 
 @Configuration
@@ -64,15 +63,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Añade CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/auth/**",
-                                "/api/empleados/**",
-                                "/api/acudiente/**",
-                                "//api/servicios/**",
-                                "/v3/api-docs/**"
-                        ).permitAll()
+                        .requestMatchers("/api/auth/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/empleados/**").hasRole("ADMIN")
+                        .requestMatchers("/api/acudiente/**").hasRole("ACUDIENTE")
+                        .requestMatchers("/api/servicios/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -83,13 +79,15 @@ public class SecurityConfig {
         return http.build();
     }
 
+
+    // ✅ Configuración CORS corregida
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*")); // En producción usa dominios específicos
+        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // 👈 Frontend local
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true); // Solo se permite con origen específico
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
