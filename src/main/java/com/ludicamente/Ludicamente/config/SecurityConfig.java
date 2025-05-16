@@ -79,13 +79,15 @@ public class SecurityConfig {
         return http.build();
     }
 
+
+    // ✅ Configuración CORS corregida
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*")); // En producción usa dominios específicos
+        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // 👈 Frontend local
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true); // Solo se permite con origen específico
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
