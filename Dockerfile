@@ -1,5 +1,5 @@
 # Etapa 1: Construcción del proyecto
-FROM maven:3.9.4-eclipse-temurin-17 AS build
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build  # Imagen con Java 21
 
 # Copia el código fuente al contenedor
 COPY . /app
@@ -10,7 +10,7 @@ WORKDIR /app
 RUN mvn clean package -DskipTests
 
 # Etapa 2: Imagen final
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:21-jre-alpine  # JRE de Java 21
 
 WORKDIR /app
 
