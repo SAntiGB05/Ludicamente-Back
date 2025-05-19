@@ -1,14 +1,23 @@
-# Imagen base de Java 17
-FROM eclipse-temurin:17-jdk-alpine
+# Etapa 1: Construcción del proyecto
+FROM maven:3.9.4-eclipse-temurin-17 AS build
 
-# Establece el directorio de trabajo
+# Copia el código fuente al contenedor
+COPY . /app
+
 WORKDIR /app
 
-# Copia el JAR al contenedor
-COPY target/Ludicamente-0.0.1-SNAPSHOT.jar app.jar
+# Construye el proyecto (sin correr tests)
+RUN mvn clean package -DskipTests
 
-# Expón el puerto (ajusta si usas otro)
+# Etapa 2: Imagen final
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+# Copia el .jar desde la etapa anterior
+COPY --from=build /app/target/Ludicamente-0.0.1-SNAPSHOT.jar app.jar
+
 EXPOSE 8080
 
-# Comando para ejecutar tu aplicación
+# Ejecuta la aplicación
 ENTRYPOINT ["java", "-jar", "app.jar"]
