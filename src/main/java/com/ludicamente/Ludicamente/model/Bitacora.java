@@ -1,95 +1,127 @@
 package com.ludicamente.Ludicamente.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "bitacora")
 public class Bitacora {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idBitacora;
+    @Column(name = "cod_bitacora")
+    private Integer codBitacora;
 
-    @Column(nullable = false, length = 50)
-    private String accion;
+    @Column(name = "descripcion_general", columnDefinition = "TEXT")
+    private String descripcionGeneral;
 
-    @Column(nullable = false, length = 50)
-    private String tablaAfectada;
+    @Column(columnDefinition = "TEXT")
+    private String oportunidades;
 
-    private Integer idRegistroAfectado;
+    @Column(columnDefinition = "TEXT")
+    private String debilidades;
 
-    @Lob
-    private String datosAnteriores;
+    @Column(columnDefinition = "TEXT")
+    private String amenazas;
 
-    @Lob
-    private String datosNuevos;
+    @Column(columnDefinition = "TEXT")
+    private String fortalezas;
 
-    @Column(nullable = false)
-    private LocalDateTime fechaHora = LocalDateTime.now();
+    @Column(columnDefinition = "TEXT")
+    private String objetivos;
+
+    @Column(columnDefinition = "TEXT")
+    private String habilidades;
+
+    @Column(columnDefinition = "TEXT")
+    private String seguimiento;
+
+    @Column(name = "historial_actividad", columnDefinition = "TEXT")
+    private String historialActividad;
 
     @ManyToOne
-    @JoinColumn(name = "fkid_empleado")
+    @JoinColumn(name = "fkid_empleado", referencedColumnName = "id_empleado")
     private Empleado empleado;
 
-    @Column(length = 45)
-    private String ipConexion;
+    // Getters y Setters
 
-    // Getters y setters...
-
-    public Integer getIdBitacora() {
-        return idBitacora;
+    public Integer getCodBitacora() {
+        return codBitacora;
     }
 
-    public void setIdBitacora(Integer idBitacora) {
-        this.idBitacora = idBitacora;
+    public void setCodBitacora(Integer codBitacora) {
+        this.codBitacora = codBitacora;
     }
 
-    public String getAccion() {
-        return accion;
+    public String getDescripcionGeneral() {
+        return descripcionGeneral;
     }
 
-    public void setAccion(String accion) {
-        this.accion = accion;
+    public void setDescripcionGeneral(String descripcionGeneral) {
+        this.descripcionGeneral = descripcionGeneral;
     }
 
-    public String getTablaAfectada() {
-        return tablaAfectada;
+    public String getOportunidades() {
+        return oportunidades;
     }
 
-    public void setTablaAfectada(String tablaAfectada) {
-        this.tablaAfectada = tablaAfectada;
+    public void setOportunidades(String oportunidades) {
+        this.oportunidades = oportunidades;
     }
 
-    public Integer getIdRegistroAfectado() {
-        return idRegistroAfectado;
+    public String getDebilidades() {
+        return debilidades;
     }
 
-    public void setIdRegistroAfectado(Integer idRegistroAfectado) {
-        this.idRegistroAfectado = idRegistroAfectado;
+    public void setDebilidades(String debilidades) {
+        this.debilidades = debilidades;
     }
 
-    public String getDatosAnteriores() {
-        return datosAnteriores;
+    public String getAmenazas() {
+        return amenazas;
     }
 
-    public void setDatosAnteriores(String datosAnteriores) {
-        this.datosAnteriores = datosAnteriores;
+    public void setAmenazas(String amenazas) {
+        this.amenazas = amenazas;
     }
 
-    public String getDatosNuevos() {
-        return datosNuevos;
+    public String getFortalezas() {
+        return fortalezas;
     }
 
-    public void setDatosNuevos(String datosNuevos) {
-        this.datosNuevos = datosNuevos;
+    public void setFortalezas(String fortalezas) {
+        this.fortalezas = fortalezas;
     }
 
-    public LocalDateTime getFechaHora() {
-        return fechaHora;
+    public String getObjetivos() {
+        return objetivos;
     }
 
-    public void setFechaHora(LocalDateTime fechaHora) {
-        this.fechaHora = fechaHora;
+    public void setObjetivos(String objetivos) {
+        this.objetivos = objetivos;
+    }
+
+    public String getHabilidades() {
+        return habilidades;
+    }
+
+    public void setHabilidades(String habilidades) {
+        this.habilidades = habilidades;
+    }
+
+    public String getSeguimiento() {
+        return seguimiento;
+    }
+
+    public void setSeguimiento(String seguimiento) {
+        this.seguimiento = seguimiento;
+    }
+
+    public String getHistorialActividad() {
+        return historialActividad;
+    }
+
+    public void setHistorialActividad(String historialActividad) {
+        this.historialActividad = historialActividad;
     }
 
     public Empleado getEmpleado() {
@@ -98,13 +130,5 @@ public class Bitacora {
 
     public void setEmpleado(Empleado empleado) {
         this.empleado = empleado;
-    }
-
-    public String getIpConexion() {
-        return ipConexion;
-    }
-
-    public void setIpConexion(String ipConexion) {
-        this.ipConexion = ipConexion;
     }
 }

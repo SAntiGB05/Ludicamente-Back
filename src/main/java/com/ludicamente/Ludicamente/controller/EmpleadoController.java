@@ -8,13 +8,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 
 import java.util.List;
 import java.util.Optional;
 
+@PreAuthorize("hasAnyRole('ROL_ADMIN')")
 @RestController
 @RequestMapping("/api/empleados")
+@Tag(name = "Empleado", description = "API para gestión de empleados")
 public class EmpleadoController {
 
     @Autowired

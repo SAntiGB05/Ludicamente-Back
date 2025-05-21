@@ -1,10 +1,13 @@
 package com.ludicamente.Ludicamente.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -45,7 +48,9 @@ public class Empleado {
     @Column(nullable = false, length = 100)
     private String horario;
 
-    @Column(name = "nivel_acceso", nullable = false, length = 15)
+    @Min(1)
+    @Max(2)
+    @Column(name = "nivel_acceso", nullable = false)
     private Integer nivelAcceso;
 
     @Enumerated(EnumType.STRING)

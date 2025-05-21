@@ -30,9 +30,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final List<String> publicEndpoints = List.of(
             "/api/auth/**",
-            "/api/empleados/**",
-            "/api/acudiente/**",
-            "/api/servicios/**",
             "/v3/api-docs/**"
     );
 

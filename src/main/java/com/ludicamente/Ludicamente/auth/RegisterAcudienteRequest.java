@@ -13,7 +13,6 @@ public class RegisterAcudienteRequest {
     private String contraseñaAcudiente;
     private String telefonoAcudiente;
     private String parentesco;
-    private String direccionAcudiente;
 
     @NotEmpty(message = "Debe registrar al menos un niño")
     private List<NiñoDto> niños;
@@ -65,14 +64,6 @@ public class RegisterAcudienteRequest {
 
     public void setParentesco(String parentesco) {
         this.parentesco = parentesco;
-    }
-
-    public String getDireccionAcudiente() {
-        return direccionAcudiente;
-    }
-
-    public void setDireccionAcudiente(String direccionAcudiente) {
-        this.direccionAcudiente = direccionAcudiente;
     }
 
     public List<NiñoDto> getNiños() {
