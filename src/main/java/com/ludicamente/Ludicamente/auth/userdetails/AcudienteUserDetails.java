@@ -7,10 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 public class AcudienteUserDetails implements UserDetails {
 
     private final Acudiente acudiente;
+
+
 
     public AcudienteUserDetails(Acudiente acudiente) {
         this.acudiente = acudiente;

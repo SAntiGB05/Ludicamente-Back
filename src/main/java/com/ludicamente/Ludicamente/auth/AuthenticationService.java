@@ -1,5 +1,10 @@
 package com.ludicamente.Ludicamente.auth;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.client.util.Value;
 import com.ludicamente.Ludicamente.auth.userdetails.AcudienteUserDetails;
 import com.ludicamente.Ludicamente.auth.userdetails.EmpleadoUserDetails;
 import com.ludicamente.Ludicamente.model.Acudiente;
@@ -17,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +36,9 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    @Value("${google.client.id}")
+    private String clientId;
+
 
     public AuthenticationService(EmpleadoRepository empleadoRepository,
                                  AcudienteRepository acudienteRepository,
@@ -146,6 +155,46 @@ public class AuthenticationService {
 
         // En caso improbable, si no encontró usuario
         throw new UsernameNotFoundException("Correo no registrado");
+    }
+
+    public AuthResponse loginConGoogle(String idTokenString) throws Exception {
+        // Solo para depuración (puedes quitar luego)
+        System.out.println("CLIENT_ID desde @Value: " + clientId);
+        System.out.println("ID Token recibido: " + idTokenString);
+
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
+                new NetHttpTransport(),
+                JacksonFactory.getDefaultInstance()
+        ).setAudience(Collections.singletonList(clientId)).build();
+
+        GoogleIdToken idToken = verifier.verify(idTokenString);
+        if (idToken == null) {
+            throw new RuntimeException("Token de Google inválido o clientId no coincide");
+        }
+
+        GoogleIdToken.Payload payload = idToken.getPayload();
+        String email = payload.getEmail();
+        String nombre = (String) payload.get("name");
+
+        Optional<Acudiente> acudienteOpt = acudienteRepository.findByCorreo(email);
+        Acudiente acudiente;
+        if (acudienteOpt.isPresent()) {
+            acudiente = acudienteOpt.get();
+        } else {
+            acudiente = Acudiente.builder()
+                    .nombre(nombre)
+                    .correo(email)
+                    .contraseña("") // sin contraseña para Google
+                    .telefono("")
+                    .cedula("")
+                    .parentesco("")
+                    .build();
+            acudienteRepository.save(acudiente);
+        }
+
+        var userDetails = new AcudienteUserDetails(acudiente);
+        var jwtToken = jwtService.generateToken(userDetails);
+        return new AuthResponse(jwtToken);
     }
 
 

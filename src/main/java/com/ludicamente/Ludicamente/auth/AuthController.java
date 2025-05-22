@@ -17,8 +17,9 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/api/auth") // URL base para autenticación
+@RequestMapping("/api/auth")// URL base para autenticación
 public class AuthController {
+
 
     private final AuthenticationService authenticationService;
 
@@ -109,5 +110,15 @@ public class AuthController {
 
         passwordResetService.resetPassword(token, newPassword);
         return ResponseEntity.ok("Contraseña restablecida correctamente.");
+    }
+    @PostMapping("/google")
+    public ResponseEntity<?> loginConGoogle(@RequestBody GoogleAuthRequest request) {
+        try {
+            AuthResponse response = authenticationService.loginConGoogle(request.getToken());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("mensaje", "Error al autenticar con Google", "error", e.getMessage()));
+        }
     }
 }
