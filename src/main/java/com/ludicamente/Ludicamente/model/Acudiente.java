@@ -15,7 +15,7 @@ public class Acudiente {
     @Column(name = "id_acudiente")
     private Integer idAcudiente;
 
-    @Column(name = "cedula_acudiente", nullable = false, length = 20, unique = true)
+    @Column(name = "cedula_acudiente", nullable = false, length = 50, unique = true)
     private String cedula;
 
     @Column(name = "nombre_acudiente", length = 50)

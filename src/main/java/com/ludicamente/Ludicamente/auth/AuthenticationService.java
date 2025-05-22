@@ -84,8 +84,8 @@ public class AuthenticationService {
                 .nombre(request.getNombreAcudiente())
                 .correo(request.getCorreoAcudiente())
                 .contraseña(passwordEncoder.encode(request.getContraseñaAcudiente()))
-                .cedula(passwordEncoder.encode(request.getCedulaAcudiente()))
-                .parentesco(passwordEncoder.encode(request.getParentesco()))
+                .cedula(request.getCedulaAcudiente())
+                .parentesco(request.getParentesco())
                 .telefono(request.getTelefonoAcudiente())
                 .build();
 
@@ -97,9 +97,10 @@ public class AuthenticationService {
         List<Niño> niños = request.getNiños().stream().map(dto -> {
             Niño n = new Niño();
             n.setNombre(dto.getNombre());
-            n.setIdNiño(dto.getIdNiño());
+            n.setnIdentificacion(dto.getnIdentificacion());
             n.setFechaNacimiento(dto.getFechaNacimiento());
             n.setSexo(dto.getSexo());
+            n.setEdad(dto.getEdad());
             n.setAcudiente(acudiente); // Relación bidireccional
             return n;
         }).collect(Collectors.toList());

@@ -13,19 +13,18 @@ public class Niño {
     @Column(nullable = false, length = 50)
     private String nombre;
 
-    @Column(nullable = false, length = 50)
-    private String apellido;
+    @Column(name = "n_identificacion", nullable = false, unique = true)
+    private String nIdentificacion;
 
     @Column(nullable = false, length = 10)
     private String sexo;
 
     @Temporal(TemporalType.DATE)
-    @Column(nullable = false)
+    @Column(name = "fecha_nacimiento", nullable = false)
     private Date fechaNacimiento;
 
-    private String alergias;
-
-    private String observaciones;
+    @Column(nullable = false)
+    private Integer edad;
 
     private String foto;
 
@@ -33,13 +32,7 @@ public class Niño {
     @JoinColumn(name = "fkid_acudiente", nullable = false)
     private Acudiente acudiente;
 
-    @Temporal(TemporalType.DATE)
-    @Column(nullable = false)
-    private Date fechaIngreso;
-
-    private String grupoSanguineo;
-
-    // Getters y setters...
+    // === Getters y Setters ===
 
     public Integer getIdNiño() {
         return idNiño;
@@ -57,12 +50,12 @@ public class Niño {
         this.nombre = nombre;
     }
 
-    public String getApellido() {
-        return apellido;
+    public String getnIdentificacion() {
+        return nIdentificacion;
     }
 
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
+    public void setnIdentificacion(String nIdentificacion) {
+        this.nIdentificacion = nIdentificacion;
     }
 
     public String getSexo() {
@@ -81,20 +74,12 @@ public class Niño {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    public String getAlergias() {
-        return alergias;
+    public Integer getEdad() {
+        return edad;
     }
 
-    public void setAlergias(String alergias) {
-        this.alergias = alergias;
-    }
-
-    public String getObservaciones() {
-        return observaciones;
-    }
-
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones;
+    public void setEdad(Integer edad) {
+        this.edad = edad;
     }
 
     public String getFoto() {
@@ -111,21 +96,5 @@ public class Niño {
 
     public void setAcudiente(Acudiente acudiente) {
         this.acudiente = acudiente;
-    }
-
-    public Date getFechaIngreso() {
-        return fechaIngreso;
-    }
-
-    public void setFechaIngreso(Date fechaIngreso) {
-        this.fechaIngreso = fechaIngreso;
-    }
-
-    public String getGrupoSanguineo() {
-        return grupoSanguineo;
-    }
-
-    public void setGrupoSanguineo(String grupoSanguineo) {
-        this.grupoSanguineo = grupoSanguineo;
     }
 }
