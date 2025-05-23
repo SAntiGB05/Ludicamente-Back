@@ -1,5 +1,6 @@
 package com.ludicamente.Ludicamente.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import java.util.Date;
 
@@ -29,6 +30,7 @@ public class Niño {
     private String foto;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "fkid_acudiente", nullable = false)
     private Acudiente acudiente;
 

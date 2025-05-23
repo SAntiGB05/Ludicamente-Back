@@ -1,5 +1,7 @@
 package com.ludicamente.Ludicamente.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -29,6 +31,7 @@ public class Empleado {
     @Column(nullable = false, length = 100, unique = true)
     private String correo;
 
+    @JsonIgnore
     @Column(nullable = false, length = 255)
     private String contraseña;
 
@@ -58,14 +61,17 @@ public class Empleado {
     private EstadoEmpleado estado = EstadoEmpleado.activo;
 
     // Relación con Facturas
+    @JsonBackReference
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Factura> facturas;
 
     // Relación con Bitácora
+    @JsonBackReference
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Bitacora> bitacoras;
 
     // Relación con Post
+    @JsonBackReference
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Post> posts;
 

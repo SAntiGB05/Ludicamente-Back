@@ -1,6 +1,8 @@
 package com.ludicamente.Ludicamente.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 
@@ -24,6 +26,7 @@ public class Acudiente {
     @Column(name = "correo_acudiente", length = 100, unique = true)
     private String correo;
 
+    @JsonIgnore
     @Column(name = "contraseña_acudiente", length = 255)
     private String contraseña;
 
@@ -37,6 +40,7 @@ public class Acudiente {
     @Column(name = "direccion_acudiente", length = 50)
     private String direccion;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "acudiente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Niño> niños;
 
