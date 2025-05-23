@@ -57,10 +57,34 @@ public class PasswordResetService {
         tokenRepository.save(token);
 
 
-        String link = "http://localhost:8080/reset-password?token=" + token.getToken();
-        String mensaje = "Haz clic en el siguiente enlace para restablecer tu contraseña:\n\n" + link;
+        // Crear el enlace
+        String link = "http://localhost:5173/resetPassword?token=" + token.getToken();
 
-        emailService.enviarCorreo(email, "Restablece tu contraseña", mensaje);
+        // Crear HTML para el botón
+        String mensajeHtml = """
+            <html>
+              <body style="font-family: Arial, sans-serif;">
+                <p>Hola,</p>
+                <p>Haz clic en el siguiente botón para restablecer tu contraseña:</p>
+                <a href="%s" style="
+                    display: inline-block;
+                    padding: 10px 20px;
+                    margin-top: 10px;
+                    background-color: #cd7e4e;
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    font-weight: bold;
+                ">
+                  Cambiar contraseña
+                </a>
+                <p style="margin-top:20px;">Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
+              </body>
+            </html>
+        """.formatted(link);
+
+        // Enviar el correo con formato HTML
+        emailService.enviarCorreoHtml(email, "Restablece tu contraseña", mensajeHtml);
 
         return token;
 
