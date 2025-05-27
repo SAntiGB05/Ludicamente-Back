@@ -58,11 +58,15 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage.toString());
         }
 
+
         try {
             return ResponseEntity.ok(authenticationService.registerAcudiente(request));
         } catch (IllegalArgumentException e) {
             // Maneja el error cuando ya existe un correo
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(e.getMessage()));
+        } catch (Exception e) {
+            e.printStackTrace(); // MUY IMPORTANTE para ver qué exactamente está fallando
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new AuthResponse("Error en el servidor: " + e.getMessage()));
         }
     }
 
