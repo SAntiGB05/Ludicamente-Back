@@ -1,19 +1,26 @@
 package com.ludicamente.Ludicamente.auth;
 
 import com.ludicamente.Ludicamente.dto.NiñoDto;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
 public class RegisterAcudienteRequest {
 
-    private String cedulaAcudiente;
-    private String nombreAcudiente;
-    private String correoAcudiente;
-    private String contraseñaAcudiente;
-    private String telefonoAcudiente;
-    private String parentesco;
 
+    @NotBlank(message = "El nombre del acudiente es obligatorio")
+    private String nombreAcudiente;
+    @Email(message = "El correo debe ser válido")
+    @NotBlank(message = "El correo es obligatorio")
+    private String correoAcudiente;
+    @NotBlank(message = "La contraseña es obligatoria")
+    private String contraseñaAcudiente;
+    @NotBlank(message = "La cédula es obligatoria")
+    private String cedulaAcudiente;
+    private String parentesco;
+    private String telefonoAcudiente;
     @NotEmpty(message = "Debe registrar al menos un niño")
     private List<NiñoDto> niños;
 
