@@ -149,6 +149,32 @@ public class AuthenticationService {
         throw new UsernameNotFoundException("Correo no registrado");
     }
 
+// Agrega esto al final de tu clase AuthenticationService
+
+    public boolean checkIfUserExistsByEmail(String email) {
+        return acudienteRepository.findByCorreo(email).isPresent() ||
+                empleadoRepository.findByCorreo(email).isPresent();
+    }
+
+    public AuthResponse authenticateWithGoogle(String email) {
+        // Intentar encontrar primero al acudiente
+        Optional<Acudiente> acudienteOpt = acudienteRepository.findByCorreo(email);
+        if (acudienteOpt.isPresent()) {
+            AcudienteUserDetails acudienteUserDetails = new AcudienteUserDetails(acudienteOpt.get());
+            String token = jwtService.generateToken(acudienteUserDetails);
+            return new AuthResponse(token);
+        }
+
+        // Si no, buscar en empleados
+        Optional<Empleado> empleadoOpt = empleadoRepository.findByCorreo(email);
+        if (empleadoOpt.isPresent()) {
+            EmpleadoUserDetails empleadoUserDetails = new EmpleadoUserDetails(empleadoOpt.get());
+            String token = jwtService.generateToken(empleadoUserDetails);
+            return new AuthResponse(token);
+        }
+
+        throw new UsernameNotFoundException("Correo no registrado en el sistema");
+    }
 
 
 
