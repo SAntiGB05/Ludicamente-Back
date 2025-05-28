@@ -1,7 +1,7 @@
 package com.ludicamente.Ludicamente.config;
 
-import com.ludicamente.Ludicamente.auth.userdetails.AcudienteDetailsService;
-import com.ludicamente.Ludicamente.auth.userdetails.EmpleadoDetailsService;
+import com.ludicamente.Ludicamente.auth.userdetails.CompositeUserDetailsService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,11 +11,14 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.*;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
@@ -23,40 +26,30 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final AcudienteDetailsService acudienteDetailsService;
-    private final EmpleadoDetailsService empleadoDetailsService;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CompositeUserDetailsService compositeUserDetailsService;
+    private final JwtService jwtService;
 
-    public SecurityConfig(AcudienteDetailsService acudienteDetailsService,
-                          EmpleadoDetailsService empleadoDetailsService,
-                          JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.acudienteDetailsService = acudienteDetailsService;
-        this.empleadoDetailsService = empleadoDetailsService;
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    public SecurityConfig(CompositeUserDetailsService compositeUserDetailsService, JwtService jwtService) {
+        this.compositeUserDetailsService = compositeUserDetailsService;
+        this.jwtService = jwtService;
     }
 
     @Bean
-    public DaoAuthenticationProvider empleadoAuthProvider() {
+    public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(empleadoDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
-
-    @Bean
-    public DaoAuthenticationProvider acudienteAuthProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(acudienteDetailsService);
+        provider.setUserDetailsService(compositeUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return new ProviderManager(
-                acudienteAuthProvider(),
-                empleadoAuthProvider()
-        );
+        return new ProviderManager(authenticationProvider());
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtService, compositeUserDetailsService);
     }
 
     @Bean
@@ -71,20 +64,18 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-
-    // ✅ Configuración CORS corregida
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // 👈 Frontend local
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true); // Solo se permite con origen específico
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
