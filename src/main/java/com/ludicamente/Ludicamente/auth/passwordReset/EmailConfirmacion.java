@@ -21,16 +21,26 @@ public class EmailConfirmacion {
         helper.setSubject("🎉 ¡Bienvenida a Ludicamente, " + nombre + "! 🎉");
         helper.setFrom("sofi.hoyos.2509@gmail.com");
 
-        String htmlContent = "<html><body>" +
-                "<h2>¡Hola " + nombre + "!</h2>" +
-                "<p>Gracias por registrarte en <strong>Ludicamente</strong>.</p>" +
-                "<p>Ya puedes empezar a disfrutar de nuestra plataforma educativa.</p>" +
-                "<p>Si tienes dudas o necesitas ayuda, no dudes en escribirnos.</p>" +
-                "<br>" +
-                "<p>Con cariño,</p>" +
-                "<p>El equipo de Ludicamente</p>" +
-                "<p><a href='https://ludicamente.com'>www.ludicamente.com</a></p>" +
-                "</body></html>";
+        String htmlContent = """
+        <html>
+        <head>
+        <meta charset='UTF-8'>
+        </head>
+        <body style='font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;'>
+        <div style='max-width: 600px; margin: auto; background-color: #ffffff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);'>
+            <h2 style='color: #4CAF50;'>¡Hola " + nombre + "!</h2>
+            <p style='font-size: 16px; color: #333;'>Gracias por registrarte en <strong>Lúdicamente</strong>.</p>
+            <p style='font-size: 16px; color: #333;'>Ya puedes empezar a disfrutar de nuestra plataforma educativa.</p>
+            <p style='font-size: 16px; color: #333;'>Si tienes dudas o necesitas ayuda, no dudes en escribirnos.</p>
+            <br>
+            <p style='font-size: 16px; color: #333;'>Con cariño,</p>
+            <p style='font-size: 16px; color: #333;'>El equipo de <strong>Lúdicamente</strong></p>
+        </div>
+        </body>
+        </html>
+        """;
+
+
 
         helper.setText(htmlContent, true);
         mailSender.send(message);

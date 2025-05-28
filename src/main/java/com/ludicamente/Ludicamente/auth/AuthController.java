@@ -1,7 +1,9 @@
 package com.ludicamente.Ludicamente.auth;
 
+import com.ludicamente.Ludicamente.auth.passwordReset.EmailConfirmacion;
 import com.ludicamente.Ludicamente.auth.passwordReset.PasswordResetService;
 import com.ludicamente.Ludicamente.model.PasswordResetToken;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth") // URL base para autenticación
 public class AuthController {
+
+    @Autowired
+    private EmailConfirmacion emailConfirmacion;
+
 
     private final AuthenticationService authenticationService;
 
@@ -50,7 +56,6 @@ public class AuthController {
     @PostMapping("/register/acudiente")
     public ResponseEntity<?> registerAcudiente(@RequestBody @Valid RegisterAcudienteRequest request, BindingResult result) {
         if (result.hasErrors()) {
-            // Maneja los errores de validación de la solicitud
             StringBuilder errorMessage = new StringBuilder();
             for (ObjectError error : result.getAllErrors()) {
                 errorMessage.append(error.getDefaultMessage()).append(" ");
@@ -59,12 +64,20 @@ public class AuthController {
         }
 
         try {
-            return ResponseEntity.ok(authenticationService.registerAcudiente(request));
+            // Registrar al acudiente
+            AuthResponse response = authenticationService.registerAcudiente(request);
+
+            // Enviar correo de bienvenida después del registro exitoso
+            emailConfirmacion.enviarCorreoBienvenida(request.getCorreoAcudiente(), request.getNombreAcudiente());
+
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            // Maneja el error cuando ya existe un correo
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(e.getMessage()));
+        } catch (MessagingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar el correo: " + e.getMessage());
         }
     }
+
 
     // Endpoint para registrar un Empleado
     @PostMapping("/register/empleado")
@@ -75,6 +88,7 @@ public class AuthController {
             for (ObjectError error : result.getAllErrors()) {
                 errorMessage.append(error.getDefaultMessage()).append(" ");
             }
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage.toString());
         }
 
@@ -110,4 +124,5 @@ public class AuthController {
         passwordResetService.resetPassword(token, newPassword);
         return ResponseEntity.ok("Contraseña restablecida correctamente.");
     }
+
 }
