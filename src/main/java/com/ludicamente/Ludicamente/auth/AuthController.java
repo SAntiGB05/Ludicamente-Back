@@ -56,6 +56,7 @@ public class AuthController {
     @PostMapping("/register/acudiente")
     public ResponseEntity<?> registerAcudiente(@RequestBody @Valid RegisterAcudienteRequest request, BindingResult result) {
         if (result.hasErrors()) {
+            // Maneja los errores de validación de la solicitud
             StringBuilder errorMessage = new StringBuilder();
             for (ObjectError error : result.getAllErrors()) {
                 errorMessage.append(error.getDefaultMessage()).append(" ");
@@ -88,7 +89,6 @@ public class AuthController {
             for (ObjectError error : result.getAllErrors()) {
                 errorMessage.append(error.getDefaultMessage()).append(" ");
             }
-
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage.toString());
         }
 
@@ -124,5 +124,4 @@ public class AuthController {
         passwordResetService.resetPassword(token, newPassword);
         return ResponseEntity.ok("Contraseña restablecida correctamente.");
     }
-
 }
