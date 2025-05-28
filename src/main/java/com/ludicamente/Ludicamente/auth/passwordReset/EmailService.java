@@ -56,7 +56,7 @@ public class EmailService {
 
     public void sendVerificationCode(String email) {
         String code = String.valueOf(new Random().nextInt(900000) + 100000);
-        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(5);
+        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(1);
 
         verificationCodes.put(email, new VerificationCodeData(code, expirationTime));
 
