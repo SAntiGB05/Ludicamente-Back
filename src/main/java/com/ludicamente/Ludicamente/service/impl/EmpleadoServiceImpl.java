@@ -1,5 +1,6 @@
 package com.ludicamente.Ludicamente.service.impl;
 
+import com.ludicamente.Ludicamente.model.Acudiente;
 import com.ludicamente.Ludicamente.model.Empleado;
 import com.ludicamente.Ludicamente.repository.EmpleadoRepository;
 import com.ludicamente.Ludicamente.service.EmpleadoService;
@@ -81,5 +82,11 @@ public class EmpleadoServiceImpl implements EmpleadoService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Empleado obtenerEmpleadoPorCorreo(String correo) {
+        return empleadoRepository.findByCorreo(correo)
+                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con correo: " + correo));
     }
 }
