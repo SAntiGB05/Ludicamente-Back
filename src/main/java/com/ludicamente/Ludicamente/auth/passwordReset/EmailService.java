@@ -1,5 +1,6 @@
 package com.ludicamente.Ludicamente.auth.passwordReset;
 
+import com.ludicamente.Ludicamente.dto.VerificationCodeData;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,11 +9,20 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 public class EmailService {
 
     @Autowired
     private JavaMailSender mailSender;
+    // En emailService
+    private final Map<String, VerificationCodeData> verificationCodes = new ConcurrentHashMap<>();
+
 
     // Correo de texto plano
     public void enviarCorreo(String destinatario, String asunto, String cuerpo) {
@@ -41,4 +51,43 @@ public class EmailService {
             throw new RuntimeException("Error al enviar el correo HTML", e);
         }
     }
+
+
+
+    public void sendVerificationCode(String email) {
+        String code = String.valueOf(new Random().nextInt(900000) + 100000);
+        LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(1);
+
+        verificationCodes.put(email, new VerificationCodeData(code, expirationTime));
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Código de verificación");
+        message.setText("Tu código de verificación es: " + code);
+
+        mailSender.send(message);
+    }
+
+
+
+
+    public boolean verifyCode(String email, String code) {
+        VerificationCodeData data = verificationCodes.get(email);
+
+        if (data == null) return false;
+
+        if (LocalDateTime.now().isAfter(data.getExpirationTime())) {
+            verificationCodes.remove(email);
+            return false;
+        }
+
+        boolean isValid = data.getCode().equals(code);
+
+        if (isValid) {
+            verificationCodes.remove(email);
+        }
+
+        return isValid;
+    }
+
 }
