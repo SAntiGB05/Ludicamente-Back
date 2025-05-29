@@ -42,6 +42,20 @@ public class AcudienteController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'ACUDIENTE')")
+    @PutMapping
+    public ResponseEntity<Acudiente> updateAcudienteAuthenticated(@RequestBody Acudiente acudienteDetails) throws AccessDeniedException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.getPrincipal() instanceof AcudienteUserDetails acudienteUserDetails) {
+            Acudiente acudiente = acudienteUserDetails.getAcudiente();
+            Acudiente actualizado = acudienteService.actualizarAcudiente(acudiente.getIdAcudiente(), acudienteDetails);
+            return ResponseEntity.ok(actualizado);
+        } else {
+            return ResponseEntity.status(403).build();
+        }
+    }
+
+
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACUDIENTE')")
     @GetMapping("/correo/{correo}")
     public ResponseEntity<Acudiente> getAcudienteByCorreo(@PathVariable String correo, Authentication authentication) {
         // Verificar que el correo solicitado coincide con el usuario autenticado
