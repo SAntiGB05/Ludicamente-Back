@@ -12,14 +12,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
 
-@Component
+// Sin @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
@@ -36,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public JwtAuthenticationFilter(JwtService jwtService, UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+        logger.debug("UserDetailsService inyectado: {}", userDetailsService.getClass().getName());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        SecurityContextHolder.clearContext(); // Limpia el contexto en cada request
+        SecurityContextHolder.clearContext();
 
         try {
             String token = extractTokenFromRequest(request);
@@ -63,15 +63,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (JwtException | UsernameNotFoundException e) {
-            handleAuthenticationError(response, "Invalid authentication: " + e.getMessage());
+            logger.warn("Invalid authentication: {}", e.getMessage());
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         } catch (Exception e) {
-            handleAuthenticationError(response, "Authentication failed: " + e.getMessage());
+            logger.warn("Authentication failed: {}", e.getMessage());
+            SecurityContextHolder.clearContext();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
     }
 
     private void authenticateWithToken(String token) {
         String username = jwtService.extractUsername(token);
+        logger.debug("Username extracted from token: {}", username);
         var userDetails = userDetailsService.loadUserByUsername(username);
+        logger.debug("UserDetails loaded: {}, roles: {}", userDetails.getUsername(), userDetails.getAuthorities());
 
         if (!jwtService.isTokenValid(token, userDetails)) {
             throw new JwtException("Invalid token");
@@ -93,11 +99,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
         return null;
-    }
-
-    private void handleAuthenticationError(HttpServletResponse response, String message) throws IOException {
-        logger.warn(message);
-        SecurityContextHolder.clearContext();
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, message);
     }
 }
