@@ -5,8 +5,10 @@ import java.util.List;
 
 public interface AcudienteService {
     List<Acudiente> listarAcudientes();
+    Acudiente obtenerAcudientePorCedula(String cedula);
     Acudiente obtenerAcudientePorCorreo(String correo); // Cambiado de obtenerAcudientePorId
     Acudiente guardarAcudiente(Acudiente acudiente);
     Acudiente actualizarAcudiente(Integer id, Acudiente acudienteDetails);
     void eliminarAcudiente(Integer id);
+
 }

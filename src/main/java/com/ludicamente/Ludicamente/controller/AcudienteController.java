@@ -30,6 +30,17 @@ public class AcudienteController {
         return acudienteService.listarAcudientes();
     }
 
+    @PreAuthorize("hasRole('ADMIN')") // Solo para ADMIN
+    @GetMapping("/cedula/{cedula}")
+    public ResponseEntity<Acudiente> getAcudienteByCedula(@PathVariable String cedula) {
+        try {
+            Acudiente acudiente = acudienteService.obtenerAcudientePorCedula(cedula); // Necesitas implementar este método en el servicio
+            return ResponseEntity.ok(acudiente);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).build(); // 404 Not Found
+        }
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'ACUDIENTE')")
     @GetMapping("/correo/{correo}")
     public ResponseEntity<Acudiente> getAcudienteByCorreo(@PathVariable String correo, Authentication authentication) {

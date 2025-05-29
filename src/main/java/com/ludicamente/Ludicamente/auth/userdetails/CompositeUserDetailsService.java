@@ -20,11 +20,11 @@ public class CompositeUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
-            return acudienteDetailsService.loadUserByUsername(username);
+            return empleadoDetailsService.loadUserByUsername(username);
         } catch (UsernameNotFoundException e) {
             // Log para depuración
             logger.debug("No se encontró acudiente con correo: {}", username);
-            return empleadoDetailsService.loadUserByUsername(username);
+            return acudienteDetailsService.loadUserByUsername(username);
         }
     }
 

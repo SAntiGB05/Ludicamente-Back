@@ -19,6 +19,11 @@ public class AcudienteServiceImpl implements AcudienteService {
         return acudienteRepository.findAll();
     }
 
+    public Acudiente obtenerAcudientePorCedula(String cedula) {
+        return acudienteRepository.findByCedula(cedula)
+                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con cédula: " + cedula));
+    }
+
     @Override
     public Acudiente obtenerAcudientePorCorreo(String correo) {
         return acudienteRepository.findByCorreo(correo)
