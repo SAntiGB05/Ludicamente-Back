@@ -20,9 +20,9 @@ public class AcudienteServiceImpl implements AcudienteService {
     }
 
     @Override
-    public Acudiente obtenerAcudientePorId(Integer id) {
-        return acudienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con id: " + id));
+    public Acudiente obtenerAcudientePorCorreo(String correo) {
+        return acudienteRepository.findByCorreo(correo)
+                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con correo: " + correo));
     }
 
     @Override

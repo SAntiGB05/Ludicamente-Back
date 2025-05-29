@@ -1,10 +1,12 @@
 package com.ludicamente.Ludicamente.auth;
 
 import com.ludicamente.Ludicamente.auth.passwordReset.EmailService;
+import com.ludicamente.Ludicamente.auth.passwordReset.EmailConfirmacion;
 import com.ludicamente.Ludicamente.auth.passwordReset.PasswordResetService;
 import com.ludicamente.Ludicamente.dto.EmailRequest;
 import com.ludicamente.Ludicamente.dto.VerificationRequest;
 import com.ludicamente.Ludicamente.model.PasswordResetToken;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,7 @@ public class AuthController {
 
     @Autowired
     private EmailService emailService;
-
+    private EmailConfirmacion emailConfirmacion;
     private final AuthenticationService authenticationService;
 
     public AuthController(AuthenticationService authenticationService) {
@@ -65,12 +67,20 @@ public class AuthController {
         }
 
         try {
-            return ResponseEntity.ok(authenticationService.registerAcudiente(request));
+            // Registrar al acudiente
+            AuthResponse response = authenticationService.registerAcudiente(request);
+
+            // Enviar correo de bienvenida después del registro exitoso
+            emailConfirmacion.enviarCorreoBienvenida(request.getCorreoAcudiente(), request.getNombreAcudiente());
+
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            // Maneja el error cuando ya existe un correo
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AuthResponse(e.getMessage()));
+        } catch (MessagingException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al enviar el correo: " + e.getMessage());
         }
     }
+
 
     // Endpoint para registrar un Empleado
     @PostMapping("/register/empleado")
