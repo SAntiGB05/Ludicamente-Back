@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface AcudienteRepository extends JpaRepository<Acudiente, Integer> {
     Optional<Acudiente> findByCorreo(String correo);
+    Optional<Acudiente> findByCedula(String cedula);
 }
