@@ -1,7 +1,10 @@
 package com.ludicamente.Ludicamente.auth;
 
+import com.ludicamente.Ludicamente.auth.passwordReset.EmailService;
 import com.ludicamente.Ludicamente.auth.passwordReset.EmailConfirmacion;
 import com.ludicamente.Ludicamente.auth.passwordReset.PasswordResetService;
+import com.ludicamente.Ludicamente.dto.EmailRequest;
+import com.ludicamente.Ludicamente.dto.VerificationRequest;
 import com.ludicamente.Ludicamente.model.PasswordResetToken;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
@@ -23,9 +26,8 @@ import java.util.Map;
 public class AuthController {
 
     @Autowired
+    private EmailService emailService;
     private EmailConfirmacion emailConfirmacion;
-
-
     private final AuthenticationService authenticationService;
 
     public AuthController(AuthenticationService authenticationService) {
@@ -123,5 +125,20 @@ public class AuthController {
 
         passwordResetService.resetPassword(token, newPassword);
         return ResponseEntity.ok("Contraseña restablecida correctamente.");
+    }
+    @PostMapping("/send-verification-email")
+    public ResponseEntity<?> sendVerification(@RequestBody EmailRequest request) {
+        emailService.sendVerificationCode(request.getEmail());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/verify-code")
+    public ResponseEntity<?> verifyCode(@RequestBody VerificationRequest req) {
+        boolean valid = emailService.verifyCode(req.getEmail(), req.getCode());
+        if (valid) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.badRequest().body("Código inválido o expirado");
+        }
     }
 }
