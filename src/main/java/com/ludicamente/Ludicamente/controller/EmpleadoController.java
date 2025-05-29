@@ -81,6 +81,8 @@ public class EmpleadoController {
         return empleado.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+
+
     // Eliminar un empleado
     @Operation(summary = "Eliminar un empleado")
     @ApiResponses(value = {
