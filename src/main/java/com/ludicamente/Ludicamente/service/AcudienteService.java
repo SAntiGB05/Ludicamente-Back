@@ -1,5 +1,6 @@
 package com.ludicamente.Ludicamente.service;
 
+import com.ludicamente.Ludicamente.auth.RegisterAcudienteRequest;
 import com.ludicamente.Ludicamente.model.Acudiente;
 import java.util.List;
 
@@ -10,5 +11,6 @@ public interface AcudienteService {
     Acudiente guardarAcudiente(Acudiente acudiente);
     Acudiente actualizarAcudiente(Integer id, Acudiente acudienteDetails);
     void eliminarAcudiente(Integer id);
+    Acudiente registrarAcudienteConNiños(RegisterAcudienteRequest request);
 
 }
