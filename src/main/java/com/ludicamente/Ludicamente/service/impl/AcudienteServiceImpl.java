@@ -1,6 +1,7 @@
 package com.ludicamente.Ludicamente.service.impl;
 
 import com.ludicamente.Ludicamente.config.JwtService;
+import com.ludicamente.Ludicamente.dto.AcudienteDto;
 import com.ludicamente.Ludicamente.model.Acudiente;
 import com.ludicamente.Ludicamente.model.Niño;
 import com.ludicamente.Ludicamente.repository.AcudienteRepository;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Service
 public class AcudienteServiceImpl implements AcudienteService {
 
+    @Autowired
     private final EmpleadoRepository empleadoRepository;
     private final AcudienteRepository acudienteRepository;
     private final PasswordEncoder passwordEncoder;
@@ -62,11 +64,32 @@ public class AcudienteServiceImpl implements AcudienteService {
         Acudiente acudiente = acudienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con id: " + id));
 
-        // Actualizar solo nombre, teléfono y parentesco
         acudiente.setNombre(acudienteDetails.getNombre());
+        acudiente.setCedula(acudienteDetails.getCedula());
+        acudiente.setCorreo(acudienteDetails.getCorreo());
+        acudiente.setContraseña(acudienteDetails.getContraseña());
+        acudiente.setTelefono(acudienteDetails.getTelefono());
+        acudiente.setParentesco(acudienteDetails.getParentesco());
+        acudiente.setDireccion(acudienteDetails.getDireccion());
+
+        return acudienteRepository.save(acudiente);
+    }
+
+    @Override
+    @Transactional
+    public Acudiente actualizarAcudienteAdmin(Integer id, AcudienteDto acudienteDetails) {
+        // Verificar si el acudiente existe
+        Acudiente acudiente = acudienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con ID: " + id));
+
+        // Mapear los datos del DTO a la entidad
+        acudiente.setCedula(acudienteDetails.getCedula());
+        acudiente.setNombre(acudienteDetails.getNombre());
+        acudiente.setCorreo(acudienteDetails.getCorreo());
         acudiente.setTelefono(acudienteDetails.getTelefono());
         acudiente.setParentesco(acudienteDetails.getParentesco());
 
+        // Guardar los cambios
         return acudienteRepository.save(acudiente);
     }
 
