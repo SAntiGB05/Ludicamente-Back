@@ -2,6 +2,7 @@ package com.ludicamente.Ludicamente.controller;
 
 import com.ludicamente.Ludicamente.auth.RegisterAcudienteRequest;
 import com.ludicamente.Ludicamente.auth.userdetails.AcudienteUserDetails;
+import com.ludicamente.Ludicamente.dto.AcudienteDto;
 import com.ludicamente.Ludicamente.model.Acudiente;
 import com.ludicamente.Ludicamente.service.AcudienteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,6 +56,13 @@ public class AcudienteController {
         } else {
             return ResponseEntity.status(403).build();
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<Acudiente> updateAcudienteByAdmin(@PathVariable Integer id, @Valid @RequestBody AcudienteDto acudienteDetails) {
+        Acudiente actualizado = acudienteService.actualizarAcudienteAdmin(id, acudienteDetails);
+        return ResponseEntity.ok(actualizado);
     }
 
 
