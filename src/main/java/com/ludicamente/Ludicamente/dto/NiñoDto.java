@@ -33,7 +33,9 @@ public class NiñoDto {
     @NotNull(message = "Debe estar asociado a un acudiente")
     private Integer idAcudiente;
 
-
+    private String  nombreAcudiente;
+    private String parentescoAcudiente;
+    private String telefonoAcudiente;
 
     public NiñoDto() {
     }
@@ -47,9 +49,34 @@ public class NiñoDto {
         this.edad = edad;
         this.foto = foto;
         this.idAcudiente = idAcudiente;
+
     }
 
     // === Getters y Setters ===
+
+    public String getNombreAcudiente() {
+        return nombreAcudiente;
+    }
+
+    public void setNombreAcudiente(String nombreAcudiente) {
+        this.nombreAcudiente = nombreAcudiente;
+    }
+
+    public String getParentescoAcudiente() {
+        return parentescoAcudiente;
+    }
+
+    public void setParentescoAcudiente(String parentescoAcudiente) {
+        this.parentescoAcudiente = parentescoAcudiente;
+    }
+
+    public String getTelefonoAcudiente() {
+        return telefonoAcudiente;
+    }
+
+    public void setTelefonoAcudiente(String telefonoAcudiente) {
+        this.telefonoAcudiente = telefonoAcudiente;
+    }
 
     public Integer getIdNiño() {
         return idNiño;

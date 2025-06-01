@@ -91,9 +91,19 @@ public class NiñoServiceImpl implements NiñoService {
     }
 
     private NiñoDto convertirADto(Niño niño) {
-        Integer idAcudiente = (niño.getAcudiente() != null) ? niño.getAcudiente().getIdAcudiente() : null;
+        Integer idAcudiente = null;
+        String nombreAcudiente = null;
+        String parentescoAcudiente = null;
+        String telefonoAcudiente = null;
 
-        return new NiñoDto(
+        if (niño.getAcudiente() != null) {
+            idAcudiente = niño.getAcudiente().getIdAcudiente();
+            nombreAcudiente = niño.getAcudiente().getNombre();
+            parentescoAcudiente = niño.getAcudiente().getParentesco();
+            telefonoAcudiente = niño.getAcudiente().getTelefono();
+        }
+
+        NiñoDto dto = new NiñoDto(
                 niño.getIdNiño(),
                 niño.getNombre(),
                 niño.getnIdentificacion(),
@@ -103,6 +113,13 @@ public class NiñoServiceImpl implements NiñoService {
                 niño.getFoto(),
                 idAcudiente
         );
+
+        // Agregar los campos nuevos
+        dto.setNombreAcudiente(nombreAcudiente);
+        dto.setParentescoAcudiente(parentescoAcudiente);
+        dto.setTelefonoAcudiente(telefonoAcudiente);
+
+        return dto;
     }
 
     private Niño convertirADominio(NiñoDto dto) {
@@ -114,6 +131,7 @@ public class NiñoServiceImpl implements NiñoService {
         niño.setFechaNacimiento(dto.getFechaNacimiento());
         niño.setEdad(dto.getEdad());
         niño.setFoto(dto.getFoto());
+
 
         if (dto.getIdAcudiente() != null) {
             Optional<Acudiente> acudienteOpt = acudienteRepository.findById(dto.getIdAcudiente());
