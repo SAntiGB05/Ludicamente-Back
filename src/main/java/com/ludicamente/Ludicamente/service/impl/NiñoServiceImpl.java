@@ -36,6 +36,14 @@ public class NiñoServiceImpl implements NiñoService {
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<NiñoDto> listarTodosLosNiños() {
+        System.out.println(">>> LISTANDO TODOS LOS NIÑOS (admin/empleado)");
+        List<Niño> niños = niñoRepository.findAll();
+        System.out.println("NIÑOS ENCONTRADOS (ADMIN/EMPLEADO): " + niños.size());
+        return niños.stream().map(this::convertirADto).collect(Collectors.toList());
+    }
     @Override
     public List<NiñoDto> listarNiñosPorCorreoAcudiente(String correoAcudiente) {
         Optional<Acudiente> acudienteOpt = acudienteRepository.findByCorreo(correoAcudiente);

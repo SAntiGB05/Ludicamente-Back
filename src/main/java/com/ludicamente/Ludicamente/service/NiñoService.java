@@ -12,4 +12,5 @@ public interface NiñoService {
     List<NiñoDto> listarNiñosPorAcudiente(Integer idAcudiente);
     Optional<NiñoDto> actualizarNiño(Integer id, NiñoDto niñoActualizado);
     boolean eliminarNiño(Integer id);
+    List<NiñoDto> listarTodosLosNiños();
 }
