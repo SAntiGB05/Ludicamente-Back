@@ -5,6 +5,15 @@ public class BitacoraDto {
     private String descripcionGeneral;
     private String oportunidades;
     private String debilidades;
+
+    public Boolean getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Boolean estado) {
+        this.estado = estado;
+    }
+
     private String amenazas;
     private String fortalezas;
     private String objetivos;
@@ -12,7 +21,7 @@ public class BitacoraDto {
     private String seguimiento;
     private String historialActividad;
     private Integer idEmpleado; // ID del empleado relacionado
-
+    private Boolean estado;
     public String getDescripcionGeneral() {
         return descripcionGeneral;
     }

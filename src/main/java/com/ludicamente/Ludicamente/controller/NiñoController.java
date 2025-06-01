@@ -1,11 +1,13 @@
 package com.ludicamente.Ludicamente.controller;
 
-import com.ludicamente.Ludicamente.model.Niño;
+import com.ludicamente.Ludicamente.auth.AuthenticationService;
+import com.ludicamente.Ludicamente.dto.NiñoDto;
 import com.ludicamente.Ludicamente.service.NiñoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +29,8 @@ public class NiñoController {
             @ApiResponse(responseCode = "400", description = "Error en los datos de entrada")
     })
     @PostMapping
-    public ResponseEntity<Niño> crearNiño(@RequestBody Niño niño) {
-        Niño nuevoNiño = niñoService.crearNiño(niño);
+    public ResponseEntity<NiñoDto> crearNiño(@RequestBody NiñoDto niñoDto) {
+        NiñoDto nuevoNiño = niñoService.crearNiño(niñoDto);
         return ResponseEntity.status(201).body(nuevoNiño);
     }
 
@@ -37,9 +39,18 @@ public class NiñoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de niños obtenida exitosamente")
     })
+
     @GetMapping
-    public ResponseEntity<List<Niño>> listarNiños() {
-        List<Niño> niños = niñoService.listarNiños();
+    public ResponseEntity<List<NiñoDto>> listarNiños(Authentication authentication) {
+        String correo = authentication.getName(); // sebaspro7767@gmail.com
+        List<NiñoDto> niños = niñoService.listarNiñosPorCorreoAcudiente(correo);
+        return ResponseEntity.ok(niños);
+    }
+
+
+    @GetMapping(params = "acudiente")
+    public ResponseEntity<List<NiñoDto>> listarNiñosPorAcudiente(@RequestParam("acudiente") Integer idAcudiente) {
+        List<NiñoDto> niños = niñoService.listarNiñosPorAcudiente(idAcudiente);
         return ResponseEntity.ok(niños);
     }
 
@@ -50,12 +61,12 @@ public class NiñoController {
             @ApiResponse(responseCode = "404", description = "Niño no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Niño> actualizarNiño(
+    public ResponseEntity<NiñoDto> actualizarNiño(
             @Parameter(description = "ID del niño a actualizar", example = "1")
             @PathVariable Integer id,
-            @RequestBody Niño niñoActualizado) {
+            @RequestBody NiñoDto niñoActualizado) {
 
-        Optional<Niño> niño = niñoService.actualizarNiño(id, niñoActualizado);
+        Optional<NiñoDto> niño = niñoService.actualizarNiño(id, niñoActualizado);
         return niño.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
