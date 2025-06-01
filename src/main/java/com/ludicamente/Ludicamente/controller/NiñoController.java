@@ -10,8 +10,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,12 +42,25 @@ public class NiñoController {
             @ApiResponse(responseCode = "200", description = "Lista de niños obtenida exitosamente")
     })
 
+
     @GetMapping
     public ResponseEntity<List<NiñoDto>> listarNiños(Authentication authentication) {
-        String correo = authentication.getName(); // sebaspro7767@gmail.com
-        List<NiñoDto> niños = niñoService.listarNiñosPorCorreoAcudiente(correo);
-        return ResponseEntity.ok(niños);
+        String correo = authentication.getName();
+
+        Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
+        roles.forEach(r -> System.out.println("ROL DETECTADO: " + r.getAuthority()));
+
+        boolean esAdmin = roles.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        boolean esEmpleado = roles.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_STAFF"));
+
+        if (esAdmin || esEmpleado) {
+            System.out.println(">>> LISTANDO TODOS LOS NIÑOS (admin/empleado)");
+            return ResponseEntity.ok(niñoService.listarTodosLosNiños());
+        }
+
+        return ResponseEntity.ok(niñoService.listarNiñosPorCorreoAcudiente(correo));
     }
+
 
 
     @GetMapping(params = "acudiente")
