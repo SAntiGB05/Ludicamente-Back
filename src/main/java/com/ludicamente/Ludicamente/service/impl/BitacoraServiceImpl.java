@@ -1,11 +1,14 @@
 package com.ludicamente.Ludicamente.service.impl;
 
 import com.ludicamente.Ludicamente.model.Bitacora;
+import com.ludicamente.Ludicamente.model.Niño;
 import com.ludicamente.Ludicamente.repository.BitacoraRepository;
+import com.ludicamente.Ludicamente.repository.NiñoRepository;
 import com.ludicamente.Ludicamente.service.BitacoraService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,20 +16,36 @@ import java.util.Optional;
 public class BitacoraServiceImpl implements BitacoraService {
 
     private final BitacoraRepository bitacoraRepository;
+    @Autowired
+    private NiñoRepository niñoRepository;
 
     @Autowired
     public BitacoraServiceImpl(BitacoraRepository bitacoraRepository) {
         this.bitacoraRepository = bitacoraRepository;
     }
 
-    @Override
-    public Bitacora crearBitacora(Bitacora bitacora) {
-        return bitacoraRepository.save(bitacora);
-    }
 
     @Override
     public List<Bitacora> listarBitacoras() {
         return bitacoraRepository.findAll();
+    }
+
+    @Override
+    public List<Bitacora> findByNiñoAndEstadoTrue(Integer idNiño) {
+        Optional<Niño> niñoOptional = niñoRepository.findById(idNiño);
+        if (niñoOptional.isPresent()) {
+            return bitacoraRepository.findByNiñoAndEstadoTrue(niñoOptional.get());
+        } else {
+            return Collections.emptyList(); // o lanzar excepción si prefieres
+        }
+    }
+
+    @Override
+    public Bitacora crearBitacora(Bitacora bitacora) {
+        // Establecer estado por defecto como activo
+        bitacora.setEstado(true);
+
+        return bitacoraRepository.save(bitacora);
     }
 
     @Override

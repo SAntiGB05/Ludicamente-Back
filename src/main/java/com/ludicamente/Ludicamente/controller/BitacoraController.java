@@ -44,6 +44,15 @@ public class BitacoraController {
         return ResponseEntity.ok(bitacoras);
     }
 
+    @PreAuthorize("hasAnyRole('ROL_ACUDIENTE','ROL_ADMIN')")
+    @Operation(summary = "Obtener bitácoras activas de un niño")
+    @GetMapping("/niño/{idNiño}")
+    public ResponseEntity<List<Bitacora>> listarBitacorasPorNiño(
+            @PathVariable Integer idNiño) {
+        List<Bitacora> bitacoras = bitacoraService.findByNiñoAndEstadoTrue(idNiño);
+        return ResponseEntity.ok(bitacoras);
+    }
+
     @PreAuthorize("hasAnyRole('ROL_ADMIN')")
 
     @Operation(summary = "Actualizar una bitácora existente")
