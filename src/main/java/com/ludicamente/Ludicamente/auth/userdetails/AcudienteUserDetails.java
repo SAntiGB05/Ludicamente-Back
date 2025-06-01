@@ -16,6 +16,7 @@ public class AcudienteUserDetails implements UserDetails {
         this.acudiente = acudiente;
     }
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_ACUDIENTE"));

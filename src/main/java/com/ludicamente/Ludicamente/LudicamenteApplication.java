@@ -6,7 +6,7 @@
 	import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 	@SpringBootApplication
-	@EnableJpaRepositories("com.ludicamente.Ludicamente.repository")
+	@EnableJpaRepositories("com.ludicamente.Ludicamente.repository")   
 	@EntityScan(basePackages = "com.ludicamente.Ludicamente.model")
 
 	public class LudicamenteApplication {
