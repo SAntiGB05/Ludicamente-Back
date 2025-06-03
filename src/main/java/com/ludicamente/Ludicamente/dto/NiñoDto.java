@@ -1,19 +1,44 @@
 package com.ludicamente.Ludicamente.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 import java.util.Date;
 
 public class NiñoDto {
 
     private Integer idNiño;
+
+    @NotBlank(message = "El nombre no puede estar vacío")
+    @Size(max = 50, message = "El nombre debe tener como máximo 50 caracteres")
     private String nombre;
+
+    @NotBlank(message = "El número de identificación es obligatorio")
     private String nIdentificacion;
+
+    @NotBlank(message = "El sexo es obligatorio")
     private String sexo;
+
+    @NotNull(message = "La fecha de nacimiento es obligatoria")
     private Date fechaNacimiento;
+
+    @NotNull(message = "La edad es obligatoria")
+    @Min(value = 0, message = "La edad debe ser positiva")
     private Integer edad;
+
     private String foto;
+
+    @NotNull(message = "Debe estar asociado a un acudiente")
     private Integer idAcudiente;
 
-    // === Constructores ===
+    private String  nombreAcudiente;
+    private String parentescoAcudiente;
+    private String telefonoAcudiente;
+    private Boolean bitacoraActiva;
+
+
 
     public NiñoDto() {
     }
@@ -27,9 +52,41 @@ public class NiñoDto {
         this.edad = edad;
         this.foto = foto;
         this.idAcudiente = idAcudiente;
+
     }
 
     // === Getters y Setters ===
+
+    public Boolean getBitacoraActiva() {
+        return bitacoraActiva;
+    }
+
+    public void setBitacoraActiva(Boolean bitacoraActiva) {
+        this.bitacoraActiva = bitacoraActiva;
+    }
+    public String getNombreAcudiente() {
+        return nombreAcudiente;
+    }
+
+    public void setNombreAcudiente(String nombreAcudiente) {
+        this.nombreAcudiente = nombreAcudiente;
+    }
+
+    public String getParentescoAcudiente() {
+        return parentescoAcudiente;
+    }
+
+    public void setParentescoAcudiente(String parentescoAcudiente) {
+        this.parentescoAcudiente = parentescoAcudiente;
+    }
+
+    public String getTelefonoAcudiente() {
+        return telefonoAcudiente;
+    }
+
+    public void setTelefonoAcudiente(String telefonoAcudiente) {
+        this.telefonoAcudiente = telefonoAcudiente;
+    }
 
     public Integer getIdNiño() {
         return idNiño;
