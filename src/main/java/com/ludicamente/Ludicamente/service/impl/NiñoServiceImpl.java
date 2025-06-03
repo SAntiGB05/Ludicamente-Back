@@ -1,9 +1,12 @@
 package com.ludicamente.Ludicamente.service.impl;
 
+import com.ludicamente.Ludicamente.dto.BitacoraDto;
 import com.ludicamente.Ludicamente.dto.NiñoDto;
 import com.ludicamente.Ludicamente.model.Acudiente;
+import com.ludicamente.Ludicamente.model.Bitacora;
 import com.ludicamente.Ludicamente.model.Niño;
 import com.ludicamente.Ludicamente.repository.AcudienteRepository;
+import com.ludicamente.Ludicamente.repository.BitacoraRepository;
 import com.ludicamente.Ludicamente.repository.NiñoRepository;
 import com.ludicamente.Ludicamente.service.NiñoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,9 @@ public class NiñoServiceImpl implements NiñoService {
 
     @Autowired
     private AcudienteRepository acudienteRepository;
+
+    @Autowired
+    private BitacoraRepository bitacoraRepository;
 
     @Override
     public NiñoDto crearNiño(NiñoDto niñoDto) {
@@ -114,13 +120,18 @@ public class NiñoServiceImpl implements NiñoService {
                 idAcudiente
         );
 
-        // Agregar los campos nuevos
         dto.setNombreAcudiente(nombreAcudiente);
         dto.setParentescoAcudiente(parentescoAcudiente);
         dto.setTelefonoAcudiente(telefonoAcudiente);
 
+        // Verificar si tiene bitácora activa
+        List<Bitacora> bitacorasActivas = bitacoraRepository.findByNiñoAndEstadoTrue(niño);
+        boolean tieneBitacoraActiva = !bitacorasActivas.isEmpty();
+        dto.setBitacoraActiva(tieneBitacoraActiva);
+
         return dto;
     }
+
 
     private Niño convertirADominio(NiñoDto dto) {
         Niño niño = new Niño();

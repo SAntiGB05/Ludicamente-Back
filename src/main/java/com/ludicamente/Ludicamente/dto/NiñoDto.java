@@ -36,6 +36,9 @@ public class NiñoDto {
     private String  nombreAcudiente;
     private String parentescoAcudiente;
     private String telefonoAcudiente;
+    private Boolean bitacoraActiva;
+
+
 
     public NiñoDto() {
     }
@@ -54,6 +57,13 @@ public class NiñoDto {
 
     // === Getters y Setters ===
 
+    public Boolean getBitacoraActiva() {
+        return bitacoraActiva;
+    }
+
+    public void setBitacoraActiva(Boolean bitacoraActiva) {
+        this.bitacoraActiva = bitacoraActiva;
+    }
     public String getNombreAcudiente() {
         return nombreAcudiente;
     }

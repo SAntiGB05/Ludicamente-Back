@@ -5,15 +5,6 @@ public class BitacoraDto {
     private String descripcionGeneral;
     private String oportunidades;
     private String debilidades;
-
-    public Boolean getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Boolean estado) {
-        this.estado = estado;
-    }
-
     private String amenazas;
     private String fortalezas;
     private String objetivos;
@@ -22,6 +13,35 @@ public class BitacoraDto {
     private String historialActividad;
     private Integer idEmpleado; // ID del empleado relacionado
     private Boolean estado;
+    private Integer idNiño;
+    private Integer codBitacora;
+
+
+
+
+    public Integer getCodBitacora() {
+        return codBitacora;
+    }
+
+    public void setCodBitacora(Integer codBitacora) {
+        this.codBitacora = codBitacora;
+    }
+
+    public Integer getIdNiño() {
+        return idNiño;
+    }
+
+    public void setIdNiño(Integer idNiño) {
+        this.idNiño = idNiño;
+    }
+
+    public Boolean getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Boolean estado) {
+        this.estado = estado;
+    }
     public String getDescripcionGeneral() {
         return descripcionGeneral;
     }
