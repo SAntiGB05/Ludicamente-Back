@@ -12,6 +12,10 @@ import com.ludicamente.Ludicamente.service.NiñoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,6 +54,7 @@ public class NiñoServiceImpl implements NiñoService {
         System.out.println("NIÑOS ENCONTRADOS (ADMIN/EMPLEADO): " + niños.size());
         return niños.stream().map(this::convertirADto).collect(Collectors.toList());
     }
+
     @Override
     public List<NiñoDto> listarNiñosPorCorreoAcudiente(String correoAcudiente) {
         Optional<Acudiente> acudienteOpt = acudienteRepository.findByCorreo(correoAcudiente);
@@ -63,17 +68,16 @@ public class NiñoServiceImpl implements NiñoService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     public Optional<NiñoDto> actualizarNiño(Integer id, NiñoDto niñoDto) {
         Optional<Niño> niñoExistente = niñoRepository.findById(id);
+
         if (niñoExistente.isPresent()) {
             Niño niño = niñoExistente.get();
             niño.setNombre(niñoDto.getNombre());
             niño.setnIdentificacion(niñoDto.getnIdentificacion());
             niño.setSexo(niñoDto.getSexo());
             niño.setFechaNacimiento(niñoDto.getFechaNacimiento());
-            niño.setEdad(niñoDto.getEdad());
             niño.setFoto(niñoDto.getFoto());
 
             if (niñoDto.getIdAcudiente() != null) {
@@ -96,6 +100,15 @@ public class NiñoServiceImpl implements NiñoService {
         return false;
     }
 
+    // ✅ Método para calcular la edad desde la fecha de nacimiento
+    private int calcularEdad(Date fechaNacimiento) {
+        LocalDate fecha = fechaNacimiento.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+        return Period.between(fecha, LocalDate.now()).getYears();
+    }
+
+    // ✅ Convertir entidad Niño a DTO, calculando edad automáticamente
     private NiñoDto convertirADto(Niño niño) {
         Integer idAcudiente = null;
         String nombreAcudiente = null;
@@ -109,13 +122,15 @@ public class NiñoServiceImpl implements NiñoService {
             telefonoAcudiente = niño.getAcudiente().getTelefono();
         }
 
+        int edadCalculada = calcularEdad(niño.getFechaNacimiento());
+
         NiñoDto dto = new NiñoDto(
                 niño.getIdNiño(),
                 niño.getNombre(),
                 niño.getnIdentificacion(),
                 niño.getSexo(),
                 niño.getFechaNacimiento(),
-                niño.getEdad(),
+                edadCalculada, // 👈 Edad calculada aquí
                 niño.getFoto(),
                 idAcudiente
         );
@@ -124,15 +139,13 @@ public class NiñoServiceImpl implements NiñoService {
         dto.setParentescoAcudiente(parentescoAcudiente);
         dto.setTelefonoAcudiente(telefonoAcudiente);
 
-        // Verificar si tiene bitácora activa
         List<Bitacora> bitacorasActivas = bitacoraRepository.findByNiñoAndEstadoTrue(niño);
-        boolean tieneBitacoraActiva = !bitacorasActivas.isEmpty();
-        dto.setBitacoraActiva(tieneBitacoraActiva);
+        dto.setBitacoraActiva(!bitacorasActivas.isEmpty());
 
         return dto;
     }
 
-
+    // ✅ Convertir DTO a entidad Niño, sin establecer edad manualmente
     private Niño convertirADominio(NiñoDto dto) {
         Niño niño = new Niño();
         niño.setIdNiño(dto.getIdNiño());
@@ -140,9 +153,9 @@ public class NiñoServiceImpl implements NiñoService {
         niño.setnIdentificacion(dto.getnIdentificacion());
         niño.setSexo(dto.getSexo());
         niño.setFechaNacimiento(dto.getFechaNacimiento());
-        niño.setEdad(dto.getEdad());
         niño.setFoto(dto.getFoto());
 
+        // ❌ No se establece la edad manualmente
 
         if (dto.getIdAcudiente() != null) {
             Optional<Acudiente> acudienteOpt = acudienteRepository.findById(dto.getIdAcudiente());
