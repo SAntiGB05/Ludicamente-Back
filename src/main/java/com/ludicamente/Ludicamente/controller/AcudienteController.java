@@ -1,6 +1,7 @@
 package com.ludicamente.Ludicamente.controller;
 
 import com.ludicamente.Ludicamente.auth.userdetails.AcudienteUserDetails;
+import com.ludicamente.Ludicamente.dto.AcudienteDto;
 import com.ludicamente.Ludicamente.model.Acudiente;
 import com.ludicamente.Ludicamente.service.AcudienteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,12 +24,20 @@ public class AcudienteController {
     @Autowired
     private AcudienteService acudienteService;
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
     @Operation(summary = "Listar acudientes")
-    @GetMapping
-    public List<Acudiente> listarAcudientes() {
-        return acudienteService.listarAcudientes();
+    @GetMapping("/listado")
+    public List<AcudienteDto> listarAcudientes() {
+        return acudienteService.listarAcudientes().stream()
+                .map(a -> new AcudienteDto(
+                        a.getIdAcudiente(),
+                        a.getNombre(),
+                        a.getCedula()
+                ))
+                .toList();
     }
+
+
 
     @PreAuthorize("hasRole('ADMIN')") // Solo para ADMIN
     @GetMapping("/cedula/{cedula}")

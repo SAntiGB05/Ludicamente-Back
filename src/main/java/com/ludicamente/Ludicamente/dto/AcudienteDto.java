@@ -21,6 +21,16 @@ public class AcudienteDto {
         this.nombre = nombre;
         this.cedula = cedula;
     }
+    // En AcudienteDto.java
+    public AcudienteDto(Integer idAcudiente, String nombre, String cedula) {
+        this.idAcudiente = idAcudiente;
+        this.nombre = nombre;
+        this.cedula = cedula;
+    }
+
+
+    public AcudienteDto() {
+    }
 
     public Integer getIdAcudiente() {
         return idAcudiente;
