@@ -1,11 +1,14 @@
 package com.ludicamente.Ludicamente.controller;
 
+import com.ludicamente.Ludicamente.dto.BitacoraDto;
+import com.ludicamente.Ludicamente.mapper.BitacoraMapper;
 import com.ludicamente.Ludicamente.model.Bitacora;
 import com.ludicamente.Ludicamente.service.BitacoraService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,16 +24,28 @@ public class BitacoraController {
     @Autowired
     private BitacoraService bitacoraService;
 
-    @PreAuthorize("hasAnyRole('ROL_ADMIN','RON_ACUDIENTE')")
+    @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_ACUDIENTE')")
     @Operation(summary = "Crear una nueva bitácora")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Bitácora creada exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos de entrada")
     })
     @PostMapping
-    public ResponseEntity<Bitacora> crearBitacora(@RequestBody Bitacora bitacora) {
-        Bitacora nuevaBitacora = bitacoraService.crearBitacora(bitacora);
-        return ResponseEntity.status(201).body(nuevaBitacora);
+    public ResponseEntity<BitacoraDto> crearBitacora(@Valid @RequestBody BitacoraDto dto) {
+        Bitacora nueva = bitacoraService.crearBitacoraDesdeDto(dto);
+        return ResponseEntity.status(201).body(BitacoraMapper.toDto(nueva));
+    }
+
+    @PreAuthorize("hasAnyRole('ROL_ACUDIENTE','ROL_ADMIN')")
+    @Operation(summary = "Obtener bitácoras activas de un niño")
+    @GetMapping("/niño/{idNiño}")
+    public ResponseEntity<List<BitacoraDto>> listarBitacorasPorNiño(
+            @PathVariable Integer idNiño) {
+        List<Bitacora> bitacoras = bitacoraService.findByNiñoAndEstadoTrue(idNiño);
+        List<BitacoraDto> dtos = bitacoras.stream()
+                .map(BitacoraMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @PreAuthorize("hasAnyRole('ROL_ADMIN')")
@@ -39,22 +54,17 @@ public class BitacoraController {
             @ApiResponse(responseCode = "200", description = "Lista de bitácoras obtenida exitosamente")
     })
     @GetMapping
-    public ResponseEntity<List<Bitacora>> listarBitacoras() {
+    public ResponseEntity<List<BitacoraDto>> listarBitacoras() {
         List<Bitacora> bitacoras = bitacoraService.listarBitacoras();
-        return ResponseEntity.ok(bitacoras);
+        List<BitacoraDto> dtos = bitacoras.stream()
+                .map(BitacoraMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
-    @PreAuthorize("hasAnyRole('ROL_ACUDIENTE','ROL_ADMIN')")
-    @Operation(summary = "Obtener bitácoras activas de un niño")
-    @GetMapping("/niño/{idNiño}")
-    public ResponseEntity<List<Bitacora>> listarBitacorasPorNiño(
-            @PathVariable Integer idNiño) {
-        List<Bitacora> bitacoras = bitacoraService.findByNiñoAndEstadoTrue(idNiño);
-        return ResponseEntity.ok(bitacoras);
-    }
+
 
     @PreAuthorize("hasAnyRole('ROL_ADMIN')")
-
     @Operation(summary = "Actualizar una bitácora existente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Bitácora actualizada exitosamente"),

@@ -1,8 +1,11 @@
 package com.ludicamente.Ludicamente.service.impl;
 
+import com.ludicamente.Ludicamente.dto.BitacoraDto;
+import com.ludicamente.Ludicamente.mapper.BitacoraMapper;
 import com.ludicamente.Ludicamente.model.Bitacora;
 import com.ludicamente.Ludicamente.model.Niño;
 import com.ludicamente.Ludicamente.repository.BitacoraRepository;
+import com.ludicamente.Ludicamente.repository.EmpleadoRepository;
 import com.ludicamente.Ludicamente.repository.NiñoRepository;
 import com.ludicamente.Ludicamente.service.BitacoraService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +19,32 @@ import java.util.Optional;
 public class BitacoraServiceImpl implements BitacoraService {
 
     private final BitacoraRepository bitacoraRepository;
+
     @Autowired
     private NiñoRepository niñoRepository;
+
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
 
     @Autowired
     public BitacoraServiceImpl(BitacoraRepository bitacoraRepository) {
         this.bitacoraRepository = bitacoraRepository;
     }
 
+    @Override
+    public Bitacora crearBitacoraDesdeDto(BitacoraDto dto) {
+        Bitacora bitacora = BitacoraMapper.toEntity(dto);
+
+        if (dto.getIdEmpleado() != null) {
+            bitacora.setEmpleado(empleadoRepository.findById(dto.getIdEmpleado()).orElse(null));
+        }
+
+        if (dto.getIdNiño() != null) {
+            bitacora.setNiño(niñoRepository.findById(dto.getIdNiño()).orElse(null));
+        }
+
+        return bitacoraRepository.save(bitacora);
+    }
 
     @Override
     public List<Bitacora> listarBitacoras() {
@@ -40,13 +61,7 @@ public class BitacoraServiceImpl implements BitacoraService {
         }
     }
 
-    @Override
-    public Bitacora crearBitacora(Bitacora bitacora) {
-        // Establecer estado por defecto como activo
-        bitacora.setEstado(true);
 
-        return bitacoraRepository.save(bitacora);
-    }
 
     @Override
     public Optional<Bitacora> actualizarBitacora(Integer id, Bitacora bitacoraActualizada) {

@@ -91,6 +91,7 @@ public class NiñoController {
             @ApiResponse(responseCode = "204", description = "Niño eliminado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Niño no encontrado")
     })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarNiño(
             @Parameter(description = "ID del niño a eliminar", example = "1")
