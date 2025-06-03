@@ -1,12 +1,16 @@
 package com.ludicamente.Ludicamente.service;
 
+import com.ludicamente.Ludicamente.dto.NiñoDto;
 import com.ludicamente.Ludicamente.model.Niño;
+
 import java.util.List;
 import java.util.Optional;
 
 public interface NiñoService {
-    Niño crearNiño(Niño niño);
-    List<Niño> listarNiños();
-    Optional<Niño> actualizarNiño(Integer id, Niño niñoActualizado);
+    NiñoDto crearNiño(NiñoDto niñoDto);
+    List<NiñoDto> listarNiñosPorCorreoAcudiente(String correoAcudiente);
+    List<NiñoDto> listarNiñosPorAcudiente(Integer idAcudiente);
+    Optional<NiñoDto> actualizarNiño(Integer id, NiñoDto niñoActualizado);
     boolean eliminarNiño(Integer id);
+    List<NiñoDto> listarTodosLosNiños();
 }
