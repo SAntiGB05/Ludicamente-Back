@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Date;
 
 public class NiñoDto {
@@ -24,7 +26,6 @@ public class NiñoDto {
     @NotNull(message = "La fecha de nacimiento es obligatoria")
     private Date fechaNacimiento;
 
-    @NotNull(message = "La edad es obligatoria")
     @Min(value = 0, message = "La edad debe ser positiva")
     private Integer edad;
 
@@ -37,7 +38,6 @@ public class NiñoDto {
     private String parentescoAcudiente;
     private String telefonoAcudiente;
     private Boolean bitacoraActiva;
-
 
 
     public NiñoDto() {
