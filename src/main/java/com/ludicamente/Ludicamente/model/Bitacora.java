@@ -2,6 +2,9 @@ package com.ludicamente.Ludicamente.model;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "bitacora")
 public class Bitacora {
@@ -10,6 +13,9 @@ public class Bitacora {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cod_bitacora")
     private Integer codBitacora;
+
+    @Column(name = "Ingrese el titulo de la bitacora", columnDefinition = "TEXT")
+    private  String titulo;
 
     @Column(name = "descripcion_general", columnDefinition = "TEXT")
     private String descripcionGeneral;
@@ -32,16 +38,11 @@ public class Bitacora {
     @Column(columnDefinition = "TEXT")
     private String habilidades;
 
+    @Column(name = "fecha_creacion")
+    private LocalDate fechaCreacion;
+
     @Column(columnDefinition = "TEXT")
     private String seguimiento;
-
-    public Niño getNiño() {
-        return niño;
-    }
-
-    public void setNiño(Niño niño) {
-        this.niño = niño;
-    }
 
     @Column(name = "historial_actividad", columnDefinition = "TEXT")
     private String historialActividad;
@@ -57,6 +58,38 @@ public class Bitacora {
 
     // Getters y Setters
 
+
+    public LocalDate getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDate fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (fechaCreacion == null) {
+            fechaCreacion = LocalDate.now();
+        }
+    }
+
+    public Niño getNiño() {
+        return niño;
+    }
+
+    public void setNiño(Niño niño) {
+        this.niño = niño;
+    }
+
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
     public Boolean getEstado() {
         return estado;
     }

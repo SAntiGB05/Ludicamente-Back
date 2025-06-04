@@ -1,5 +1,7 @@
 package com.ludicamente.Ludicamente.dto;
 
+import java.time.LocalDate;
+
 public class BitacoraDto {
 
     private String descripcionGeneral;
@@ -15,9 +17,29 @@ public class BitacoraDto {
     private Boolean estado;
     private Integer idNiño;
     private Integer codBitacora;
+    private  String titulo;
+    private LocalDate fechaCreacion;
 
 
 
+
+    public LocalDate getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDate fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
 
     public Integer getCodBitacora() {
         return codBitacora;
