@@ -7,6 +7,8 @@ public class BitacoraMapper {
 
     public static BitacoraDto toDto(Bitacora b) {
         BitacoraDto dto = new BitacoraDto();
+        dto.setTitulo(b.getTitulo());
+        dto.setFechaCreacion(b.getFechaCreacion());
         dto.setCodBitacora(b.getCodBitacora());
         dto.setDescripcionGeneral(b.getDescripcionGeneral());
         dto.setOportunidades(b.getOportunidades());

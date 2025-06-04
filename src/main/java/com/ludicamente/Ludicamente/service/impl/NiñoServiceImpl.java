@@ -1,6 +1,5 @@
 package com.ludicamente.Ludicamente.service.impl;
 
-import com.ludicamente.Ludicamente.dto.BitacoraDto;
 import com.ludicamente.Ludicamente.dto.NiñoDto;
 import com.ludicamente.Ludicamente.model.Acudiente;
 import com.ludicamente.Ludicamente.model.Bitacora;
@@ -36,6 +35,13 @@ public class NiñoServiceImpl implements NiñoService {
     public NiñoDto crearNiño(NiñoDto niñoDto) {
         Niño niño = convertirADominio(niñoDto);
         Niño niñoGuardado = niñoRepository.save(niño);
+
+        Bitacora bitacoraInicial = new Bitacora();
+        bitacoraInicial.setTitulo("Bitácora inicial");
+        bitacoraInicial.setEstado(true); // activa
+        bitacoraInicial.setNiño(niñoGuardado);
+        bitacoraInicial.setFechaCreacion(LocalDate.now()); // Asegúrate de tener este campo en la entidad
+        bitacoraRepository.save(bitacoraInicial);
         return convertirADto(niñoGuardado);
     }
 
@@ -52,14 +58,16 @@ public class NiñoServiceImpl implements NiñoService {
         System.out.println(">>> LISTANDO TODOS LOS NIÑOS (admin/empleado)");
         List<Niño> niños = niñoRepository.findAll();
         System.out.println("NIÑOS ENCONTRADOS (ADMIN/EMPLEADO): " + niños.size());
-        return niños.stream().map(this::convertirADto).collect(Collectors.toList());
+        return niños.stream()
+                .map(this::convertirADto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<NiñoDto> listarNiñosPorCorreoAcudiente(String correoAcudiente) {
         Optional<Acudiente> acudienteOpt = acudienteRepository.findByCorreo(correoAcudiente);
         if (acudienteOpt.isEmpty()) {
-            return List.of(); // o lanzar excepción
+            return List.of(); // O podrías lanzar una excepción personalizada
         }
         Acudiente acudiente = acudienteOpt.get();
         List<Niño> niños = niñoRepository.findByAcudienteIdAcudiente(acudiente.getIdAcudiente());
@@ -71,13 +79,13 @@ public class NiñoServiceImpl implements NiñoService {
     @Override
     public Optional<NiñoDto> actualizarNiño(Integer id, NiñoDto niñoDto) {
         Optional<Niño> niñoExistente = niñoRepository.findById(id);
-
         if (niñoExistente.isPresent()) {
             Niño niño = niñoExistente.get();
             niño.setNombre(niñoDto.getNombre());
             niño.setnIdentificacion(niñoDto.getnIdentificacion());
             niño.setSexo(niñoDto.getSexo());
             niño.setFechaNacimiento(niñoDto.getFechaNacimiento());
+            niño.setEdad(calcularEdad(niñoDto.getFechaNacimiento()));
             niño.setFoto(niñoDto.getFoto());
 
             if (niñoDto.getIdAcudiente() != null) {
@@ -100,7 +108,6 @@ public class NiñoServiceImpl implements NiñoService {
         return false;
     }
 
-    // ✅ Método para calcular la edad desde la fecha de nacimiento
     private int calcularEdad(Date fechaNacimiento) {
         LocalDate fecha = fechaNacimiento.toInstant()
                 .atZone(ZoneId.systemDefault())
@@ -108,7 +115,6 @@ public class NiñoServiceImpl implements NiñoService {
         return Period.between(fecha, LocalDate.now()).getYears();
     }
 
-    // ✅ Convertir entidad Niño a DTO, calculando edad automáticamente
     private NiñoDto convertirADto(Niño niño) {
         Integer idAcudiente = null;
         String nombreAcudiente = null;
@@ -122,15 +128,13 @@ public class NiñoServiceImpl implements NiñoService {
             telefonoAcudiente = niño.getAcudiente().getTelefono();
         }
 
-        int edadCalculada = calcularEdad(niño.getFechaNacimiento());
-
         NiñoDto dto = new NiñoDto(
                 niño.getIdNiño(),
                 niño.getNombre(),
                 niño.getnIdentificacion(),
                 niño.getSexo(),
                 niño.getFechaNacimiento(),
-                edadCalculada, // 👈 Edad calculada aquí
+                niño.getEdad(),
                 niño.getFoto(),
                 idAcudiente
         );
@@ -139,13 +143,13 @@ public class NiñoServiceImpl implements NiñoService {
         dto.setParentescoAcudiente(parentescoAcudiente);
         dto.setTelefonoAcudiente(telefonoAcudiente);
 
+        // Verificar si tiene bitácora activa
         List<Bitacora> bitacorasActivas = bitacoraRepository.findByNiñoAndEstadoTrue(niño);
         dto.setBitacoraActiva(!bitacorasActivas.isEmpty());
 
         return dto;
     }
 
-    // ✅ Convertir DTO a entidad Niño, sin establecer edad manualmente
     private Niño convertirADominio(NiñoDto dto) {
         Niño niño = new Niño();
         niño.setIdNiño(dto.getIdNiño());
@@ -154,12 +158,12 @@ public class NiñoServiceImpl implements NiñoService {
         niño.setSexo(dto.getSexo());
         niño.setFechaNacimiento(dto.getFechaNacimiento());
         niño.setFoto(dto.getFoto());
+        niño.setEdad(calcularEdad(dto.getFechaNacimiento()));
 
-        // ❌ No se establece la edad manualmente
 
         if (dto.getIdAcudiente() != null) {
-            Optional<Acudiente> acudienteOpt = acudienteRepository.findById(dto.getIdAcudiente());
-            acudienteOpt.ifPresent(niño::setAcudiente);
+            acudienteRepository.findById(dto.getIdAcudiente())
+                    .ifPresent(niño::setAcudiente);
         }
 
         return niño;

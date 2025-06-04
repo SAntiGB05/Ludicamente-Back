@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BitacoraServiceImpl implements BitacoraService {
@@ -45,6 +46,18 @@ public class BitacoraServiceImpl implements BitacoraService {
 
         return bitacoraRepository.save(bitacora);
     }
+    @Override
+    public List<BitacoraDto> obtenerHistorialPorNiño(Integer idNiño) {
+        Optional<Niño> niñoOpt = niñoRepository.findById(idNiño);
+        if (niñoOpt.isEmpty()) return List.of();
+
+        List<Bitacora> bitacoras = bitacoraRepository.findByNiñoAndEstadoTrue(niñoOpt.get());
+        return bitacoras.stream()
+                .map(BitacoraMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+
 
     @Override
     public List<Bitacora> listarBitacoras() {
@@ -64,11 +77,12 @@ public class BitacoraServiceImpl implements BitacoraService {
 
 
     @Override
-    public Optional<Bitacora> actualizarBitacora(Integer id, Bitacora bitacoraActualizada) {
-        Optional<Bitacora> bitacoraExistente = bitacoraRepository.findById(id);
+    public Optional<Bitacora> actualizarBitacora(Integer idBitacora, Bitacora bitacoraActualizada) {
+        Optional<Bitacora> bitacoraExistente = bitacoraRepository.findById(idBitacora);
         if (bitacoraExistente.isPresent()) {
             Bitacora bitacora = bitacoraExistente.get();
 
+            // Set campos a actualizar
             bitacora.setDescripcionGeneral(bitacoraActualizada.getDescripcionGeneral());
             bitacora.setOportunidades(bitacoraActualizada.getOportunidades());
             bitacora.setDebilidades(bitacoraActualizada.getDebilidades());
@@ -85,13 +99,20 @@ public class BitacoraServiceImpl implements BitacoraService {
         return Optional.empty();
     }
 
-
     @Override
-    public boolean eliminarBitacora(Integer id) {
-        if (bitacoraRepository.existsById(id)) {
-            bitacoraRepository.deleteById(id);
-            return true;
+    public Optional<Bitacora> archivarBitacora(Integer idBitacora) {
+        Optional<Bitacora> bitacoraOpt = bitacoraRepository.findById(idBitacora);
+        if (bitacoraOpt.isPresent()) {
+            Bitacora bitacora = bitacoraOpt.get();
+            bitacora.setEstado(false); // Marcar como inactiva
+            return Optional.of(bitacoraRepository.save(bitacora));
         }
-        return false;
+        return Optional.empty();
     }
+
+
+
+
+
+
 }

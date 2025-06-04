@@ -10,8 +10,10 @@ import java.util.Optional;
 public interface BitacoraService {
     Bitacora crearBitacoraDesdeDto(BitacoraDto dto);
     List<Bitacora> listarBitacoras();
-    Optional<Bitacora> actualizarBitacora(Integer id, Bitacora bitacoraActualizada);
-    boolean eliminarBitacora(Integer id);
+    Optional<Bitacora> actualizarBitacora(Integer idNiño, Bitacora bitacoraActualizada);
     List<Bitacora> findByNiñoAndEstadoTrue(Integer idNiño);
+    Optional<Bitacora> archivarBitacora(Integer idBitacora);
+    List<BitacoraDto> obtenerHistorialPorNiño(Integer idNiño);
+
 
 }
