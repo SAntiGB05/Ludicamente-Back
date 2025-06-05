@@ -10,6 +10,7 @@ public class AcudienteDto {
     private String parentesco;
     private String direccion;
 
+
     public AcudienteDto(Integer idAcudiente, String direccion, String parentesco, String telefono, String contraseña, String correo, String nombre, String cedula) {
         this.idAcudiente = idAcudiente;
         this.direccion = direccion;
@@ -19,6 +20,16 @@ public class AcudienteDto {
         this.correo = correo;
         this.nombre = nombre;
         this.cedula = cedula;
+    }
+    // En AcudienteDto.java
+    public AcudienteDto(Integer idAcudiente, String nombre, String cedula) {
+        this.idAcudiente = idAcudiente;
+        this.nombre = nombre;
+        this.cedula = cedula;
+    }
+
+
+    public AcudienteDto() {
     }
 
     public Integer getIdAcudiente() {

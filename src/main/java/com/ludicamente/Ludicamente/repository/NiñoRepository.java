@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface NiñoRepository extends JpaRepository<Niño, Integer> {
-    List<Niño> findByAcudiente_IdAcudiente(Integer idAcudiente);
+    List<Niño> findByAcudienteIdAcudiente(Integer idAcudiente);
 }

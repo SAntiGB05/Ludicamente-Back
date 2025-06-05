@@ -35,14 +35,35 @@ public class Bitacora {
     @Column(columnDefinition = "TEXT")
     private String seguimiento;
 
+    public Niño getNiño() {
+        return niño;
+    }
+
+    public void setNiño(Niño niño) {
+        this.niño = niño;
+    }
+
     @Column(name = "historial_actividad", columnDefinition = "TEXT")
     private String historialActividad;
+
+    private Boolean estado;
+    @ManyToOne
+    @JoinColumn(name = "id_niño")
+    private Niño niño;
 
     @ManyToOne
     @JoinColumn(name = "fkid_empleado", referencedColumnName = "id_empleado")
     private Empleado empleado;
 
     // Getters y Setters
+
+    public Boolean getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Boolean estado) {
+        this.estado = estado;
+    }
 
     public Integer getCodBitacora() {
         return codBitacora;

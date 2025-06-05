@@ -1,15 +1,19 @@
 package com.ludicamente.Ludicamente.controller;
 
-import com.ludicamente.Ludicamente.model.Niño;
+import com.ludicamente.Ludicamente.auth.AuthenticationService;
+import com.ludicamente.Ludicamente.dto.NiñoDto;
 import com.ludicamente.Ludicamente.service.NiñoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +31,8 @@ public class NiñoController {
             @ApiResponse(responseCode = "400", description = "Error en los datos de entrada")
     })
     @PostMapping
-    public ResponseEntity<Niño> crearNiño(@RequestBody Niño niño) {
-        Niño nuevoNiño = niñoService.crearNiño(niño);
+    public ResponseEntity<NiñoDto> crearNiño(@RequestBody NiñoDto niñoDto) {
+        NiñoDto nuevoNiño = niñoService.crearNiño(niñoDto);
         return ResponseEntity.status(201).body(nuevoNiño);
     }
 
@@ -37,9 +41,31 @@ public class NiñoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de niños obtenida exitosamente")
     })
+
+
     @GetMapping
-    public ResponseEntity<List<Niño>> listarNiños() {
-        List<Niño> niños = niñoService.listarNiños();
+    public ResponseEntity<List<NiñoDto>> listarNiños(Authentication authentication) {
+        String correo = authentication.getName();
+
+        Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
+        roles.forEach(r -> System.out.println("ROL DETECTADO: " + r.getAuthority()));
+
+        boolean esAdmin = roles.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        boolean esEmpleado = roles.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_STAFF"));
+
+        if (esAdmin || esEmpleado) {
+            System.out.println(">>> LISTANDO TODOS LOS NIÑOS (admin/empleado)");
+            return ResponseEntity.ok(niñoService.listarTodosLosNiños());
+        }
+
+        return ResponseEntity.ok(niñoService.listarNiñosPorCorreoAcudiente(correo));
+    }
+
+
+
+    @GetMapping(params = "acudiente")
+    public ResponseEntity<List<NiñoDto>> listarNiñosPorAcudiente(@RequestParam("acudiente") Integer idAcudiente) {
+        List<NiñoDto> niños = niñoService.listarNiñosPorAcudiente(idAcudiente);
         return ResponseEntity.ok(niños);
     }
 
@@ -50,12 +76,12 @@ public class NiñoController {
             @ApiResponse(responseCode = "404", description = "Niño no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Niño> actualizarNiño(
+    public ResponseEntity<NiñoDto> actualizarNiño(
             @Parameter(description = "ID del niño a actualizar", example = "1")
             @PathVariable Integer id,
-            @RequestBody Niño niñoActualizado) {
+            @RequestBody NiñoDto niñoActualizado) {
 
-        Optional<Niño> niño = niñoService.actualizarNiño(id, niñoActualizado);
+        Optional<NiñoDto> niño = niñoService.actualizarNiño(id, niñoActualizado);
         return niño.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -65,6 +91,7 @@ public class NiñoController {
             @ApiResponse(responseCode = "204", description = "Niño eliminado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Niño no encontrado")
     })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarNiño(
             @Parameter(description = "ID del niño a eliminar", example = "1")

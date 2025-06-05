@@ -1,5 +1,7 @@
 package com.ludicamente.Ludicamente.config;
 
+import com.ludicamente.Ludicamente.auth.userdetails.AcudienteUserDetails;
+import com.ludicamente.Ludicamente.auth.userdetails.EmpleadoUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
@@ -10,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.SecurityFilterChain;
@@ -45,6 +48,7 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
         return buildToken(new HashMap<>(), userDetails, expirationTime);
+
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
@@ -56,6 +60,13 @@ public class JwtService {
                               long expiration) {
         Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
 
+        // Agregar userId dependiendo del tipo de UserDetails
+        if (userDetails instanceof EmpleadoUserDetails empleadoDetails) {
+            extraClaims.put("userId", empleadoDetails.getEmpleado().getIdEmpleado());
+        } else if (userDetails instanceof AcudienteUserDetails acudienteDetails) {
+            extraClaims.put("userId", acudienteDetails.getAcudiente().getIdAcudiente());
+        }
+
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
@@ -63,10 +74,11 @@ public class JwtService {
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .claim("authorities", authorities.stream()
                         .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList()))
+                        .toList())
                 .signWith(signingKey, SignatureAlgorithm.HS256)
                 .compact();
     }
+
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         try {
