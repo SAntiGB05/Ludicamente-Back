@@ -36,26 +36,34 @@ public class BitacoraServiceImpl implements BitacoraService {
     public Bitacora crearBitacoraDesdeDto(BitacoraDto dto) {
         Bitacora bitacora = BitacoraMapper.toEntity(dto);
 
+        // Validar existencia del niño
+        Niño niño = niñoRepository.findById(dto.getIdNiño())
+                .orElseThrow(() -> new IllegalArgumentException("Niño con ID " + dto.getIdNiño() + " no existe."));
+
+        // Validar existencia del empleado
         if (dto.getIdEmpleado() != null) {
-            bitacora.setEmpleado(empleadoRepository.findById(dto.getIdEmpleado()).orElse(null));
+            bitacora.setEmpleado(
+                    empleadoRepository.findById(dto.getIdEmpleado())
+                            .orElseThrow(() -> new IllegalArgumentException("Empleado con ID " + dto.getIdEmpleado() + " no existe."))
+            );
         }
 
-        if (dto.getIdNiño() != null) {
-            bitacora.setNiño(niñoRepository.findById(dto.getIdNiño()).orElse(null));
-        }
-
+        bitacora.setNiño(niño);
         return bitacoraRepository.save(bitacora);
     }
+
     @Override
     public List<BitacoraDto> obtenerHistorialPorNiño(Integer idNiño) {
-        Optional<Niño> niñoOpt = niñoRepository.findById(idNiño);
-        if (niñoOpt.isEmpty()) return List.of();
+        Niño niño = niñoRepository.findById(idNiño)
+                .orElseThrow(() -> new IllegalArgumentException("Niño con ID " + idNiño + " no existe."));
 
-        List<Bitacora> bitacoras = bitacoraRepository.findByNiñoAndEstadoTrue(niñoOpt.get());
+        List<Bitacora> bitacoras = bitacoraRepository.findByNiñoAndEstadoTrue(niño); // sin filtrar por estado
+
         return bitacoras.stream()
                 .map(BitacoraMapper::toDto)
                 .collect(Collectors.toList());
     }
+
 
 
 
@@ -78,37 +86,61 @@ public class BitacoraServiceImpl implements BitacoraService {
 
     @Override
     public Optional<Bitacora> actualizarBitacora(Integer idBitacora, Bitacora bitacoraActualizada) {
-        Optional<Bitacora> bitacoraExistente = bitacoraRepository.findById(idBitacora);
-        if (bitacoraExistente.isPresent()) {
-            Bitacora bitacora = bitacoraExistente.get();
+        Optional<Bitacora> bitacoraExistenteOpt = bitacoraRepository.findById(idBitacora);
 
-            // Set campos a actualizar
-            bitacora.setDescripcionGeneral(bitacoraActualizada.getDescripcionGeneral());
-            bitacora.setOportunidades(bitacoraActualizada.getOportunidades());
-            bitacora.setDebilidades(bitacoraActualizada.getDebilidades());
-            bitacora.setAmenazas(bitacoraActualizada.getAmenazas());
-            bitacora.setFortalezas(bitacoraActualizada.getFortalezas());
-            bitacora.setObjetivos(bitacoraActualizada.getObjetivos());
-            bitacora.setHabilidades(bitacoraActualizada.getHabilidades());
-            bitacora.setSeguimiento(bitacoraActualizada.getSeguimiento());
-            bitacora.setHistorialActividad(bitacoraActualizada.getHistorialActividad());
-            bitacora.setEmpleado(bitacoraActualizada.getEmpleado());
+        if (bitacoraExistenteOpt.isEmpty()) return Optional.empty();
 
-            return Optional.of(bitacoraRepository.save(bitacora));
+        Bitacora existente = bitacoraExistenteOpt.get();
+
+        if (bitacoraActualizada.getNiño() != null &&
+                !bitacoraActualizada.getNiño().getIdNiño().equals(existente.getNiño().getIdNiño())) {
+            throw new IllegalArgumentException("No se puede cambiar el niño asociado a esta bitácora.");
         }
-        return Optional.empty();
+
+        if (bitacoraActualizada.getEmpleado() != null &&
+                !bitacoraActualizada.getEmpleado().getIdEmpleado().equals(existente.getEmpleado().getIdEmpleado())) {
+            throw new IllegalArgumentException("No se puede cambiar el empleado asociado a esta bitácora.");
+        }
+
+        // 📝 Actualizar campos de contenido
+        existente.setDescripcionGeneral(bitacoraActualizada.getDescripcionGeneral());
+        existente.setOportunidades(bitacoraActualizada.getOportunidades());
+        existente.setDebilidades(bitacoraActualizada.getDebilidades());
+        existente.setAmenazas(bitacoraActualizada.getAmenazas());
+        existente.setFortalezas(bitacoraActualizada.getFortalezas());
+        existente.setObjetivos(bitacoraActualizada.getObjetivos());
+        existente.setHabilidades(bitacoraActualizada.getHabilidades());
+        existente.setSeguimiento(bitacoraActualizada.getSeguimiento());
+        existente.setHistorialActividad(bitacoraActualizada.getHistorialActividad());
+
+        return Optional.of(bitacoraRepository.save(existente));
     }
 
     @Override
     public Optional<Bitacora> archivarBitacora(Integer idBitacora) {
         Optional<Bitacora> bitacoraOpt = bitacoraRepository.findById(idBitacora);
-        if (bitacoraOpt.isPresent()) {
-            Bitacora bitacora = bitacoraOpt.get();
-            bitacora.setEstado(false); // Marcar como inactiva
-            return Optional.of(bitacoraRepository.save(bitacora));
+
+        if (bitacoraOpt.isEmpty()) return Optional.empty();
+
+        Bitacora bitacora = bitacoraOpt.get();
+
+        Niño niñoAsociado = bitacora.getNiño();
+        if (niñoAsociado == null) return Optional.empty();
+
+        // 🔄 Buscar todas las bitácoras activas del mismo niño
+        List<Bitacora> activasDelNiño = bitacoraRepository.findByNiñoAndEstadoTrue(niñoAsociado);
+
+        // ❌ Marcar todas como inactivas
+        for (Bitacora b : activasDelNiño) {
+            b.setEstado(false);
         }
-        return Optional.empty();
+
+        // 💾 Guardar todas las bitácoras actualizadas
+        bitacoraRepository.saveAll(activasDelNiño);
+
+        return Optional.of(bitacora);
     }
+
 
 
 
