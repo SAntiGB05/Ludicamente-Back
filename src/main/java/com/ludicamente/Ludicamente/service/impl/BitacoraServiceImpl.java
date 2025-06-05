@@ -34,18 +34,23 @@ public class BitacoraServiceImpl implements BitacoraService {
         Optional<Bitacora> bitacoraExistente = bitacoraRepository.findById(id);
         if (bitacoraExistente.isPresent()) {
             Bitacora bitacora = bitacoraExistente.get();
-            bitacora.setAccion(bitacoraActualizada.getAccion());
-            bitacora.setTablaAfectada(bitacoraActualizada.getTablaAfectada());
-            bitacora.setIdRegistroAfectado(bitacoraActualizada.getIdRegistroAfectado());
-            bitacora.setDatosAnteriores(bitacoraActualizada.getDatosAnteriores());
-            bitacora.setDatosNuevos(bitacoraActualizada.getDatosNuevos());
-            bitacora.setFechaHora(bitacoraActualizada.getFechaHora());
+
+            bitacora.setDescripcionGeneral(bitacoraActualizada.getDescripcionGeneral());
+            bitacora.setOportunidades(bitacoraActualizada.getOportunidades());
+            bitacora.setDebilidades(bitacoraActualizada.getDebilidades());
+            bitacora.setAmenazas(bitacoraActualizada.getAmenazas());
+            bitacora.setFortalezas(bitacoraActualizada.getFortalezas());
+            bitacora.setObjetivos(bitacoraActualizada.getObjetivos());
+            bitacora.setHabilidades(bitacoraActualizada.getHabilidades());
+            bitacora.setSeguimiento(bitacoraActualizada.getSeguimiento());
+            bitacora.setHistorialActividad(bitacoraActualizada.getHistorialActividad());
             bitacora.setEmpleado(bitacoraActualizada.getEmpleado());
-            bitacora.setIpConexion(bitacoraActualizada.getIpConexion());
+
             return Optional.of(bitacoraRepository.save(bitacora));
         }
         return Optional.empty();
     }
+
 
     @Override
     public boolean eliminarBitacora(Integer id) {

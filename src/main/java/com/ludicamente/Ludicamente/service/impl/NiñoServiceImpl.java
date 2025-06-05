@@ -2,14 +2,13 @@ package com.ludicamente.Ludicamente.service.impl;
 
 import com.ludicamente.Ludicamente.model.Niño;
 import com.ludicamente.Ludicamente.repository.NiñoRepository;
+import com.ludicamente.Ludicamente.service.NiñoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ludicamente.Ludicamente.service.NiñoService;
-
 
 import java.util.List;
 import java.util.Optional;
@@ -53,15 +52,12 @@ public class NiñoServiceImpl implements NiñoService {
         if (niñoExistente.isPresent()) {
             Niño niño = niñoExistente.get();
             niño.setNombre(niñoActualizado.getNombre());
-            niño.setApellido(niñoActualizado.getApellido());
+            niño.setnIdentificacion(niñoActualizado.getnIdentificacion());
             niño.setSexo(niñoActualizado.getSexo());
             niño.setFechaNacimiento(niñoActualizado.getFechaNacimiento());
-            niño.setAlergias(niñoActualizado.getAlergias());
-            niño.setObservaciones(niñoActualizado.getObservaciones());
+            niño.setEdad(niñoActualizado.getEdad());
             niño.setFoto(niñoActualizado.getFoto());
             niño.setAcudiente(niñoActualizado.getAcudiente());
-            niño.setFechaIngreso(niñoActualizado.getFechaIngreso());
-            niño.setGrupoSanguineo(niñoActualizado.getGrupoSanguineo());
             return Optional.of(niñoRepository.save(niño));
         }
         return Optional.empty();

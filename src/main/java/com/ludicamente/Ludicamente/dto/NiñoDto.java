@@ -3,26 +3,33 @@ package com.ludicamente.Ludicamente.dto;
 import java.util.Date;
 
 public class NiñoDto {
+
     private Integer idNiño;
     private String nombre;
+    private String nIdentificacion;
     private String sexo;
     private Date fechaNacimiento;
-    private String observaciones;
+    private Integer edad;
     private String foto;
     private Integer idAcudiente;
 
-    // Getters y setters
-    // Constructor(es)
+    // === Constructores ===
 
-    public NiñoDto(Integer idNiño, String nombre, String sexo, Date fechaNacimiento, String observaciones, String foto, Integer idAcudiente) {
+    public NiñoDto() {
+    }
+
+    public NiñoDto(Integer idNiño, String nombre, String nIdentificacion, String sexo, Date fechaNacimiento, Integer edad, String foto, Integer idAcudiente) {
         this.idNiño = idNiño;
         this.nombre = nombre;
+        this.nIdentificacion = nIdentificacion;
         this.sexo = sexo;
         this.fechaNacimiento = fechaNacimiento;
-        this.observaciones = observaciones;
+        this.edad = edad;
         this.foto = foto;
         this.idAcudiente = idAcudiente;
     }
+
+    // === Getters y Setters ===
 
     public Integer getIdNiño() {
         return idNiño;
@@ -38,6 +45,14 @@ public class NiñoDto {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getnIdentificacion() {
+        return nIdentificacion;
+    }
+
+    public void setnIdentificacion(String nIdentificacion) {
+        this.nIdentificacion = nIdentificacion;
     }
 
     public String getSexo() {
@@ -56,12 +71,12 @@ public class NiñoDto {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    public String getObservaciones() {
-        return observaciones;
+    public Integer getEdad() {
+        return edad;
     }
 
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones;
+    public void setEdad(Integer edad) {
+        this.edad = edad;
     }
 
     public String getFoto() {

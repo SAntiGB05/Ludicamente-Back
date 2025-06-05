@@ -1,10 +1,17 @@
 package com.ludicamente.Ludicamente.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
+
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
+
 
 @Entity
 @Table(name = "empleado")
@@ -21,12 +28,10 @@ public class Empleado {
     @Column(length = 50, nullable = false)
     private String nombre;
 
-    @Column(length = 50, nullable = false)
-    private String apellido;
-
     @Column(nullable = false, length = 100, unique = true)
     private String correo;
 
+    @JsonIgnore
     @Column(nullable = false, length = 255)
     private String contraseña;
 
@@ -40,68 +45,165 @@ public class Empleado {
     @Column(name = "fecha_contratacion", nullable = false)
     private Date fechaContratacion;
 
-    @Column(name = "fecha_nacimiento", nullable = false)
-    private Date fechaNacimiento;
-
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal salario;
 
     @Column(nullable = false, length = 100)
     private String horario;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "nivel_acceso", nullable = false, length = 15)
-    private NivelAcceso nivelAcceso;
-
-    @Column(length = 50)
-    private String especialidad;
-
-    @Column(length = 255)
-    private String foto;
+    @Min(1)
+    @Max(2)
+    @Column(name = "nivel_acceso", nullable = false)
+    private Integer nivelAcceso;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 15)
     private EstadoEmpleado estado = EstadoEmpleado.activo;
 
     // Relación con Facturas
+    @JsonBackReference
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Factura> facturas;
 
     // Relación con Bitácora
+    @JsonBackReference
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Bitacora> bitacoras;
 
     // Relación con Post
+    @JsonBackReference
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Post> posts;
 
-    // Constructor vacío
-    public Empleado() {
+    // ... (el resto de tus imports)
+
+    public Empleado(){
+
     }
 
-    // Constructor completo
-    public Empleado(Integer idEmpleado, String cedula, String nombre, String apellido, String correo, String contraseña,
-                    String telefono, String direccion, Date fechaContratacion, Date fechaNacimiento,
-                    BigDecimal salario, String horario, NivelAcceso nivelAcceso, String especialidad, String foto, EstadoEmpleado estado) {
-        this.idEmpleado = idEmpleado;
-        this.cedula = cedula;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.correo = correo;
-        this.contraseña = contraseña;
-        this.telefono = telefono;
-        this.direccion = direccion;
-        this.fechaContratacion = fechaContratacion;
-        this.fechaNacimiento = fechaNacimiento;
-        this.salario = salario;
-        this.horario = horario;
-        this.nivelAcceso = nivelAcceso;
-        this.especialidad = especialidad;
-        this.foto = foto;
-        this.estado = estado;
-    }
+        // Constructor privado para el Builder
+        private Empleado(Builder builder) {
+            this.idEmpleado = builder.idEmpleado;
+            this.cedula = builder.cedula;
+            this.nombre = builder.nombre;
+            this.correo = builder.correo;
+            this.contraseña = builder.contraseña;
+            this.telefono = builder.telefono;
+            this.direccion = builder.direccion;
+            this.fechaContratacion = builder.fechaContratacion;
+            this.salario = builder.salario;
+            this.horario = builder.horario;
+            this.nivelAcceso = builder.nivelAcceso;
+            this.estado = builder.estado;
+            this.facturas = builder.facturas;
+            this.bitacoras = builder.bitacoras;
+            this.posts = builder.posts;
+        }
 
-    // ======== Getters y Setters ========
+        // Método estático para crear el Builder
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        // Clase Builder interna
+        public static final class Builder {
+            private Integer idEmpleado;
+            private String cedula;
+            private String nombre;
+            private String correo;
+            private String contraseña;
+            private String telefono;
+            private String direccion;
+            private Date fechaContratacion;
+            private BigDecimal salario;
+            private String horario;
+            private Integer nivelAcceso;
+            private EstadoEmpleado estado = EstadoEmpleado.activo;
+            private List<Factura> facturas;
+            private List<Bitacora> bitacoras;
+            private List<Post> posts;
+
+            private Builder() {}
+
+            public Builder idEmpleado(Integer idEmpleado) {
+                this.idEmpleado = idEmpleado;
+                return this;
+            }
+
+            public Builder cedula(String cedula) {
+                this.cedula = cedula;
+                return this;
+            }
+
+            public Builder nombre(String nombre) {
+                this.nombre = nombre;
+                return this;
+            }
+
+            public Builder correo(String correo) {
+                this.correo = correo;
+                return this;
+            }
+
+            public Builder contraseña(String contraseña) {
+                this.contraseña = contraseña;
+                return this;
+            }
+
+            public Builder telefono(String telefono) {
+                this.telefono = telefono;
+                return this;
+            }
+
+            public Builder direccion(String direccion) {
+                this.direccion = direccion;
+                return this;
+            }
+
+            public Builder fechaContratacion(Date fechaContratacion) {
+                this.fechaContratacion = fechaContratacion;
+                return this;
+            }
+
+            public Builder salario(BigDecimal salario) {
+                this.salario = salario;
+                return this;
+            }
+
+            public Builder horario(String horario) {
+                this.horario = horario;
+                return this;
+            }
+
+            public Builder nivelAcceso(Integer nivelAcceso) {
+                this.nivelAcceso = nivelAcceso;
+                return this;
+            }
+
+            public Builder estado(EstadoEmpleado estado) {
+                this.estado = estado;
+                return this;
+            }
+
+            public Builder facturas(List<Factura> facturas) {
+                this.facturas = facturas;
+                return this;
+            }
+
+            public Builder bitacoras(List<Bitacora> bitacoras) {
+                this.bitacoras = bitacoras;
+                return this;
+            }
+
+            public Builder posts(List<Post> posts) {
+                this.posts = posts;
+                return this;
+            }
+
+            public Empleado build() {
+                return new Empleado(this);
+            }
+        }
 
     public Integer getIdEmpleado() {
         return idEmpleado;
@@ -127,14 +229,6 @@ public class Empleado {
         this.nombre = nombre;
     }
 
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
     public String getCorreo() {
         return correo;
     }
@@ -151,11 +245,11 @@ public class Empleado {
         this.contraseña = contraseña;
     }
 
-    public String getTelefono() {
+    public @Pattern(regexp = "\\d{7,15}") String getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(String telefono) {
+    public void setTelefono(@Pattern(regexp = "\\d{7,15}") String telefono) {
         this.telefono = telefono;
     }
 
@@ -175,14 +269,6 @@ public class Empleado {
         this.fechaContratacion = fechaContratacion;
     }
 
-    public Date getFechaNacimiento() {
-        return fechaNacimiento;
-    }
-
-    public void setFechaNacimiento(Date fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
-    }
-
     public BigDecimal getSalario() {
         return salario;
     }
@@ -199,28 +285,12 @@ public class Empleado {
         this.horario = horario;
     }
 
-    public NivelAcceso getNivelAcceso() {
+    public Integer getNivelAcceso() {
         return nivelAcceso;
     }
 
-    public void setNivelAcceso(NivelAcceso nivelAcceso) {
+    public void setNivelAcceso(Integer nivelAcceso) {
         this.nivelAcceso = nivelAcceso;
-    }
-
-    public String getEspecialidad() {
-        return especialidad;
-    }
-
-    public void setEspecialidad(String especialidad) {
-        this.especialidad = especialidad;
-    }
-
-    public String getFoto() {
-        return foto;
-    }
-
-    public void setFoto(String foto) {
-        this.foto = foto;
     }
 
     public EstadoEmpleado getEstado() {
@@ -257,13 +327,7 @@ public class Empleado {
 
     public enum EstadoEmpleado {
         activo,
-        licencia,
         inactivo
     }
 
-    public enum NivelAcceso {
-        administrador,
-        supervisor,
-        empleado
-    }
 }

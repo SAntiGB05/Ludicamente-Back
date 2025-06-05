@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class BitacoraController {
     @Autowired
     private BitacoraService bitacoraService;
 
+    @PreAuthorize("hasAnyRole('ROL_ADMIN','RON_ACUDIENTE')")
     @Operation(summary = "Crear una nueva bitácora")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Bitácora creada exitosamente"),
@@ -31,6 +33,7 @@ public class BitacoraController {
         return ResponseEntity.status(201).body(nuevaBitacora);
     }
 
+    @PreAuthorize("hasAnyRole('ROL_ADMIN')")
     @Operation(summary = "Obtener todas las bitácoras")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de bitácoras obtenida exitosamente")
@@ -40,6 +43,8 @@ public class BitacoraController {
         List<Bitacora> bitacoras = bitacoraService.listarBitacoras();
         return ResponseEntity.ok(bitacoras);
     }
+
+    @PreAuthorize("hasAnyRole('ROL_ADMIN')")
 
     @Operation(summary = "Actualizar una bitácora existente")
     @ApiResponses(value = {
@@ -56,6 +61,7 @@ public class BitacoraController {
         return bitacora.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PreAuthorize("hasAnyRole('ROL_ADMIN')")
     @Operation(summary = "Eliminar una bitácora")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Bitácora eliminada exitosamente"),

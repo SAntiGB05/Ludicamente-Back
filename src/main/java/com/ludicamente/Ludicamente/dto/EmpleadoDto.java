@@ -1,19 +1,40 @@
 package com.ludicamente.Ludicamente.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class EmpleadoDto {
 
+
     private Integer idEmpleado;
+
+    @NotBlank(message = "La cédula es obligatoria")
     private String cedulaEmpleado;
+
+    @NotBlank(message = "El nombre es obligatorio")
     private String nombre;
+
+    @Email(message = "Correo inválido")
+    @NotBlank(message = "El correo es obligatorio")
     private String correo;
+
+    @NotBlank(message = "El teléfono es obligatorio")
     private String telefono;
+
     private String direccion;
+
+    @NotNull(message = "La fecha de contratación es obligatoria")
     private LocalDate fechaContratacion;
+
+    @NotNull(message = "El salario es obligatorio")
     private BigDecimal salario;
+
     private String horario;
+
     private Integer nivelAcceso;
 
     // Constructor vacío
