@@ -1,5 +1,13 @@
 package com.ludicamente.Ludicamente.auth;
 
+import com.ludicamente.Ludicamente.auth.passwordReset.EmailConfirmacion;
+import com.ludicamente.Ludicamente.auth.passwordReset.EmailService;
+import com.ludicamente.Ludicamente.auth.passwordReset.PasswordResetService;
+import com.ludicamente.Ludicamente.dto.EmailRequest;
+import com.ludicamente.Ludicamente.dto.VerificationRequest;
+import com.ludicamente.Ludicamente.model.PasswordResetToken;
+import com.ludicamente.Ludicamente.auth.AuthenticationService;
+import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,8 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +25,34 @@ import java.util.Map;
 @RequestMapping("/api/auth") // URL base para autenticación
 public class AuthController {
 
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private EmailConfirmacion emailConfirmacion; // Inyección de EmailConfirmacion
+    private final AuthenticationService authenticationService;
+
+    public AuthController(AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
+    }
+
+    // Endpoint para iniciar sesión
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+        try {
+            AuthResponse response = authenticationService.authenticate(request);
+            return ResponseEntity.ok(response);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new AuthResponse("Correo no registrado"));
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse("Contraseña incorrecta"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new AuthResponse("Error en la autenticación: " + e.getMessage()));
+        }
+    }
 
     // Endpoint para registrar un Acudiente
     @PostMapping("/register/acudiente")
