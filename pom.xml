@@ -109,6 +109,15 @@
 			<artifactId>jakarta.validation-api</artifactId>
 		</dependency>
 
+		<!-- Google Cloud -->
+
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>spring-cloud-gcp-dependencies</artifactId>
+			<version>6.2.1</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
 
 	</dependencies>
 
