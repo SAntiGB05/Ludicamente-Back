@@ -20,8 +20,7 @@ public class BitacoraDto {
     private  String titulo;
     private LocalDate fechaCreacion;
 
-
-
+    public BitacoraDto() {}
 
     public LocalDate getFechaCreacion() {
         return fechaCreacion;
