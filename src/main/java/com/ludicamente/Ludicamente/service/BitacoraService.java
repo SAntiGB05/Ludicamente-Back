@@ -14,6 +14,7 @@ public interface BitacoraService {
     List<Bitacora> findByNiñoAndEstadoTrue(Integer idNiño);
     Optional<Bitacora> archivarBitacora(Integer idBitacora);
     List<BitacoraDto> obtenerHistorialPorNiño(Integer idNiño);
+    Optional<Bitacora> findByNiñoAndCodBitacora(Integer idNiño, Integer codBitacora);
 
 
 }
