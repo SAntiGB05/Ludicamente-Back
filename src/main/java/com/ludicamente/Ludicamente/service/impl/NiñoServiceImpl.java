@@ -8,12 +8,16 @@ import com.ludicamente.Ludicamente.repository.AcudienteRepository;
 import com.ludicamente.Ludicamente.repository.BitacoraRepository;
 import com.ludicamente.Ludicamente.repository.NiñoRepository;
 import com.ludicamente.Ludicamente.service.NiñoService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +78,23 @@ public class NiñoServiceImpl implements NiñoService {
         return niños.stream()
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
+    }
+    @Override
+    @Transactional
+    public void actualizarFoto(Integer id, MultipartFile foto) {
+        Niño niño = niñoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Niño no encontrado con ID: " + id));
+
+        try {
+            byte[] bytes = foto.getBytes();
+            String base64Image = "data:" + foto.getContentType() + ";base64," +
+                    Base64.getEncoder().encodeToString(bytes);
+
+            niño.setFoto(base64Image);
+            niñoRepository.save(niño);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al procesar la imagen", e);
+        }
     }
 
     @Override

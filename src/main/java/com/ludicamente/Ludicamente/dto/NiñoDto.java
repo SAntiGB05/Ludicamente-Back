@@ -1,5 +1,6 @@
 package com.ludicamente.Ludicamente.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +30,7 @@ public class NiñoDto {
     @Min(value = 0, message = "La edad debe ser positiva")
     private Integer edad;
 
+    @Column(name = "foto", columnDefinition = "TEXT") // o LONGTEXT si esperas imágenes más grandes
     private String foto;
 
     @NotNull(message = "Debe estar asociado a un acudiente")
