@@ -15,6 +15,10 @@ public interface BitacoraService {
     Optional<Bitacora> archivarBitacora(Integer idBitacora);
     List<BitacoraDto> obtenerHistorialPorNiño(Integer idNiño);
     Optional<Bitacora> findByNiñoAndCodBitacora(Integer idNiño, Integer codBitacora);
+    void guardarTodas(List<Bitacora> bitacoras);
+    public void activarTodasPorNiño(Integer idNiño);
+
+
 
 
 }

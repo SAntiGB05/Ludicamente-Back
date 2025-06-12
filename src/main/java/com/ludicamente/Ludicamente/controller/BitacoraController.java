@@ -96,7 +96,7 @@ public class BitacoraController {
     }
 
 
-    @PreAuthorize("hasRole('ROL_ADMIN','ROL_STAFF')")
+    @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
     @Operation(summary = "Archivar una bitácora (marcar como inactiva)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Bitácora archivada exitosamente"),
@@ -112,6 +112,36 @@ public class BitacoraController {
                 .map(bit -> ResponseEntity.ok(BitacoraMapper.toDto(bit)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+    @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
+    @Operation(summary = "Archivar una bitácora (marcar como inactiva)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bitácora archivada exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Bitácora no encontrada")
+    })
+    @PutMapping("/archivar/todas/{idNiño}")
+    public ResponseEntity<Void> archivarTodasLasBitacoras(@PathVariable Integer idNiño) {
+        List<Bitacora> activas = bitacoraService.findByNiñoAndEstadoTrue(idNiño);
+        for (Bitacora b : activas) {
+            b.setEstado(false);
+        }
+        bitacoraService.guardarTodas(activas); // Asegúrate de que este método exista en tu servicio
+        return ResponseEntity.ok().build();
+    }
+
+    @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
+    @Operation(summary = "Archivar una bitácora (marcar como inactiva)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Bitácora Activa exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Bitácora no encontrada")
+    })
+    @PutMapping("/activar/todas/{idNiño}")
+    public ResponseEntity<Void> activarTodasLasBitacoras(@PathVariable Integer idNiño) {
+        bitacoraService.activarTodasPorNiño(idNiño);
+        return ResponseEntity.noContent().build();
+    }
+
+
+
 
     @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF','ROL_ACUDIENTE')")
     @Operation(summary = "Obtener una bitácora específica de un niño")
