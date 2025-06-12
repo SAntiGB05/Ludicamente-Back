@@ -33,6 +33,7 @@ public class NiñoDto {
 
     @NotNull(message = "Debe estar asociado a un acudiente")
     private Integer idAcudiente;
+    private String cedulaAcudiente; // <--- ¡NUEVO CAMPO!
 
     private String  nombreAcudiente;
     private String parentescoAcudiente;
@@ -43,7 +44,7 @@ public class NiñoDto {
     public NiñoDto() {
     }
 
-    public NiñoDto(Integer idNiño, String nombre, String nIdentificacion, String sexo, Date fechaNacimiento, Integer edad, String foto, Integer idAcudiente) {
+    public NiñoDto(Integer idNiño, String nombre, String nIdentificacion, String sexo, Date fechaNacimiento, Integer edad, String foto, Integer idAcudiente, String cedulaAcudiente) { // <--- Constructor actualizado
         this.idNiño = idNiño;
         this.nombre = nombre;
         this.nIdentificacion = nIdentificacion;
@@ -52,6 +53,7 @@ public class NiñoDto {
         this.edad = edad;
         this.foto = foto;
         this.idAcudiente = idAcudiente;
+        this.cedulaAcudiente = cedulaAcudiente; // <--- Asignar nuevo campo
 
     }
 
@@ -150,5 +152,13 @@ public class NiñoDto {
 
     public void setIdAcudiente(Integer idAcudiente) {
         this.idAcudiente = idAcudiente;
+    }
+
+    public String getCedulaAcudiente() { // <--- ¡NUEVO GETTER!
+        return cedulaAcudiente;
+    }
+
+    public void setCedulaAcudiente(String cedulaAcudiente) { // <--- ¡NUEVO SETTER!
+        this.cedulaAcudiente = cedulaAcudiente;
     }
 }

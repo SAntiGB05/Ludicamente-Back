@@ -4,6 +4,11 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Google Cloud service account credentials
+src/main/resources/*.json
+# o específicamente si solo es ese archivo
+# src/main/resources/ludicamente-service-account.json
+
 ### STS ###
 .apt_generated
 .classpath

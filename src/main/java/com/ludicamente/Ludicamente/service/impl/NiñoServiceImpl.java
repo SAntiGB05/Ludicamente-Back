@@ -8,6 +8,12 @@ import com.ludicamente.Ludicamente.repository.AcudienteRepository;
 import com.ludicamente.Ludicamente.repository.BitacoraRepository;
 import com.ludicamente.Ludicamente.repository.NiñoRepository;
 import com.ludicamente.Ludicamente.service.NiñoService;
+import com.ludicamente.Ludicamente.dto.NiñoDto; // <--- Importa el DTO
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +23,8 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.stream.Collectors; // Necesario para el stream() y collect()
+
 
 @Service
 public class NiñoServiceImpl implements NiñoService {
@@ -54,6 +61,10 @@ public class NiñoServiceImpl implements NiñoService {
     }
 
     @Override
+    @Operation(summary = "Obtener todos los niños")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de niños obtenida exitosamente")
+    })
     public List<NiñoDto> listarTodosLosNiños() {
         System.out.println(">>> LISTANDO TODOS LOS NIÑOS (admin/empleado)");
         List<Niño> niños = niñoRepository.findAll();
@@ -107,6 +118,7 @@ public class NiñoServiceImpl implements NiñoService {
         }
         return false;
     }
+
 
     private int calcularEdad(Date fechaNacimiento) {
         LocalDate fecha = fechaNacimiento.toInstant()

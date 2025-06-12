@@ -1,8 +1,7 @@
 package com.ludicamente.Ludicamente.auth;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.sql.Date;
+import java.time.LocalDate; // ¡Importante! Usaremos LocalDate
 
 public class RegisterEmpleadoRequest {
 
@@ -12,10 +11,12 @@ public class RegisterEmpleadoRequest {
     private String contraseñaEmpleado;
     private String telefonoEmpleado;
     private String direccionEmpleado;
-    private Date fechaContartacion;
+    private LocalDate fechaContratacion; // ¡CORRECCIÓN! Cambiado a LocalDate y nombre corregido
     private BigDecimal salario;
     private String horario;
     private Integer nivelAcceso;
+
+    // Puedes añadir un constructor si lo deseas, o depender del constructor por defecto.
 
     // Getters y Setters
     public String getCedulaEmpleado() {
@@ -66,12 +67,12 @@ public class RegisterEmpleadoRequest {
         this.direccionEmpleado = direccionEmpleado;
     }
 
-    public Date getFechaContartacion() {
-        return fechaContartacion;
+    public LocalDate getFechaContratacion() { // ¡CORRECCIÓN! Nombre del getter y tipo de retorno
+        return fechaContratacion;
     }
 
-    public void setFechaContartacion(Date fechaContartacion) {
-        this.fechaContartacion = fechaContartacion;
+    public void setFechaContratacion(LocalDate fechaContratacion) { // ¡CORRECCIÓN! Nombre del setter y tipo de parámetro
+        this.fechaContratacion = fechaContratacion;
     }
 
     public BigDecimal getSalario() {
