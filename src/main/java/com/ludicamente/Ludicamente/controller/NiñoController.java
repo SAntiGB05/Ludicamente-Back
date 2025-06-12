@@ -1,16 +1,20 @@
 package com.ludicamente.Ludicamente.controller;
 
-import com.ludicamente.Ludicamente.model.Niño;
+import com.ludicamente.Ludicamente.auth.AuthenticationService;
+import com.ludicamente.Ludicamente.dto.NiñoDto;
 import com.ludicamente.Ludicamente.service.NiñoService;
 import com.ludicamente.Ludicamente.dto.NiñoDto; // <--- Importa el NiñoDto
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +25,8 @@ public class NiñoController {
     @Autowired
     private NiñoService niñoService;
 
+
+    // Crear un niño
     // Crear un niño
     @Operation(summary = "Crear un nuevo niño")
     @ApiResponses(value = {
@@ -41,11 +47,42 @@ public class NiñoController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de niños obtenida exitosamente")
     })
+
+
     @GetMapping
-    public ResponseEntity<List<NiñoDto>> listarNiños() { // <--- CAMBIO CLAVE: Ahora devuelve List<NiñoDto>
-        // El servicio ya se encarga de transformar las entidades Niño a NiñoDto
-        // incluyendo la cédula del acudiente.
-        List<NiñoDto> niños = niñoService.listarNiños();
+    public ResponseEntity<List<NiñoDto>> listarNiños(Authentication authentication) {
+        String correo = authentication.getName();
+
+        Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
+        roles.forEach(r -> System.out.println("ROL DETECTADO: " + r.getAuthority()));
+
+        boolean esAdmin = roles.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+        boolean esEmpleado = roles.stream().anyMatch(auth -> auth.getAuthority().equals("ROLE_STAFF"));
+
+        if (esAdmin || esEmpleado) {
+            System.out.println(">>> LISTANDO TODOS LOS NIÑOS (admin/empleado)");
+            return ResponseEntity.ok(niñoService.listarTodosLosNiños());
+        }
+
+        return ResponseEntity.ok(niñoService.listarNiñosPorCorreoAcudiente(correo));
+    }
+
+    @Operation(summary = "Obtener un niño por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Niño encontrado"),
+            @ApiResponse(responseCode = "404", description = "Niño no encontrado")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<NiñoDto> obtenerNiñoPorId(@PathVariable Integer id) {
+        Optional<NiñoDto> niño = niñoService.obtenerNiñoPorId(id);
+        return niño.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+
+    @GetMapping(params = "acudiente")
+    public ResponseEntity<List<NiñoDto>> listarNiñosPorAcudiente(@RequestParam("acudiente") Integer idAcudiente) {
+        List<NiñoDto> niños = niñoService.listarNiñosPorAcudiente(idAcudiente);
         return ResponseEntity.ok(niños);
     }
 
@@ -56,7 +93,7 @@ public class NiñoController {
             @ApiResponse(responseCode = "404", description = "Niño no encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Niño> actualizarNiño(
+    public ResponseEntity<NiñoDto> actualizarNiño(
             @Parameter(description = "ID del niño a actualizar", example = "1")
             @PathVariable Integer id,
             @RequestBody Niño niñoActualizado) { // Recibe la entidad Niño para la actualización
@@ -69,6 +106,7 @@ public class NiñoController {
         // y hacer el mapeo aquí o en el servicio.
         // Por simplicidad, mantenemos que devuelva Niño, ya que el frontend para UPDATE
         // lo puede manejar sin la cédula del acudiente si solo refresca la tabla después.
+
         return niño.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -78,6 +116,7 @@ public class NiñoController {
             @ApiResponse(responseCode = "204", description = "Niño eliminado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Niño no encontrado")
     })
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarNiño(
             @Parameter(description = "ID del niño a eliminar", example = "1")
