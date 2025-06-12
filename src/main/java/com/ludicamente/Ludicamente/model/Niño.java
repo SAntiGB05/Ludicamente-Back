@@ -34,7 +34,11 @@ public class Niño {
     @JoinColumn(name = "fkid_acudiente", nullable = false)
     private Acudiente acudiente;
 
+
+
     // === Getters y Setters ===
+
+
 
     public Integer getIdNiño() {
         return idNiño;

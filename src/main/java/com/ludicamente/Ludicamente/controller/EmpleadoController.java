@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.Optional;
-
 import com.ludicamente.Ludicamente.dto.EmpleadoDto; // Importación para la creación de empleados (POST)
 import com.ludicamente.Ludicamente.dto.EmpleadoUpdateDto; // ¡NUEVA IMPORTACIÓN para la actualización de empleados (PUT)!
 
@@ -23,7 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.validation.Valid;
 
-@PreAuthorize("hasAnyRole('ROL_ADMIN')") // Asegúrate que tu rol de admin sea 'ROL_ADMIN' o 'ADMIN'
+@PreAuthorize("hasAnyRole('ROL_STAFF','ROL_ADMIN')")
 @RestController
 @RequestMapping("/api/empleados")
 @Tag(name = "Empleado", description = "API para gestión de empleados")
@@ -31,7 +30,6 @@ public class EmpleadoController {
 
     @Autowired
     private EmpleadoService empleadoService;
-
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -49,18 +47,29 @@ public class EmpleadoController {
         // O que el usuario autenticado tiene el rol de ADMIN
         if (!correo.equals(authentication.getName()) && !authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 403 Forbidden
+    @GetMapping("/correo/{correo}")
+    public ResponseEntity<Empleado> getEmpleadoByCorreo(@PathVariable String correo, Authentication authentication) {
+        // Verificar que el correo solicitado coincide con el usuario autenticado
+        if (!correo.equals(authentication.getName())) {
+            return ResponseEntity.status(403).build(); // 403 Forbidden
         }
 
         try {
             Empleado empleado = empleadoService.obtenerEmpleadoPorCorreo(correo);
             return ResponseEntity.ok(empleado);
         } catch (RuntimeException e) {
+          
             System.err.println("Error al obtener empleado por correo: " + e.getMessage()); // Para depuración
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
         }
     }
 
 
+            return ResponseEntity.status(404).build(); // 404 Not Found
+        }
+    }
+
+    // Crear un empleado
     @Operation(summary = "Crear un nuevo empleado")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Empleado creado exitosamente"),
@@ -143,6 +152,8 @@ public class EmpleadoController {
     }
 
 
+
+    // Eliminar un empleado
     @Operation(summary = "Eliminar un empleado")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Empleado eliminado exitosamente"),

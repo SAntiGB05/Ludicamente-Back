@@ -15,4 +15,5 @@ public interface AcudienteService {
     void eliminarAcudiente(Integer id);
 
     Acudiente registrarAcudienteConNiños(RegisterAcudienteRequest request);
+
 }

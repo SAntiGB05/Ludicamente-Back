@@ -1,6 +1,7 @@
 package com.ludicamente.Ludicamente.service.impl;
 
 // Make sure these imports are correct
+import com.ludicamente.Ludicamente.model.Acudiente;
 import com.ludicamente.Ludicamente.model.Empleado;
 import com.ludicamente.Ludicamente.repository.EmpleadoRepository;
 import com.ludicamente.Ludicamente.service.EmpleadoService; // <--- Correct package for EmpleadoService
@@ -71,3 +72,4 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         return empleadoRepository.findById(id);
     }
 }
+
