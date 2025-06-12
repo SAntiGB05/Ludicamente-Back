@@ -14,7 +14,7 @@ public class Bitacora {
     @Column(name = "cod_bitacora")
     private Integer codBitacora;
 
-    @Column(name = "Ingrese el titulo de la bitacora", columnDefinition = "TEXT")
+    @Column(name = "titulo", columnDefinition = "TEXT")
     private  String titulo;
 
     @Column(name = "descripcion_general", columnDefinition = "TEXT")

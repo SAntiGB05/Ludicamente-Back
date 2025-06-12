@@ -149,6 +149,12 @@ public class NiñoServiceImpl implements NiñoService {
 
         return dto;
     }
+    @Override
+    public Optional<NiñoDto> obtenerNiñoPorId(Integer id) {
+        return niñoRepository.findById(id)
+                .map(this::convertirADto);
+    }
+
 
     private Niño convertirADominio(NiñoDto dto) {
         Niño niño = new Niño();

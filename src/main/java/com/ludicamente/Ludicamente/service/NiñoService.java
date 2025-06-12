@@ -13,4 +13,6 @@ public interface NiñoService {
     Optional<NiñoDto> actualizarNiño(Integer id, NiñoDto niñoActualizado);
     boolean eliminarNiño(Integer id);
     List<NiñoDto> listarTodosLosNiños();
+    Optional<NiñoDto> obtenerNiñoPorId(Integer id);
+
 }
