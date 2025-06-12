@@ -24,6 +24,7 @@ public class NiñoController {
     @Autowired
     private NiñoService niñoService;
 
+
     // Crear un niño
     @Operation(summary = "Crear un nuevo niño")
     @ApiResponses(value = {
@@ -59,6 +60,17 @@ public class NiñoController {
         }
 
         return ResponseEntity.ok(niñoService.listarNiñosPorCorreoAcudiente(correo));
+    }
+
+    @Operation(summary = "Obtener un niño por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Niño encontrado"),
+            @ApiResponse(responseCode = "404", description = "Niño no encontrado")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<NiñoDto> obtenerNiñoPorId(@PathVariable Integer id) {
+        Optional<NiñoDto> niño = niñoService.obtenerNiñoPorId(id);
+        return niño.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 
