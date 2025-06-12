@@ -3,6 +3,7 @@ package com.ludicamente.Ludicamente.service.impl;
 import com.ludicamente.Ludicamente.model.Niño;
 import com.ludicamente.Ludicamente.repository.NiñoRepository;
 import com.ludicamente.Ludicamente.service.NiñoService;
+import com.ludicamente.Ludicamente.dto.NiñoDto; // <--- Importa el DTO
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors; // Necesario para el stream() y collect()
 
 @Service
 public class NiñoServiceImpl implements NiñoService {
@@ -34,8 +36,10 @@ public class NiñoServiceImpl implements NiñoService {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de niños obtenida exitosamente")
     })
-    public List<Niño> listarNiños() {
-        return niñoRepository.findAll();
+    public List<NiñoDto> listarNiños() { // <--- El tipo de retorno ahora es List<NiñoDto>
+        return niñoRepository.findAll().stream()
+                .map(this::convertToDto) // <--- Mapeamos cada Niño a NiñoDto
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -75,5 +79,28 @@ public class NiñoServiceImpl implements NiñoService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Convierte una entidad Niño a un NiñoDto, incluyendo la cédula del acudiente.
+     * @param niño La entidad Niño a convertir.
+     * @return El NiñoDto resultante.
+     */
+    private NiñoDto convertToDto(Niño niño) {
+        NiñoDto dto = new NiñoDto();
+        dto.setIdNiño(niño.getIdNiño());
+        dto.setNombre(niño.getNombre());
+        dto.setnIdentificacion(niño.getnIdentificacion());
+        dto.setSexo(niño.getSexo());
+        dto.setFechaNacimiento(niño.getFechaNacimiento());
+        dto.setEdad(niño.getEdad());
+        dto.setFoto(niño.getFoto());
+
+        // Asegúrate de que el acudiente no sea nulo antes de intentar acceder a sus propiedades
+        if (niño.getAcudiente() != null) {
+            dto.setIdAcudiente(niño.getAcudiente().getIdAcudiente());
+            dto.setCedulaAcudiente(niño.getAcudiente().getCedula()); // <--- ¡Aquí se obtiene la cédula del Acudiente!
+        }
+        return dto;
     }
 }

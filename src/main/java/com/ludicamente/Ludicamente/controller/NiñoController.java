@@ -2,6 +2,7 @@ package com.ludicamente.Ludicamente.controller;
 
 import com.ludicamente.Ludicamente.model.Niño;
 import com.ludicamente.Ludicamente.service.NiñoService;
+import com.ludicamente.Ludicamente.dto.NiñoDto; // <--- Importa el NiñoDto
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,6 +29,9 @@ public class NiñoController {
     })
     @PostMapping
     public ResponseEntity<Niño> crearNiño(@RequestBody Niño niño) {
+        // Al crear un niño, recibimos la entidad Niño directamente del frontend.
+        // El servicio la guarda y nos la devuelve. No hay DTO intermedio para la creación,
+        // ya que la cédula del acudiente no es un campo que el frontend envíe para crear un niño.
         Niño nuevoNiño = niñoService.crearNiño(niño);
         return ResponseEntity.status(201).body(nuevoNiño);
     }
@@ -38,8 +42,10 @@ public class NiñoController {
             @ApiResponse(responseCode = "200", description = "Lista de niños obtenida exitosamente")
     })
     @GetMapping
-    public ResponseEntity<List<Niño>> listarNiños() {
-        List<Niño> niños = niñoService.listarNiños();
+    public ResponseEntity<List<NiñoDto>> listarNiños() { // <--- CAMBIO CLAVE: Ahora devuelve List<NiñoDto>
+        // El servicio ya se encarga de transformar las entidades Niño a NiñoDto
+        // incluyendo la cédula del acudiente.
+        List<NiñoDto> niños = niñoService.listarNiños();
         return ResponseEntity.ok(niños);
     }
 
@@ -53,9 +59,16 @@ public class NiñoController {
     public ResponseEntity<Niño> actualizarNiño(
             @Parameter(description = "ID del niño a actualizar", example = "1")
             @PathVariable Integer id,
-            @RequestBody Niño niñoActualizado) {
+            @RequestBody Niño niñoActualizado) { // Recibe la entidad Niño para la actualización
 
         Optional<Niño> niño = niñoService.actualizarNiño(id, niñoActualizado);
+        // Al actualizar, normalmente devolvemos la entidad actualizada o el DTO
+        // El frontend espera el NiñoDto si usas el mismo endpoint para la tabla después
+        // Si quieres que este PUT devuelva un NiñoDto, tendrías que modificar
+        // el método actualizarNiño en NiñoService para que devuelva Optional<NiñoDto>
+        // y hacer el mapeo aquí o en el servicio.
+        // Por simplicidad, mantenemos que devuelva Niño, ya que el frontend para UPDATE
+        // lo puede manejar sin la cédula del acudiente si solo refresca la tabla después.
         return niño.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 

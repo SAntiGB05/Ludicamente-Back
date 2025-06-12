@@ -12,13 +12,14 @@ public class NiñoDto {
     private Integer edad;
     private String foto;
     private Integer idAcudiente;
+    private String cedulaAcudiente; // <--- ¡NUEVO CAMPO!
 
     // === Constructores ===
 
     public NiñoDto() {
     }
 
-    public NiñoDto(Integer idNiño, String nombre, String nIdentificacion, String sexo, Date fechaNacimiento, Integer edad, String foto, Integer idAcudiente) {
+    public NiñoDto(Integer idNiño, String nombre, String nIdentificacion, String sexo, Date fechaNacimiento, Integer edad, String foto, Integer idAcudiente, String cedulaAcudiente) { // <--- Constructor actualizado
         this.idNiño = idNiño;
         this.nombre = nombre;
         this.nIdentificacion = nIdentificacion;
@@ -27,6 +28,7 @@ public class NiñoDto {
         this.edad = edad;
         this.foto = foto;
         this.idAcudiente = idAcudiente;
+        this.cedulaAcudiente = cedulaAcudiente; // <--- Asignar nuevo campo
     }
 
     // === Getters y Setters ===
@@ -93,5 +95,13 @@ public class NiñoDto {
 
     public void setIdAcudiente(Integer idAcudiente) {
         this.idAcudiente = idAcudiente;
+    }
+
+    public String getCedulaAcudiente() { // <--- ¡NUEVO GETTER!
+        return cedulaAcudiente;
+    }
+
+    public void setCedulaAcudiente(String cedulaAcudiente) { // <--- ¡NUEVO SETTER!
+        this.cedulaAcudiente = cedulaAcudiente;
     }
 }
