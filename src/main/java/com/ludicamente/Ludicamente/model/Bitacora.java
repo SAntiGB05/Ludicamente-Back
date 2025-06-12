@@ -1,95 +1,181 @@
 package com.ludicamente.Ludicamente.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "bitacora")
 public class Bitacora {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idBitacora;
+    @Column(name = "cod_bitacora")
+    private Integer codBitacora;
 
-    @Column(nullable = false, length = 50)
-    private String accion;
+    @Column(name = "Ingrese el titulo de la bitacora", columnDefinition = "TEXT")
+    private  String titulo;
 
-    @Column(nullable = false, length = 50)
-    private String tablaAfectada;
+    @Column(name = "descripcion_general", columnDefinition = "TEXT")
+    private String descripcionGeneral;
 
-    private Integer idRegistroAfectado;
+    @Column(columnDefinition = "TEXT")
+    private String oportunidades;
 
-    @Lob
-    private String datosAnteriores;
+    @Column(columnDefinition = "TEXT")
+    private String debilidades;
 
-    @Lob
-    private String datosNuevos;
+    @Column(columnDefinition = "TEXT")
+    private String amenazas;
 
-    @Column(nullable = false)
-    private LocalDateTime fechaHora = LocalDateTime.now();
+    @Column(columnDefinition = "TEXT")
+    private String fortalezas;
+
+    @Column(columnDefinition = "TEXT")
+    private String objetivos;
+
+    @Column(columnDefinition = "TEXT")
+    private String habilidades;
+
+    @Column(name = "fecha_creacion")
+    private LocalDate fechaCreacion;
+
+    @Column(columnDefinition = "TEXT")
+    private String seguimiento;
+
+    @Column(name = "historial_actividad", columnDefinition = "TEXT")
+    private String historialActividad;
+
+    private Boolean estado;
+    @ManyToOne
+    @JoinColumn(name = "id_niño")
+    private Niño niño;
 
     @ManyToOne
-    @JoinColumn(name = "fkid_empleado")
+    @JoinColumn(name = "fkid_empleado", referencedColumnName = "id_empleado")
     private Empleado empleado;
 
-    @Column(length = 45)
-    private String ipConexion;
+    // Getters y Setters
 
-    // Getters y setters...
 
-    public Integer getIdBitacora() {
-        return idBitacora;
+    public LocalDate getFechaCreacion() {
+        return fechaCreacion;
     }
 
-    public void setIdBitacora(Integer idBitacora) {
-        this.idBitacora = idBitacora;
+    public void setFechaCreacion(LocalDate fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 
-    public String getAccion() {
-        return accion;
+    @PrePersist
+    public void prePersist() {
+        if (fechaCreacion == null) {
+            fechaCreacion = LocalDate.now();
+        }
     }
 
-    public void setAccion(String accion) {
-        this.accion = accion;
+    public Niño getNiño() {
+        return niño;
     }
 
-    public String getTablaAfectada() {
-        return tablaAfectada;
+    public void setNiño(Niño niño) {
+        this.niño = niño;
     }
 
-    public void setTablaAfectada(String tablaAfectada) {
-        this.tablaAfectada = tablaAfectada;
+
+    public String getTitulo() {
+        return titulo;
     }
 
-    public Integer getIdRegistroAfectado() {
-        return idRegistroAfectado;
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
+    public Boolean getEstado() {
+        return estado;
     }
 
-    public void setIdRegistroAfectado(Integer idRegistroAfectado) {
-        this.idRegistroAfectado = idRegistroAfectado;
+    public void setEstado(Boolean estado) {
+        this.estado = estado;
     }
 
-    public String getDatosAnteriores() {
-        return datosAnteriores;
+    public Integer getCodBitacora() {
+        return codBitacora;
     }
 
-    public void setDatosAnteriores(String datosAnteriores) {
-        this.datosAnteriores = datosAnteriores;
+    public void setCodBitacora(Integer codBitacora) {
+        this.codBitacora = codBitacora;
     }
 
-    public String getDatosNuevos() {
-        return datosNuevos;
+    public String getDescripcionGeneral() {
+        return descripcionGeneral;
     }
 
-    public void setDatosNuevos(String datosNuevos) {
-        this.datosNuevos = datosNuevos;
+    public void setDescripcionGeneral(String descripcionGeneral) {
+        this.descripcionGeneral = descripcionGeneral;
     }
 
-    public LocalDateTime getFechaHora() {
-        return fechaHora;
+    public String getOportunidades() {
+        return oportunidades;
     }
 
-    public void setFechaHora(LocalDateTime fechaHora) {
-        this.fechaHora = fechaHora;
+    public void setOportunidades(String oportunidades) {
+        this.oportunidades = oportunidades;
+    }
+
+    public String getDebilidades() {
+        return debilidades;
+    }
+
+    public void setDebilidades(String debilidades) {
+        this.debilidades = debilidades;
+    }
+
+    public String getAmenazas() {
+        return amenazas;
+    }
+
+    public void setAmenazas(String amenazas) {
+        this.amenazas = amenazas;
+    }
+
+    public String getFortalezas() {
+        return fortalezas;
+    }
+
+    public void setFortalezas(String fortalezas) {
+        this.fortalezas = fortalezas;
+    }
+
+    public String getObjetivos() {
+        return objetivos;
+    }
+
+    public void setObjetivos(String objetivos) {
+        this.objetivos = objetivos;
+    }
+
+    public String getHabilidades() {
+        return habilidades;
+    }
+
+    public void setHabilidades(String habilidades) {
+        this.habilidades = habilidades;
+    }
+
+    public String getSeguimiento() {
+        return seguimiento;
+    }
+
+    public void setSeguimiento(String seguimiento) {
+        this.seguimiento = seguimiento;
+    }
+
+    public String getHistorialActividad() {
+        return historialActividad;
+    }
+
+    public void setHistorialActividad(String historialActividad) {
+        this.historialActividad = historialActividad;
     }
 
     public Empleado getEmpleado() {
@@ -98,13 +184,5 @@ public class Bitacora {
 
     public void setEmpleado(Empleado empleado) {
         this.empleado = empleado;
-    }
-
-    public String getIpConexion() {
-        return ipConexion;
-    }
-
-    public void setIpConexion(String ipConexion) {
-        this.ipConexion = ipConexion;
     }
 }

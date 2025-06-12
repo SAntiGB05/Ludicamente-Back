@@ -19,10 +19,15 @@ public class AcudienteServiceImpl implements AcudienteService {
         return acudienteRepository.findAll();
     }
 
+    public Acudiente obtenerAcudientePorCedula(String cedula) {
+        return acudienteRepository.findByCedula(cedula)
+                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con cédula: " + cedula));
+    }
+
     @Override
-    public Acudiente obtenerAcudientePorId(Integer id) {
-        return acudienteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con id: " + id));
+    public Acudiente obtenerAcudientePorCorreo(String correo) {
+        return acudienteRepository.findByCorreo(correo)
+                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con correo: " + correo));
     }
 
     @Override
@@ -35,13 +40,10 @@ public class AcudienteServiceImpl implements AcudienteService {
         Acudiente acudiente = acudienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con id: " + id));
 
+        // Actualizar solo nombre, teléfono y parentesco
         acudiente.setNombre(acudienteDetails.getNombre());
-        acudiente.setCedula(acudienteDetails.getCedula());
-        acudiente.setCorreo(acudienteDetails.getCorreo());
-        acudiente.setContraseña(acudienteDetails.getContraseña());
         acudiente.setTelefono(acudienteDetails.getTelefono());
         acudiente.setParentesco(acudienteDetails.getParentesco());
-        acudiente.setDireccion(acudienteDetails.getDireccion());
 
         return acudienteRepository.save(acudiente);
     }

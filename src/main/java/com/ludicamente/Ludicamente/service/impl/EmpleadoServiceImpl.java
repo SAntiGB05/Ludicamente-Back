@@ -1,5 +1,6 @@
 package com.ludicamente.Ludicamente.service.impl;
 
+import com.ludicamente.Ludicamente.model.Acudiente;
 import com.ludicamente.Ludicamente.model.Empleado;
 import com.ludicamente.Ludicamente.repository.EmpleadoRepository;
 import com.ludicamente.Ludicamente.service.EmpleadoService;
@@ -55,18 +56,14 @@ public class EmpleadoServiceImpl implements EmpleadoService {
         if (empleadoExistente.isPresent()) {
             Empleado empleado = empleadoExistente.get();
             empleado.setNombre(empleadoActualizado.getNombre());
-            empleado.setApellido(empleadoActualizado.getApellido());
             empleado.setCorreo(empleadoActualizado.getCorreo());
             empleado.setTelefono(empleadoActualizado.getTelefono());
             empleado.setDireccion(empleadoActualizado.getDireccion());
             empleado.setSalario(empleadoActualizado.getSalario());
             empleado.setNivelAcceso(empleadoActualizado.getNivelAcceso());
             empleado.setEstado(empleadoActualizado.getEstado());
-            empleado.setEspecialidad(empleadoActualizado.getEspecialidad());
             empleado.setHorario(empleadoActualizado.getHorario());
-            empleado.setFechaNacimiento(empleadoActualizado.getFechaNacimiento());
             empleado.setFechaContratacion(empleadoActualizado.getFechaContratacion());
-            empleado.setFoto(empleadoActualizado.getFoto());
             return Optional.of(empleadoRepository.save(empleado));
         }
         return Optional.empty();
@@ -85,5 +82,11 @@ public class EmpleadoServiceImpl implements EmpleadoService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Empleado obtenerEmpleadoPorCorreo(String correo) {
+        return empleadoRepository.findByCorreo(correo)
+                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con correo: " + correo));
     }
 }

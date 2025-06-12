@@ -8,17 +8,38 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 
 import java.util.List;
 import java.util.Optional;
 
+@PreAuthorize("hasAnyRole('ROL_STAFF','ROL_ADMIN')")
 @RestController
 @RequestMapping("/api/empleados")
+@Tag(name = "Empleado", description = "API para gestión de empleados")
 public class EmpleadoController {
 
     @Autowired
     private EmpleadoService empleadoService;
+
+    @GetMapping("/correo/{correo}")
+    public ResponseEntity<Empleado> getEmpleadoByCorreo(@PathVariable String correo, Authentication authentication) {
+        // Verificar que el correo solicitado coincide con el usuario autenticado
+        if (!correo.equals(authentication.getName())) {
+            return ResponseEntity.status(403).build(); // 403 Forbidden
+        }
+
+        try {
+            Empleado empleado = empleadoService.obtenerEmpleadoPorCorreo(correo);
+            return ResponseEntity.ok(empleado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).build(); // 404 Not Found
+        }
+    }
 
     // Crear un empleado
     @Operation(summary = "Crear un nuevo empleado")
@@ -58,6 +79,8 @@ public class EmpleadoController {
         Optional<Empleado> empleado = empleadoService.actualizarEmpleado(id, empleadoActualizado);
         return empleado.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+
 
     // Eliminar un empleado
     @Operation(summary = "Eliminar un empleado")

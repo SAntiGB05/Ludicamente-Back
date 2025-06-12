@@ -1,27 +1,91 @@
 package com.ludicamente.Ludicamente.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Date;
 
 public class NiñoDto {
+
     private Integer idNiño;
+
+    @NotBlank(message = "El nombre no puede estar vacío")
+    @Size(max = 50, message = "El nombre debe tener como máximo 50 caracteres")
     private String nombre;
+
+    @NotBlank(message = "El número de identificación es obligatorio")
+    private String nIdentificacion;
+
+    @NotBlank(message = "El sexo es obligatorio")
     private String sexo;
+
+    @NotNull(message = "La fecha de nacimiento es obligatoria")
     private Date fechaNacimiento;
-    private String observaciones;
+
+    @Min(value = 0, message = "La edad debe ser positiva")
+    private Integer edad;
+
     private String foto;
+
+    @NotNull(message = "Debe estar asociado a un acudiente")
     private Integer idAcudiente;
 
-    // Getters y setters
-    // Constructor(es)
+    private String  nombreAcudiente;
+    private String parentescoAcudiente;
+    private String telefonoAcudiente;
+    private Boolean bitacoraActiva;
 
-    public NiñoDto(Integer idNiño, String nombre, String sexo, Date fechaNacimiento, String observaciones, String foto, Integer idAcudiente) {
+
+    public NiñoDto() {
+    }
+
+    public NiñoDto(Integer idNiño, String nombre, String nIdentificacion, String sexo, Date fechaNacimiento, Integer edad, String foto, Integer idAcudiente) {
         this.idNiño = idNiño;
         this.nombre = nombre;
+        this.nIdentificacion = nIdentificacion;
         this.sexo = sexo;
         this.fechaNacimiento = fechaNacimiento;
-        this.observaciones = observaciones;
+        this.edad = edad;
         this.foto = foto;
         this.idAcudiente = idAcudiente;
+
+    }
+
+    // === Getters y Setters ===
+
+    public Boolean getBitacoraActiva() {
+        return bitacoraActiva;
+    }
+
+    public void setBitacoraActiva(Boolean bitacoraActiva) {
+        this.bitacoraActiva = bitacoraActiva;
+    }
+    public String getNombreAcudiente() {
+        return nombreAcudiente;
+    }
+
+    public void setNombreAcudiente(String nombreAcudiente) {
+        this.nombreAcudiente = nombreAcudiente;
+    }
+
+    public String getParentescoAcudiente() {
+        return parentescoAcudiente;
+    }
+
+    public void setParentescoAcudiente(String parentescoAcudiente) {
+        this.parentescoAcudiente = parentescoAcudiente;
+    }
+
+    public String getTelefonoAcudiente() {
+        return telefonoAcudiente;
+    }
+
+    public void setTelefonoAcudiente(String telefonoAcudiente) {
+        this.telefonoAcudiente = telefonoAcudiente;
     }
 
     public Integer getIdNiño() {
@@ -40,6 +104,14 @@ public class NiñoDto {
         this.nombre = nombre;
     }
 
+    public String getnIdentificacion() {
+        return nIdentificacion;
+    }
+
+    public void setnIdentificacion(String nIdentificacion) {
+        this.nIdentificacion = nIdentificacion;
+    }
+
     public String getSexo() {
         return sexo;
     }
@@ -56,12 +128,12 @@ public class NiñoDto {
         this.fechaNacimiento = fechaNacimiento;
     }
 
-    public String getObservaciones() {
-        return observaciones;
+    public Integer getEdad() {
+        return edad;
     }
 
-    public void setObservaciones(String observaciones) {
-        this.observaciones = observaciones;
+    public void setEdad(Integer edad) {
+        this.edad = edad;
     }
 
     public String getFoto() {
