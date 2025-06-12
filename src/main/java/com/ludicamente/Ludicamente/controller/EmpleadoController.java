@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.Optional;
 
-@PreAuthorize("hasAnyRole('ROL_ADMIN')")
+@PreAuthorize("hasAnyRole('ROL_STAFF','ROL_ADMIN')")
 @RestController
 @RequestMapping("/api/empleados")
 @Tag(name = "Empleado", description = "API para gestión de empleados")
@@ -26,7 +26,6 @@ public class EmpleadoController {
     @Autowired
     private EmpleadoService empleadoService;
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/correo/{correo}")
     public ResponseEntity<Empleado> getEmpleadoByCorreo(@PathVariable String correo, Authentication authentication) {
         // Verificar que el correo solicitado coincide con el usuario autenticado
