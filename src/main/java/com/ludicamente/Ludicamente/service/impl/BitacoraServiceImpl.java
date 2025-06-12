@@ -34,13 +34,14 @@ public class BitacoraServiceImpl implements BitacoraService {
 
     @Override
     public Bitacora crearBitacoraDesdeDto(BitacoraDto dto) {
+
         Bitacora bitacora = BitacoraMapper.toEntity(dto);
 
         // Validar existencia del niño
         Niño niño = niñoRepository.findById(dto.getIdNiño())
                 .orElseThrow(() -> new IllegalArgumentException("Niño con ID " + dto.getIdNiño() + " no existe."));
 
-        // Validar existencia del empleado
+        // Validar existencia del empleado (opcional)
         if (dto.getIdEmpleado() != null) {
             bitacora.setEmpleado(
                     empleadoRepository.findById(dto.getIdEmpleado())
@@ -48,7 +49,19 @@ public class BitacoraServiceImpl implements BitacoraService {
             );
         }
 
+        // Asociar niño
         bitacora.setNiño(niño);
+
+        // ✅ Asignar textos por defecto para los campos de contenido
+        bitacora.setDescripcionGeneral("Aquí va la descripción general del pequeño genio.");
+        bitacora.setOportunidades("Aquí van las oportunidades del pequeño genio.");
+        bitacora.setDebilidades("Aquí van las debilidades del pequeño genio.");
+        bitacora.setFortalezas("Aquí van las fortalezas del pequeño genio.");
+        bitacora.setAmenazas("Aquí van las amenazas del pequeño genio.");
+        bitacora.setObjetivos("Aquí van los objetivos del pequeño genio.");
+        bitacora.setHabilidades("Aquí van las habilidades del pequeño genio.");
+        bitacora.setSeguimiento("Aquí va el seguimiento del pequeño genio.");
+
         return bitacoraRepository.save(bitacora);
     }
 
@@ -156,6 +169,26 @@ public class BitacoraServiceImpl implements BitacoraService {
 
         return Optional.of(bitacoraRepository.save(existente));
     }
+
+    @Override
+    public void guardarTodas(List<Bitacora> bitacoras) {
+        bitacoraRepository.saveAll(bitacoras);
+    }
+
+    @Override
+    public void activarTodasPorNiño(Integer idNiño) {
+        Optional<Niño> niñoOpt = niñoRepository.findById(idNiño.intValue()); // o idNiño si es Integer
+        if (niñoOpt.isEmpty()) {
+            throw new IllegalArgumentException("Niño con ID " + idNiño + " no existe.");
+        }
+
+        List<Bitacora> bitacoras = bitacoraRepository.findByNiño(niñoOpt.get());
+        for (Bitacora bitacora : bitacoras) {
+            bitacora.setEstado(true);
+        }
+        bitacoraRepository.saveAll(bitacoras);
+    }
+
 
 
     @Override

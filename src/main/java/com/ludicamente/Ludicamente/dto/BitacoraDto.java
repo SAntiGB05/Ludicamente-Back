@@ -40,6 +40,8 @@ public class BitacoraDto {
         this.titulo = titulo;
     }
 
+
+
     public Integer getCodBitacora() {
         return codBitacora;
     }
