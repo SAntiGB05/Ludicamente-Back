@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.List;
@@ -23,6 +24,7 @@ public class NiñoController {
 
     @Autowired
     private NiñoService niñoService;
+
 
     // Crear un niño
     @Operation(summary = "Crear un nuevo niño")
@@ -61,6 +63,17 @@ public class NiñoController {
         return ResponseEntity.ok(niñoService.listarNiñosPorCorreoAcudiente(correo));
     }
 
+    @Operation(summary = "Obtener un niño por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Niño encontrado"),
+            @ApiResponse(responseCode = "404", description = "Niño no encontrado")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<NiñoDto> obtenerNiñoPorId(@PathVariable Integer id) {
+        Optional<NiñoDto> niño = niñoService.obtenerNiñoPorId(id);
+        return niño.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 
 
     @GetMapping(params = "acudiente")
@@ -84,6 +97,16 @@ public class NiñoController {
         Optional<NiñoDto> niño = niñoService.actualizarNiño(id, niñoActualizado);
         return niño.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+
+    @PutMapping("/{id}/foto")
+    public ResponseEntity<Void> actualizarFotoNiño(
+            @PathVariable Integer id,
+            @RequestParam("foto") MultipartFile foto) {
+        niñoService.actualizarFoto(id, foto);
+        return ResponseEntity.ok().build();
+    }
+
 
     // Eliminar un niño
     @Operation(summary = "Eliminar un niño")
