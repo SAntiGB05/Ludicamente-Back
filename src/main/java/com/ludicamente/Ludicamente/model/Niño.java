@@ -27,6 +27,7 @@ public class Niño {
     @Column(nullable = false)
     private Integer edad;
 
+    @Column(name = "foto", columnDefinition = "TEXT") // o LONGTEXT si esperas imágenes más grandes
     private String foto;
 
     @ManyToOne
