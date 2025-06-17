@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.List;
@@ -109,6 +110,16 @@ public class NiñoController {
 
         return niño.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+
+    @PutMapping("/{id}/foto")
+    public ResponseEntity<Void> actualizarFotoNiño(
+            @PathVariable Integer id,
+            @RequestParam("foto") MultipartFile foto) {
+        niñoService.actualizarFoto(id, foto);
+        return ResponseEntity.ok().build();
+    }
+
 
     // Eliminar un niño
     @Operation(summary = "Eliminar un niño")
