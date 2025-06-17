@@ -7,6 +7,8 @@ public class BitacoraMapper {
 
     public static BitacoraDto toDto(Bitacora b) {
         BitacoraDto dto = new BitacoraDto();
+        dto.setTitulo(b.getTitulo());
+        dto.setFechaCreacion(b.getFechaCreacion());
         dto.setCodBitacora(b.getCodBitacora());
         dto.setDescripcionGeneral(b.getDescripcionGeneral());
         dto.setOportunidades(b.getOportunidades());
@@ -35,6 +37,8 @@ public class BitacoraMapper {
         b.setSeguimiento(dto.getSeguimiento());
         b.setHistorialActividad(dto.getHistorialActividad());
         b.setEstado(true); // por defecto activa
+        b.setTitulo(dto.getTitulo());
+        b.setFechaCreacion(dto.getFechaCreacion());
         return b;
     }
 }
