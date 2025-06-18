@@ -40,27 +40,14 @@ public class AcudienteController {
                 .toList();
     }
 
-
-
-    @PreAuthorize("hasRole('ADMIN')") // Solo para ADMIN
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/cedula/{cedula}")
     public ResponseEntity<Acudiente> getAcudienteByCedula(@PathVariable String cedula) {
         try {
-            Acudiente acudiente = acudienteService.obtenerAcudientePorCedula(cedula); // Necesitas implementar este método en el servicio
+            Acudiente acudiente = acudienteService.obtenerAcudientePorCedula(cedula);
             return ResponseEntity.ok(acudiente);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).build(); // 404 Not Found
-        }
-    }
-
-    @PreAuthorize("hasRole('ADMIN')") // Solo para ADMIN
-    @GetMapping("/cedula/{cedula}")
-    public ResponseEntity<Acudiente> getAcudienteByCedula(@PathVariable String cedula) {
-        try {
-            Acudiente acudiente = acudienteService.obtenerAcudientePorCedula(cedula); // Necesitas implementar este método en el servicio
-            return ResponseEntity.ok(acudiente);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).build(); // 404 Not Found
+            return ResponseEntity.status(404).build(); // Not Found
         }
     }
 
@@ -73,7 +60,7 @@ public class AcudienteController {
             Acudiente actualizado = acudienteService.actualizarAcudiente(acudiente.getIdAcudiente(), acudienteDetails);
             return ResponseEntity.ok(actualizado);
         } else {
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(403).build(); // Forbidden
         }
     }
 
@@ -84,34 +71,18 @@ public class AcudienteController {
         return ResponseEntity.ok(actualizado);
     }
 
-
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACUDIENTE')")
-    @PutMapping
-    public ResponseEntity<Acudiente> updateAcudienteAuthenticated(@RequestBody Acudiente acudienteDetails) throws AccessDeniedException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.getPrincipal() instanceof AcudienteUserDetails acudienteUserDetails) {
-            Acudiente acudiente = acudienteUserDetails.getAcudiente();
-            Acudiente actualizado = acudienteService.actualizarAcudiente(acudiente.getIdAcudiente(), acudienteDetails);
-            return ResponseEntity.ok(actualizado);
-        } else {
-            return ResponseEntity.status(403).build();
-        }
-    }
-
-
     @PreAuthorize("hasAnyRole('ADMIN', 'ACUDIENTE')")
     @GetMapping("/correo/{correo}")
     public ResponseEntity<Acudiente> getAcudienteByCorreo(@PathVariable String correo, Authentication authentication) {
-        // Verificar que el correo solicitado coincide con el usuario autenticado
         if (!correo.equals(authentication.getName())) {
-            return ResponseEntity.status(403).build(); // 403 Forbidden
+            return ResponseEntity.status(403).build(); // Forbidden
         }
 
         try {
             Acudiente acudiente = acudienteService.obtenerAcudientePorCorreo(correo);
             return ResponseEntity.ok(acudiente);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).build(); // 404 Not Found
+            return ResponseEntity.status(404).build(); // Not Found
         }
     }
 
@@ -127,10 +98,11 @@ public class AcudienteController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Eliminar un acudiente")
     @DeleteMapping("/{id}")
-    public void deleteAcudiente(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteAcudiente(@PathVariable Integer id) {
         acudienteService.eliminarAcudiente(id);
+        return ResponseEntity.noContent().build(); // 204
     }
 }

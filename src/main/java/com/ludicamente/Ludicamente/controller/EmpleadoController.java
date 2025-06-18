@@ -2,25 +2,24 @@ package com.ludicamente.Ludicamente.controller;
 
 import com.ludicamente.Ludicamente.model.Empleado;
 import com.ludicamente.Ludicamente.service.EmpleadoService;
+import com.ludicamente.Ludicamente.dto.EmpleadoDto;
+import com.ludicamente.Ludicamente.dto.EmpleadoUpdateDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 import java.util.Optional;
-import com.ludicamente.Ludicamente.dto.EmpleadoDto; // Importación para la creación de empleados (POST)
-import com.ludicamente.Ludicamente.dto.EmpleadoUpdateDto; // ¡NUEVA IMPORTACIÓN para la actualización de empleados (PUT)!
-
-import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import jakarta.validation.Valid;
 
 @PreAuthorize("hasAnyRole('ROL_STAFF','ROL_ADMIN')")
 @RestController
@@ -30,55 +29,42 @@ public class EmpleadoController {
 
     @Autowired
     private EmpleadoService empleadoService;
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // --- Obtener empleado por correo ---
     @Operation(summary = "Obtener un empleado por su correo electrónico")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Empleado encontrado exitosamente"),
             @ApiResponse(responseCode = "403", description = "Acceso denegado"),
             @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
     })
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')") // Ajusta los roles según tu lógica de negocio
+    @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
     @GetMapping("/correo/{correo}")
     public ResponseEntity<Empleado> getEmpleadoByCorreo(@PathVariable String correo, Authentication authentication) {
-        // Verificar que el correo solicitado coincide con el usuario autenticado
-        // O que el usuario autenticado tiene el rol de ADMIN
-        if (!correo.equals(authentication.getName()) && !authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 403 Forbidden
-    @GetMapping("/correo/{correo}")
-    public ResponseEntity<Empleado> getEmpleadoByCorreo(@PathVariable String correo, Authentication authentication) {
-        // Verificar que el correo solicitado coincide con el usuario autenticado
-        if (!correo.equals(authentication.getName())) {
-            return ResponseEntity.status(403).build(); // 403 Forbidden
+        boolean esAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!correo.equals(authentication.getName()) && !esAdmin) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 403
         }
 
         try {
             Empleado empleado = empleadoService.obtenerEmpleadoPorCorreo(correo);
             return ResponseEntity.ok(empleado);
         } catch (RuntimeException e) {
-          
-            System.err.println("Error al obtener empleado por correo: " + e.getMessage()); // Para depuración
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404
         }
     }
 
-
-            return ResponseEntity.status(404).build(); // 404 Not Found
-        }
-    }
-
-    // Crear un empleado
     @Operation(summary = "Crear un nuevo empleado")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Empleado creado exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos de entrada")
     })
-    @PreAuthorize("hasRole('ADMIN')") // Asegúrate de que este rol sea el correcto (ej. 'ROL_ADMIN')
+    @PreAuthorize("hasRole('ROL_ADMIN')")
     @PostMapping
     public ResponseEntity<Empleado> crearEmpleado(@Valid @RequestBody EmpleadoDto empleadoDto) {
-        // Mapear EmpleadoDto a la entidad Empleado
         Empleado empleado = new Empleado();
         empleado.setCedulaEmpleado(empleadoDto.getCedulaEmpleado());
         empleado.setNombre(empleadoDto.getNombre());
@@ -89,85 +75,69 @@ public class EmpleadoController {
         empleado.setSalario(empleadoDto.getSalario());
         empleado.setHorario(empleadoDto.getHorario());
         empleado.setNivelAcceso(empleadoDto.getNivelAcceso());
-        empleado.setEstado(Empleado.EstadoEmpleado.valueOf(empleadoDto.getEstado().toLowerCase()));
+        empleado.setEstado(Empleado.EstadoEmpleado.valueOf(empleadoDto.getEstado().toUpperCase()));
 
-        // ¡IMPORTANTE! Hashear la contraseña antes de guardarla
+        // Hash de contraseña
         empleado.setContraseña(passwordEncoder.encode(empleadoDto.getContraseña()));
 
         Empleado nuevoEmpleado = empleadoService.crearEmpleado(empleado);
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoEmpleado);
     }
 
-
     @Operation(summary = "Obtener todos los empleados")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista de empleados obtenida exitosamente")
     })
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')") // Ajusta los roles para listar empleados
+    @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
     @GetMapping
     public ResponseEntity<List<Empleado>> listarEmpleados() {
         List<Empleado> empleados = empleadoService.listarEmpleados();
         return ResponseEntity.ok(empleados);
     }
 
-
     @Operation(summary = "Actualizar un empleado existente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Empleado actualizado exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Empleado no encontrado"),
-            @ApiResponse(responseCode = "400", description = "Error en los datos de entrada")
+            @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
     })
-    @PreAuthorize("hasRole('ADMIN')") // Solo ADMIN puede actualizar
+    @PreAuthorize("hasRole('ROL_ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Empleado> actualizarEmpleado(
-            @Parameter(description = "ID del empleado a actualizar", example = "1")
             @PathVariable Integer id,
-            // ¡CAMBIO CLAVE AQUÍ! Usamos EmpleadoUpdateDto para la actualización
             @Valid @RequestBody EmpleadoUpdateDto empleadoUpdateDto) {
 
-        Optional<Empleado> existingEmpleadoOpt = empleadoService.obtenerEmpleadoPorId(id);
-
-        if (!existingEmpleadoOpt.isPresent()) {
-            return ResponseEntity.notFound().build(); // 404 Not Found si no existe
+        Optional<Empleado> empleadoOpt = empleadoService.obtenerEmpleadoPorId(id);
+        if (empleadoOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
 
-        Empleado existingEmpleado = existingEmpleadoOpt.get();
+        Empleado empleado = empleadoOpt.get();
+        empleado.setCedulaEmpleado(empleadoUpdateDto.getCedulaEmpleado());
+        empleado.setNombre(empleadoUpdateDto.getNombre());
+        empleado.setCorreo(empleadoUpdateDto.getCorreo());
+        empleado.setTelefono(empleadoUpdateDto.getTelefono());
+        empleado.setDireccion(empleadoUpdateDto.getDireccion());
+        empleado.setFechaContratacion(empleadoUpdateDto.getFechaContratacion());
+        empleado.setSalario(empleadoUpdateDto.getSalario());
+        empleado.setHorario(empleadoUpdateDto.getHorario());
+        empleado.setNivelAcceso(empleadoUpdateDto.getNivelAcceso());
+        empleado.setEstado(Empleado.EstadoEmpleado.valueOf(empleadoUpdateDto.getEstado().toUpperCase()));
 
-        // Actualizar solo los campos que vienen en el EmpleadoUpdateDto
-        // (La contraseña no está en EmpleadoUpdateDto, por lo tanto, no se intenta actualizar aquí)
-        existingEmpleado.setCedulaEmpleado(empleadoUpdateDto.getCedulaEmpleado());
-        existingEmpleado.setNombre(empleadoUpdateDto.getNombre());
-        existingEmpleado.setCorreo(empleadoUpdateDto.getCorreo());
-        existingEmpleado.setTelefono(empleadoUpdateDto.getTelefono());
-        existingEmpleado.setDireccion(empleadoUpdateDto.getDireccion());
-        existingEmpleado.setFechaContratacion(empleadoUpdateDto.getFechaContratacion());
-        existingEmpleado.setSalario(empleadoUpdateDto.getSalario());
-        existingEmpleado.setHorario(empleadoUpdateDto.getHorario());
-        existingEmpleado.setNivelAcceso(empleadoUpdateDto.getNivelAcceso());
-        // Asegúrate de que el String del DTO se convierta correctamente al Enum
-        existingEmpleado.setEstado(Empleado.EstadoEmpleado.valueOf(empleadoUpdateDto.getEstado().toLowerCase()));
-
-        Optional<Empleado> empleadoActualizado = empleadoService.actualizarEmpleado(id, existingEmpleado);
-        return empleadoActualizado.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        Optional<Empleado> actualizado = empleadoService.actualizarEmpleado(id, empleado);
+        return actualizado.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-
-    // Eliminar un empleado
     @Operation(summary = "Eliminar un empleado")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Empleado eliminado exitosamente"),
             @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
     })
-    @PreAuthorize("hasRole('ADMIN')") // Solo ADMIN puede eliminar
+    @PreAuthorize("hasRole('ROL_ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarEmpleado(
-            @Parameter(description = "ID del empleado a eliminar", example = "1")
-            @PathVariable Integer id) {
-
+    public ResponseEntity<Void> eliminarEmpleado(@PathVariable Integer id) {
         if (empleadoService.eliminarEmpleado(id)) {
-            return ResponseEntity.noContent().build(); // 204 No Content
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }
