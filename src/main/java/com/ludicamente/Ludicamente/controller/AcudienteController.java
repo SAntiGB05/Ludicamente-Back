@@ -53,29 +53,7 @@ public class AcudienteController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')") // Solo para ADMIN
-    @GetMapping("/cedula/{cedula}")
-    public ResponseEntity<Acudiente> getAcudienteByCedula(@PathVariable String cedula) {
-        try {
-            Acudiente acudiente = acudienteService.obtenerAcudientePorCedula(cedula); // Necesitas implementar este método en el servicio
-            return ResponseEntity.ok(acudiente);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).build(); // 404 Not Found
-        }
-    }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACUDIENTE')")
-    @PutMapping
-    public ResponseEntity<Acudiente> updateAcudienteAuthenticated(@RequestBody Acudiente acudienteDetails) throws AccessDeniedException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.getPrincipal() instanceof AcudienteUserDetails acudienteUserDetails) {
-            Acudiente acudiente = acudienteUserDetails.getAcudiente();
-            Acudiente actualizado = acudienteService.actualizarAcudiente(acudiente.getIdAcudiente(), acudienteDetails);
-            return ResponseEntity.ok(actualizado);
-        } else {
-            return ResponseEntity.status(403).build();
-        }
-    }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
@@ -83,8 +61,6 @@ public class AcudienteController {
         Acudiente actualizado = acudienteService.actualizarAcudienteAdmin(id, acudienteDetails);
         return ResponseEntity.ok(actualizado);
     }
-
-
     @PreAuthorize("hasAnyRole('ADMIN', 'ACUDIENTE')")
     @PutMapping
     public ResponseEntity<Acudiente> updateAcudienteAuthenticated(@RequestBody Acudiente acudienteDetails) throws AccessDeniedException {
