@@ -33,7 +33,6 @@ public class EmpleadoController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // --- Obtener empleado por correo ---
     @Operation(summary = "Obtener un empleado por su correo electrónico")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Empleado encontrado exitosamente"),
@@ -42,32 +41,27 @@ public class EmpleadoController {
     })
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')") // Ajusta los roles según tu lógica de negocio
     @GetMapping("/correo/{correo}")
-    public ResponseEntity<Empleado> getEmpleadoByCorreo(@PathVariable String correo, Authentication authentication) {
-        // Verificar que el correo solicitado coincide con el usuario autenticado
-        // O que el usuario autenticado tiene el rol de ADMIN
-        if (!correo.equals(authentication.getName()) && !authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+    public ResponseEntity<Empleado> getEmpleadoByCorreo(
+            @PathVariable String correo,
+            Authentication authentication
+    ) {
+        // Verificar si el correo coincide con el autenticado o si tiene rol de ADMIN
+        boolean esAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!correo.equals(authentication.getName()) && !esAdmin) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 403 Forbidden
-    @GetMapping("/correo/{correo}")
-    public ResponseEntity<Empleado> getEmpleadoByCorreo(@PathVariable String correo, Authentication authentication) {
-        // Verificar que el correo solicitado coincide con el usuario autenticado
-        if (!correo.equals(authentication.getName())) {
-            return ResponseEntity.status(403).build(); // 403 Forbidden
         }
 
         try {
             Empleado empleado = empleadoService.obtenerEmpleadoPorCorreo(correo);
             return ResponseEntity.ok(empleado);
         } catch (RuntimeException e) {
-          
-            System.err.println("Error al obtener empleado por correo: " + e.getMessage()); // Para depuración
+            System.err.println("Error al obtener empleado por correo: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
         }
     }
 
-
-            return ResponseEntity.status(404).build(); // 404 Not Found
-        }
-    }
 
     // Crear un empleado
     @Operation(summary = "Crear un nuevo empleado")

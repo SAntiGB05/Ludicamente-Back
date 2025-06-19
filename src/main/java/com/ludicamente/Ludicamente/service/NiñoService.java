@@ -8,11 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface NiñoService {
-    Niño crearNiño(Niño niño);
-    List<NiñoDto> listarNiños(); // <--- Ahora retorna una lista de NiñoDto
-    Optional<Niño> actualizarNiño(Integer id, Niño niñoActualizado);
+    NiñoDto crearNiño(NiñoDto niñoDto);
+     // List<NiñoDto> listarNiños();
+     List<NiñoDto> listarTodosLosNiños();
     boolean eliminarNiño(Integer id);
-}
     List<NiñoDto> listarNiñosPorCorreoAcudiente(String correoAcudiente);
     List<NiñoDto> listarNiñosPorAcudiente(Integer idAcudiente);
     Optional<NiñoDto> actualizarNiño(Integer id, NiñoDto niñoActualizado);

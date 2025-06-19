@@ -36,7 +36,6 @@ public class NiñoDto {
     @NotNull(message = "Debe estar asociado a un acudiente")
     private Integer idAcudiente;
     private String cedulaAcudiente; // <--- ¡NUEVO CAMPO!
-
     private String  nombreAcudiente;
     private String parentescoAcudiente;
     private String telefonoAcudiente;
@@ -46,7 +45,7 @@ public class NiñoDto {
     public NiñoDto() {
     }
 
-    public NiñoDto(Integer idNiño, String nombre, String nIdentificacion, String sexo, Date fechaNacimiento, Integer edad, String foto, Integer idAcudiente, String cedulaAcudiente) { // <--- Constructor actualizado
+    public NiñoDto(Integer idNiño, String nombre, String nIdentificacion, String sexo, Date fechaNacimiento, Integer edad, String foto, Integer idAcudiente) { // <--- Constructor actualizado
         this.idNiño = idNiño;
         this.nombre = nombre;
         this.nIdentificacion = nIdentificacion;
@@ -55,7 +54,7 @@ public class NiñoDto {
         this.edad = edad;
         this.foto = foto;
         this.idAcudiente = idAcudiente;
-        this.cedulaAcudiente = cedulaAcudiente; // <--- Asignar nuevo campo
+        //this.cedulaAcudiente = cedulaAcudiente; // <--- Asignar nuevo campo
 
     }
 
