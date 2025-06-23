@@ -111,6 +111,7 @@
             <type>pom</type>
             <scope>import</scope>
         </dependency>
+
         <dependency>
             <groupId>com.google.cloud</groupId>
             <artifactId>spring-cloud-gcp-starter-storage</artifactId>
