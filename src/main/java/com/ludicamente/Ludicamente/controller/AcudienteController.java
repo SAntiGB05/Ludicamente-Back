@@ -28,14 +28,17 @@ public class AcudienteController {
     private AcudienteService acudienteService;
 
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @Operation(summary = "Listar acudientes")
+    @Operation(summary = "Listar acudientes con información completa")
     @GetMapping("/listado")
     public List<AcudienteDto> listarAcudientes() {
         return acudienteService.listarAcudientes().stream()
                 .map(a -> new AcudienteDto(
                         a.getIdAcudiente(),
+                        a.getCedula(),
                         a.getNombre(),
-                        a.getCedula()
+                        a.getCorreo(),
+                        a.getTelefono(),
+                        a.getParentesco()
                 ))
                 .toList();
     }
@@ -72,13 +75,6 @@ public class AcudienteController {
         } else {
             return ResponseEntity.status(403).build();
         }
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
-    public ResponseEntity<Acudiente> updateAcudienteByAdmin(@PathVariable Integer id, @Valid @RequestBody AcudienteDto acudienteDetails) {
-        Acudiente actualizado = acudienteService.actualizarAcudienteAdmin(id, acudienteDetails);
-        return ResponseEntity.ok(actualizado);
     }
 
 

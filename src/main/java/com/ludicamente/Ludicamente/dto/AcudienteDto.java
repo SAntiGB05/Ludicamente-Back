@@ -11,7 +11,7 @@ public class AcudienteDto {
     private String direccion;
 
 
-    public AcudienteDto(Integer idAcudiente, String direccion, String parentesco, String telefono, String contraseña, String correo, String nombre, String cedula) {
+    public AcudienteDto(Integer idAcudiente, String direccion, String parentesco, String telefono, String contraseña, String correo) {
         this.idAcudiente = idAcudiente;
         this.direccion = direccion;
         this.parentesco = parentesco;
