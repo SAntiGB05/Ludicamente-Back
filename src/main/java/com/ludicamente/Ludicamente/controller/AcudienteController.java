@@ -74,6 +74,13 @@ public class AcudienteController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<Acudiente> updateAcudienteByAdmin(@PathVariable Integer id, @Valid @RequestBody AcudienteDto acudienteDetails) {
+        Acudiente actualizado = acudienteService.actualizarAcudienteAdmin(id, acudienteDetails);
+        return ResponseEntity.ok(actualizado);
+    }
+
 
     @PreAuthorize("hasAnyRole('ADMIN', 'ACUDIENTE')")
     @GetMapping("/correo/{correo}")
