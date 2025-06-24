@@ -27,6 +27,7 @@ public class Niño {
     @Column(nullable = false)
     private Integer edad;
 
+    @Column(name = "foto", columnDefinition = "TEXT") // o LONGTEXT si esperas imágenes más grandes
     private String foto;
 
     @ManyToOne
@@ -34,7 +35,11 @@ public class Niño {
     @JoinColumn(name = "fkid_acudiente", nullable = false)
     private Acudiente acudiente;
 
+
+
     // === Getters y Setters ===
+
+
 
     public Integer getIdNiño() {
         return idNiño;

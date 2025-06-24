@@ -2,7 +2,6 @@ package com.ludicamente.Ludicamente.service;
 
 import com.ludicamente.Ludicamente.model.Acudiente;
 import com.ludicamente.Ludicamente.model.Empleado;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -20,5 +19,10 @@ public interface EmpleadoService {
     // Eliminar un empleado
     boolean eliminarEmpleado(Integer id);
 
+    // Obtener empleado por correo
     Empleado obtenerEmpleadoPorCorreo(String correo);
+
+    // Obtener empleado por ID
+    Optional<Empleado> obtenerEmpleadoPorId(Integer id);
 }
+
