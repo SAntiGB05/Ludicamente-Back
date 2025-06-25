@@ -1,5 +1,8 @@
 // ludicamente-backend/src/main/java/com/ludicamente/Ludicamente/config/SecurityConfig.java
 package com.ludicamente.Ludicamente.config;
+import org.springframework.http.HttpMethod;
+import com.ludicamente.Ludicamente.auth.userdetails.CompositeUserDetailsService;
+import org.springframework.beans.factory.annotation.Qualifier; // No usado, se puede eliminar si no se usa en otra parte
 
 // Importaciones necesarias
 import com.ludicamente.Ludicamente.auth.userdetails.CompositeUserDetailsService; // <-- ¡Asegúrate de que esta ruta de paquete sea EXACTA!
@@ -63,6 +66,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        // Permitir acceso sin autenticación a la URL de subida de archivos
+                        .requestMatchers(HttpMethod.GET, "/api/servicios/categoria/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorias").permitAll()
+                        .requestMatchers("/api/files/upload").permitAll() // <--- ¡AÑADIDO AQUÍ!
+                        .requestMatchers("/api/auth/**", "/v3/api-docs/**", "/error", "/favicon.ico", "/resources/**").permitAll()
                         .requestMatchers(
                                 "/api/chatbot/**",
                                 "/api/files/upload",
