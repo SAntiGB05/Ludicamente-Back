@@ -11,4 +11,6 @@ public interface CategoriaService {
     List<Categoria> listarCategorias();
     Optional<Categoria> actualizarCategoria(Integer id, Categoria categoriaActualizada);
     boolean eliminarCategoria(Integer id);
+    Optional<Categoria> obtenerPorId(Integer id);
+
 }

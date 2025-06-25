@@ -1,5 +1,4 @@
 package com.ludicamente.Ludicamente.controller;
-
 import com.ludicamente.Ludicamente.dto.BitacoraDto;
 import com.ludicamente.Ludicamente.mapper.BitacoraMapper;
 import com.ludicamente.Ludicamente.model.Bitacora;
