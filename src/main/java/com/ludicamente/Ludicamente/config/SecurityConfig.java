@@ -1,5 +1,5 @@
 package com.ludicamente.Ludicamente.config;
-
+import org.springframework.http.HttpMethod;
 import com.ludicamente.Ludicamente.auth.userdetails.CompositeUserDetailsService;
 import org.springframework.beans.factory.annotation.Qualifier; // No usado, se puede eliminar si no se usa en otra parte
 import org.springframework.context.annotation.Bean;
@@ -67,6 +67,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         // Permitir acceso sin autenticación a la URL de subida de archivos
+                        .requestMatchers(HttpMethod.GET, "/api/servicios/categoria/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorias").permitAll()
                         .requestMatchers("/api/files/upload").permitAll() // <--- ¡AÑADIDO AQUÍ!
                         .requestMatchers("/api/auth/**", "/v3/api-docs/**", "/error", "/favicon.ico", "/resources/**").permitAll()
                         .anyRequest().authenticated()

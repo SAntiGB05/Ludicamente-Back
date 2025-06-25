@@ -1,17 +1,25 @@
 package com.ludicamente.Ludicamente.controller;
 
+import com.ludicamente.Ludicamente.dto.ServicioDto;
+import com.ludicamente.Ludicamente.mapper.ServicioMapper;
+import com.ludicamente.Ludicamente.model.Categoria;
 import com.ludicamente.Ludicamente.model.Servicio;
+import com.ludicamente.Ludicamente.service.CategoriaService;
 import com.ludicamente.Ludicamente.service.ServicioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/servicios")
@@ -20,15 +28,25 @@ public class ServicioController {
     @Autowired
     private ServicioService servicioService;
 
+    @Autowired
+    private CategoriaService categoriaService;
+
+    @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
     @Operation(summary = "Crear un nuevo servicio")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Servicio creado exitosamente"),
             @ApiResponse(responseCode = "400", description = "Error en los datos de entrada")
     })
     @PostMapping
-    public ResponseEntity<Servicio> crearServicio(@RequestBody Servicio servicio) {
-        Servicio nuevoServicio = servicioService.crearServicio(servicio);
-        return ResponseEntity.status(201).body(nuevoServicio);
+    public ResponseEntity<ServicioDto> crearServicio(@Valid @RequestBody ServicioDto dto) {
+        Optional<Categoria> categoriaOpt = categoriaService.obtenerPorId(dto.getFkcodCategoria());
+        if (categoriaOpt.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Servicio servicio = ServicioMapper.toEntity(dto, categoriaOpt.get());
+        Servicio creado = servicioService.crearServicio(servicio);
+        return ResponseEntity.created(URI.create("/api/servicios/" + creado.getCodServicio()))
+                .body(ServicioMapper.toDto(creado));
     }
 
     @Operation(summary = "Obtener todos los servicios")
@@ -36,26 +54,49 @@ public class ServicioController {
             @ApiResponse(responseCode = "200", description = "Lista de servicios obtenida exitosamente")
     })
     @GetMapping
-    public ResponseEntity<List<Servicio>> listarServicios() {
-        List<Servicio> servicios = servicioService.listarServicios();
-        return ResponseEntity.ok(servicios);
+    public ResponseEntity<List<ServicioDto>> listarServicios() {
+        List<ServicioDto> dtos = servicioService.listarServicios();
+        return ResponseEntity.ok(dtos);
     }
 
+
+    @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
     @Operation(summary = "Actualizar un servicio existente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Servicio actualizado exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Servicio no encontrado")
+            @ApiResponse(responseCode = "404", description = "Servicio o categoría no encontrada")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<Servicio> actualizarServicio(
+    public ResponseEntity<ServicioDto> actualizarServicio(
             @Parameter(description = "ID del servicio a actualizar", example = "1")
             @PathVariable Integer id,
-            @RequestBody Servicio servicioActualizado) {
+            @Valid @RequestBody ServicioDto dto) {
 
-        Optional<Servicio> servicio = servicioService.actualizarServicio(id, servicioActualizado);
-        return servicio.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        Optional<Categoria> categoriaOpt = categoriaService.obtenerPorId(dto.getFkcodCategoria());
+        if (categoriaOpt.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Servicio servicioActualizado = ServicioMapper.toEntity(dto, categoriaOpt.get());
+        Optional<Servicio> actualizado = servicioService.actualizarServicio(id, servicioActualizado);
+
+        return actualizado
+                .map(servicio -> ResponseEntity.ok(ServicioMapper.toDto(servicio)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+
+    @GetMapping("/categoria/{idCategoria}")
+    public ResponseEntity<List<ServicioDto>> listarPorCategoria(@PathVariable Integer idCategoria) {
+        List<ServicioDto> servicios = servicioService.listarServicios()
+                .stream()
+                .filter(dto -> idCategoria.equals(dto.getFkcodCategoria()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(servicios);
+    }
+
+
+    @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
     @Operation(summary = "Eliminar un servicio")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Servicio eliminado exitosamente"),
@@ -66,9 +107,7 @@ public class ServicioController {
             @Parameter(description = "ID del servicio a eliminar", example = "1")
             @PathVariable Integer id) {
 
-        if (servicioService.eliminarServicio(id)) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+        boolean eliminado = servicioService.eliminarServicio(id);
+        return eliminado ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 }

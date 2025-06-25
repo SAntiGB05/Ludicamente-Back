@@ -39,6 +39,11 @@ public class CategoriaServiceImpl implements CategoriaService {
         }
         return Optional.empty();
     }
+    @Override
+    public Optional<Categoria> obtenerPorId(Integer id) {
+        return categoriaRepository.findById(id);
+    }
+
 
     @Override
     public boolean eliminarCategoria(Integer id) {
