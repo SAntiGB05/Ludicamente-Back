@@ -28,14 +28,17 @@ public class AcudienteController {
     private AcudienteService acudienteService;
 
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @Operation(summary = "Listar acudientes")
+    @Operation(summary = "Listar acudientes con información completa")
     @GetMapping("/listado")
     public List<AcudienteDto> listarAcudientes() {
         return acudienteService.listarAcudientes().stream()
                 .map(a -> new AcudienteDto(
                         a.getIdAcudiente(),
+                        a.getCedula(),
                         a.getNombre(),
-                        a.getCedula()
+                        a.getCorreo(),
+                        a.getTelefono(),
+                        a.getParentesco()
                 ))
                 .toList();
     }

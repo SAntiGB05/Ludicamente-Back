@@ -64,13 +64,18 @@ public class AcudienteServiceImpl implements AcudienteService {
         Acudiente acudiente = acudienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con id: " + id));
 
-        // Actualizar solo nombre, teléfono y parentesco
         acudiente.setNombre(acudienteDetails.getNombre());
+        acudiente.setCedula(acudienteDetails.getCedula());
+        acudiente.setCorreo(acudienteDetails.getCorreo());
+        acudiente.setContraseña(acudienteDetails.getContraseña());
         acudiente.setTelefono(acudienteDetails.getTelefono());
         acudiente.setParentesco(acudienteDetails.getParentesco());
+        acudiente.setDireccion(acudienteDetails.getDireccion());
 
         return acudienteRepository.save(acudiente);
     }
+
+
 
     @Override
     @Transactional

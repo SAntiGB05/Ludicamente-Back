@@ -140,9 +140,11 @@ public class NiñoServiceImpl implements NiñoService {
         String nombreAcudiente = null;
         String parentescoAcudiente = null;
         String telefonoAcudiente = null;
+        String cedulaAcudiente = null;
 
         if (niño.getAcudiente() != null) {
             idAcudiente = niño.getAcudiente().getIdAcudiente();
+            cedulaAcudiente = niño.getAcudiente().getCedula();
             nombreAcudiente = niño.getAcudiente().getNombre();
             parentescoAcudiente = niño.getAcudiente().getParentesco();
             telefonoAcudiente = niño.getAcudiente().getTelefono();
@@ -156,7 +158,8 @@ public class NiñoServiceImpl implements NiñoService {
                 niño.getFechaNacimiento(),
                 niño.getEdad(),
                 niño.getFoto(),
-                idAcudiente
+                idAcudiente,
+                cedulaAcudiente
         );
 
         dto.setNombreAcudiente(nombreAcudiente);
