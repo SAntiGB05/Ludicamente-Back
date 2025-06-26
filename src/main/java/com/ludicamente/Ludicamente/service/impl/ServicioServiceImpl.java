@@ -80,6 +80,11 @@ public class ServicioServiceImpl implements ServicioService {
     }
 
     @Override
+    public Optional<Servicio> obtenerPorId(Integer id) {
+        return servicioRepository.findById(id);
+    }
+
+    @Override
     public boolean eliminarServicio(Integer id) {
         if (servicioRepository.existsById(id)) {
             servicioRepository.deleteById(id);

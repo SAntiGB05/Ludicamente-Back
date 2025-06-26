@@ -101,6 +101,22 @@ public class AcudienteServiceImpl implements AcudienteService {
     }
 
     @Override
+    public AcudienteDto obtenerAcudienteAutenticado(String correo) {
+        Acudiente acudiente = acudienteRepository.findByCorreo(correo)
+                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado"));
+
+        return new AcudienteDto(
+                acudiente.getIdAcudiente(),
+                acudiente.getCedula(),
+                acudiente.getNombre(),
+                acudiente.getCorreo(),
+                acudiente.getTelefono(),
+                acudiente.getParentesco()
+        );
+    }
+
+
+    @Override
     @Transactional
     public Acudiente registrarAcudienteConNiños(RegisterAcudienteRequest request) {
         // Verificar si el correo ya está registrado

@@ -59,6 +59,15 @@ public class ServicioController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<ServicioDto> obtenerServicioPorId(@PathVariable Integer id) {
+        Optional<Servicio> servicioOpt = servicioService.obtenerPorId(id);
+        return servicioOpt
+                .map(servicio -> ResponseEntity.ok(ServicioMapper.toDto(servicio)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
 
     @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
     @Operation(summary = "Actualizar un servicio existente")
