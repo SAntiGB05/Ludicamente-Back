@@ -90,6 +90,10 @@ public class Empleado {
     public Empleado(){
     }
 
+    public Empleado(Integer idEmpleado) {
+        this.idEmpleado = idEmpleado;
+    }
+
     // --- Constructor privado para el Builder ---
     private Empleado(Builder builder) {
         this.idEmpleado = builder.idEmpleado;

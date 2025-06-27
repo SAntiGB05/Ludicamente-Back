@@ -64,10 +64,12 @@ public class SecurityConfig {
                                 "/error",
                                 "/favicon.ico",
                                 "/resources/**",
-                                "/api/chatbot/**",
+                        "/api/chatbot/**",
                                 "/api/files/upload",
                                 "/api/servicios/categoria/**",
-                                "/api/categorias"
+                                "/api/categorias",
+                                "/api/pago/**"
+
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

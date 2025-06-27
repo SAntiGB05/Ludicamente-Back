@@ -2,6 +2,8 @@ package com.ludicamente.Ludicamente.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Time;
 
 @Entity
 @Table(name = "detalle_factura")
@@ -21,6 +23,12 @@ public class DetalleFactura {
     @Column(name = "descuento_unitario", nullable = false, precision = 10, scale = 2)
     private BigDecimal descuentoUnitario = BigDecimal.ZERO;
 
+    @Column(name = "horario", nullable = false)
+    private Time horario;
+
+    @Column(name = "fecha", nullable = false)
+    private Date fecha;
+
     @Column(name = "subtotal_item", precision = 10, scale = 2, insertable = false, updatable = false)
     private BigDecimal subtotalItem;
 
@@ -38,11 +46,14 @@ public class DetalleFactura {
     // Constructor vacío
     public DetalleFactura() {}
 
-    // Constructor con parámetros (opcional)
-    public DetalleFactura(int cantidad, BigDecimal precioUnitario, BigDecimal descuentoUnitario, Factura factura, Servicio servicio) {
+    // Constructor con parámetros
+    public DetalleFactura(int cantidad, BigDecimal precioUnitario, BigDecimal descuentoUnitario,
+                          Time horario, Date fecha, Factura factura, Servicio servicio) {
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
         this.descuentoUnitario = descuentoUnitario;
+        this.horario = horario;
+        this.fecha = fecha;
         this.factura = factura;
         this.servicio = servicio;
     }
@@ -78,6 +89,22 @@ public class DetalleFactura {
 
     public void setDescuentoUnitario(BigDecimal descuentoUnitario) {
         this.descuentoUnitario = descuentoUnitario;
+    }
+
+    public Time getHorario() {
+        return horario;
+    }
+
+    public void setHorario(Time horario) {
+        this.horario = horario;
+    }
+
+    public Date getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(Date fecha) {
+        this.fecha = fecha;
     }
 
     public BigDecimal getSubtotalItem() {

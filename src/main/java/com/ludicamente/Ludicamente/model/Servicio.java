@@ -55,6 +55,11 @@ public class Servicio {
         this.estado = estado;
     }
 
+    public Servicio(Integer idServicio) {
+        this.codServicio = idServicio;
+    }
+
+
     public int getCodServicio() {
         return codServicio;
     }
