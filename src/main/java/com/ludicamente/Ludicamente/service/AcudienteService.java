@@ -13,7 +13,7 @@ public interface AcudienteService {
     Acudiente actualizarAcudiente(Integer id, Acudiente acudienteDetails);
     Acudiente actualizarAcudienteAdmin(Integer id, AcudienteDto acudienteDetails);
     void eliminarAcudiente(Integer id);
+    AcudienteDto obtenerAcudienteAutenticado(String correo);
 
     Acudiente registrarAcudienteConNiños(RegisterAcudienteRequest request);
-
 }

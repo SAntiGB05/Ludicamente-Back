@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,14 +29,17 @@ public class AcudienteController {
     private AcudienteService acudienteService;
 
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @Operation(summary = "Listar acudientes")
+    @Operation(summary = "Listar acudientes con información completa")
     @GetMapping("/listado")
     public List<AcudienteDto> listarAcudientes() {
         return acudienteService.listarAcudientes().stream()
                 .map(a -> new AcudienteDto(
                         a.getIdAcudiente(),
+                        a.getCedula(),
                         a.getNombre(),
-                        a.getCedula()
+                        a.getCorreo(),
+                        a.getTelefono(),
+                        a.getParentesco()
                 ))
                 .toList();
     }
@@ -51,6 +55,13 @@ public class AcudienteController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(404).build(); // 404 Not Found
         }
+    }
+
+    @PreAuthorize("hasRole('ACUDIENTE')")
+    @GetMapping("/auth")
+    public ResponseEntity<AcudienteDto> getAcudienteAutenticado(@AuthenticationPrincipal AcudienteUserDetails userDetails) {
+        AcudienteDto dto = acudienteService.obtenerAcudienteAutenticado(userDetails.getUsername());
+        return ResponseEntity.ok(dto);
     }
 
 

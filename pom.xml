@@ -18,6 +18,12 @@
     <name>Ludicamente</name>
     <description>Proyecto Ludicamente con Spring Boot 3.4.4 y Java 21</description>
 
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     <properties>
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -121,6 +127,16 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+
+
+        <dependency>
+            <groupId>com.mercadopago</groupId>
+            <artifactId>dx-java</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

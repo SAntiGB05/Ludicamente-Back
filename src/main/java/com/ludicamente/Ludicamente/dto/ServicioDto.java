@@ -1,29 +1,33 @@
 package com.ludicamente.Ludicamente.dto;
 
 import java.math.BigDecimal;
-
 public class ServicioDto {
 
     private Integer codServicio;
     private String nombreServicio;
     private String descripcion;
     private BigDecimal costo;
+    private Integer duracionMinutos;
+    private Integer capacidadMaxima;
     private Integer fkcodCategoria;
-
-    // Constructor vacío
+    private String requisitos;
+    private String estado;
     public ServicioDto() {}
 
-    // Constructor con parámetros
     public ServicioDto(Integer codServicio, String nombreServicio, String descripcion,
-                       BigDecimal costo, Integer fkcodCategoria) {
+                       BigDecimal costo, Integer duracionMinutos, Integer capacidadMaxima,
+                       Integer fkcodCategoria, String requisitos, String estado) {
         this.codServicio = codServicio;
         this.nombreServicio = nombreServicio;
         this.descripcion = descripcion;
         this.costo = costo;
+        this.duracionMinutos = duracionMinutos;
+        this.capacidadMaxima = capacidadMaxima;
         this.fkcodCategoria = fkcodCategoria;
+        this.requisitos = requisitos;
+        this.estado = estado;
     }
 
-    // Getters y Setters
     public Integer getCodServicio() {
         return codServicio;
     }
@@ -56,11 +60,43 @@ public class ServicioDto {
         this.costo = costo;
     }
 
+    public Integer getCapacidadMaxima() {
+        return capacidadMaxima;
+    }
+
+    public void setCapacidadMaxima(Integer capacidadMaxima) {
+        this.capacidadMaxima = capacidadMaxima;
+    }
+
+    public Integer getDuracionMinutos() {
+        return duracionMinutos;
+    }
+
+    public void setDuracionMinutos(Integer duracionMinutos) {
+        this.duracionMinutos = duracionMinutos;
+    }
+
     public Integer getFkcodCategoria() {
         return fkcodCategoria;
     }
 
     public void setFkcodCategoria(Integer fkcodCategoria) {
         this.fkcodCategoria = fkcodCategoria;
+    }
+
+    public String getRequisitos() {
+        return requisitos;
+    }
+
+    public void setRequisitos(String requisitos) {
+        this.requisitos = requisitos;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }
