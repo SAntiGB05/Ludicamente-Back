@@ -1,11 +1,11 @@
-// ludicamente-backend/src/main/java/com/ludicamente/Ludicamente/config/SecurityConfig.java
 package com.ludicamente.Ludicamente.config;
 
 // Importaciones necesarias
-import com.ludicamente.Ludicamente.auth.userdetails.CompositeUserDetailsService; // <-- ¡Asegúrate de que esta ruta de paquete sea EXACTA!
-import com.ludicamente.Ludicamente.config.JwtService; // <-- Asegúrate de que esta ruta de paquete sea EXACTA para tu JwtService
-import com.ludicamente.Ludicamente.config.JwtAuthenticationFilter; // <-- Asegúrate de que esta ruta de paquete sea EXACTA para tu JwtAuthenticationFilter
+import com.ludicamente.Ludicamente.auth.userdetails.CompositeUserDetailsService;
+import com.ludicamente.Ludicamente.config.JwtService;
+import com.ludicamente.Ludicamente.config.JwtAuthenticationFilter;
 
+import org.springframework.beans.factory.annotation.Value; // ¡Nueva importación!
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,12 +18,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-// La anotación CrossOrigin en este archivo es redundante si tienes CorsConfigurationSource
-// import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays; // ¡Nueva importación para Arrays.asList!
 import java.util.List;
 
 @Configuration
@@ -34,6 +33,10 @@ public class SecurityConfig {
     private final JwtService jwtService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    // Inyecta el valor de la propiedad 'cors.allowed-origins' desde application.properties
+    @Value("${cors.allowed-origins}")
+    private String allowedOrigins;
+
     // Constructor con inyección de dependencias
     public SecurityConfig(CompositeUserDetailsService compositeUserDetailsService, JwtService jwtService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.compositeUserDetailsService = compositeUserDetailsService;
@@ -41,12 +44,9 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    // ... el resto de tu clase SecurityConfig permanece igual ...
-
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        // Aquí es donde el error ocurría si CompositeUserDetailsService no era un UserDetailsService
         provider.setUserDetailsService(compositeUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
@@ -65,12 +65,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/chatbot/**",
-                                "/api/files/upload",
                                 "/api/auth/**",
+                                "/api/upload/image", // ¡Asegúrate de que este endpoint también sea permitido si no requiere autenticación inicial para la subida!
                                 "/v3/api-docs/**",
                                 "/error",
                                 "/favicon.ico",
-                                "/resources/**"
+                                "/resources/**",
+                                "/api/categorias", // <-- AÑADIR ESTA LÍNEA
+                                "/api/categorias/**" // <-- AÑADIR ESTA LÍNEA SI HAY SUB-RECURSOS (ej. /api/categorias/1)
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -85,7 +87,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173")); // O "http://localhost:3000"
+        // Divide la cadena de origins por comas y la convierte en una lista.
+        // Esto permite múltiples orígenes definidos en application.properties.
+        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
