@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/upload/image", // <-- ¡AÑADIR ESTA LÍNEA!
             "/error",             // <-- ¡AÑADIR ESTA LÍNEA!
             "/favicon.ico",       // <-- ¡AÑADIR ESTA LÍNEA!
-            "/resources/**"       // <-- ¡AÑADIR ESTA LÍNEA!// <-- Asegúrate de que esto esté aquí si quieres que el filtro lo omita
+            "/resources/**",       // <-- ¡AÑADIR ESTA LÍNEA!// <-- Asegúrate de que esto esté aquí si quieres que el filtro lo omita
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/api/chatbot/**",
