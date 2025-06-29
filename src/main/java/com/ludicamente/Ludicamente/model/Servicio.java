@@ -1,6 +1,10 @@
 package com.ludicamente.Ludicamente.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "servicio")
@@ -18,7 +22,7 @@ public class Servicio {
     private String descripcion;
 
     @Column(name = "costo", nullable = false)
-    private double costo;
+    private BigDecimal costo;
 
     @Column(name = "duracion_minutos", nullable = false)
     private int duracionMinutos;
@@ -34,14 +38,12 @@ public class Servicio {
     private String requisitos;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado", columnDefinition = "ENUM('disponible', 'no_disponible') DEFAULT 'disponible'")
+    @Column(name = "estado", columnDefinition = "ENUM('DISPONIBLE', 'NO_DISPONIBLE') DEFAULT 'DISPONIBLE'")
     private EstadoServicio estado;
 
-    // Constructor vacío
     public Servicio() {}
 
-    // Constructor con parámetros
-    public Servicio(String nombreServicio, String descripcion, double costo, int duracionMinutos,
+    public Servicio(String nombreServicio, String descripcion, BigDecimal  costo, int duracionMinutos,
                     Integer capacidadMaxima, Categoria categoria, String requisitos, EstadoServicio estado) {
         this.nombreServicio = nombreServicio;
         this.descripcion = descripcion;
@@ -53,7 +55,11 @@ public class Servicio {
         this.estado = estado;
     }
 
-    // Getters y Setters
+    public Servicio(Integer idServicio) {
+        this.codServicio = idServicio;
+    }
+
+
     public int getCodServicio() {
         return codServicio;
     }
@@ -78,11 +84,11 @@ public class Servicio {
         this.descripcion = descripcion;
     }
 
-    public double getCosto() {
+    public BigDecimal  getCosto() {
         return costo;
     }
 
-    public void setCosto(double costo) {
+    public void setCosto(BigDecimal  costo) {
         this.costo = costo;
     }
 
@@ -126,9 +132,27 @@ public class Servicio {
         this.estado = estado;
     }
 
-    // Enum para el estado del servicio
     public enum EstadoServicio {
-        DISPONIBLE,
-        NO_DISPONIBLE
+        disponible,
+        no_disponible;
+
+        @JsonCreator
+        public static EstadoServicio fromString(String valor) {
+            if (valor == null) {
+                throw new IllegalArgumentException("El estado no puede ser nulo");
+            }
+
+            return switch (valor.trim().toLowerCase()) {
+                case "disponible" -> disponible;
+                case "no_disponible" -> no_disponible;
+                default -> throw new IllegalArgumentException("EstadoServicio inválido: " + valor);
+            };
+        }
+
+        @JsonValue
+        public String toJson() {
+            return name(); // devuelve "disponible" o "no_disponible"
+        }
     }
+
 }

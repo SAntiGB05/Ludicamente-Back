@@ -63,8 +63,10 @@ public class JwtService {
         // Agregar userId dependiendo del tipo de UserDetails
         if (userDetails instanceof EmpleadoUserDetails empleadoDetails) {
             extraClaims.put("userId", empleadoDetails.getEmpleado().getIdEmpleado());
+            extraClaims.put("rol", "EMPLEADO");
         } else if (userDetails instanceof AcudienteUserDetails acudienteDetails) {
             extraClaims.put("userId", acudienteDetails.getAcudiente().getIdAcudiente());
+            extraClaims.put("rol", "ACUDIENTE");
         }
 
         return Jwts.builder()

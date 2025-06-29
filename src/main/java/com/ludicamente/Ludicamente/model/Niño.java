@@ -36,7 +36,12 @@ public class Niño {
     private Acudiente acudiente;
 
 
+    public Niño(Integer idNiño) {
+        this.idNiño = idNiño;
+    }
+    public Niño() {
 
+    }
     // === Getters y Setters ===
 
 
