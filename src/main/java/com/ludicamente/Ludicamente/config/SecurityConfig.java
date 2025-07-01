@@ -1,9 +1,9 @@
 package com.ludicamente.Ludicamente.config;
 // Importaciones necesarias
-import com.ludicamente.Ludicamente.auth.userdetails.CompositeUserDetailsService;
 import com.ludicamente.Ludicamente.config.JwtService;
 import com.ludicamente.Ludicamente.config.JwtAuthenticationFilter;
-import org.springframework.beans.factory.annotation.Value; // ¡Nueva importación!
+import com.ludicamente.Ludicamente.auth.userdetails.CompositeUserDetailsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import java.util.Arrays; // ¡Nueva importación para Arrays.asList!
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -36,6 +36,13 @@ public class SecurityConfig {
 
 // Constructor con inyección de dependencias
     public SecurityConfig(CompositeUserDetailsService compositeUserDetailsService, JwtService jwtService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    @Value("${cors.allowed-origins}")
+    private String allowedOrigins;
+
+    public SecurityConfig(
+            CompositeUserDetailsService compositeUserDetailsService,
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) {
         this.compositeUserDetailsService = compositeUserDetailsService;
         this.jwtService = jwtService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
@@ -61,13 +68,19 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/chatbot/**",
                                 "/api/auth/**",
                                 "/api/upload/image",
                                 "/api/gallery/images",
                                 "/api/gallery/hide-image",
                                 "/api/gallery/show-image", // <-- ¡ASEGÚRATE DE ESTA LÍNEA!
                                 "/api/gallery/hidden-images", // <-- ¡ASEGÚRATE DE ESTA LÍNEA!
+                                "/api/chatbot/**",
+                                "/api/upload/image",
+                                "/api/files/upload",
+                                "/api/servicios/categoria/**",
+                                "/api/categorias",
+                                "/api/categorias/**",
+                                "/api/pago/**",
                                 "/v3/api-docs/**",
                                 "/error",
                                 "/favicon.ico",
@@ -76,12 +89,14 @@ public class SecurityConfig {
                                 "/api/categorias/**",
                                 "/swagger-ui/**", // <-- También es buena idea tener esto como público
                                 "/swagger-resources/**" // <-- Y esto
+                                "/resources/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
