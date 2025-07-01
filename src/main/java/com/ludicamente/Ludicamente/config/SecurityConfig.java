@@ -1,7 +1,5 @@
 package com.ludicamente.Ludicamente.config;
-// Importaciones necesarias
-import com.ludicamente.Ludicamente.config.JwtService;
-import com.ludicamente.Ludicamente.config.JwtAuthenticationFilter;
+
 import com.ludicamente.Ludicamente.auth.userdetails.CompositeUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsConfigurationSource;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,15 +26,8 @@ import java.util.List;
 public class SecurityConfig {
 
     private final CompositeUserDetailsService compositeUserDetailsService;
-    private final JwtService jwtService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-// Inyecta el valor de la propiedad 'cors.allowed-origins' desde application.properties
-    @Value("${cors.allowed-origins}")
-    private String allowedOrigins;
-
-// Constructor con inyección de dependencias
-    public SecurityConfig(CompositeUserDetailsService compositeUserDetailsService, JwtService jwtService, JwtAuthenticationFilter jwtAuthenticationFilter) {
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
 
@@ -44,8 +36,12 @@ public class SecurityConfig {
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
         this.compositeUserDetailsService = compositeUserDetailsService;
-        this.jwtService = jwtService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -68,34 +64,15 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/auth/**",
-                                "/api/upload/image",
-                                "/api/gallery/images",
-                                "/api/gallery/hide-image",
-                                "/api/gallery/show-image", // <-- ¡ASEGÚRATE DE ESTA LÍNEA!
-                                "/api/gallery/hidden-images", // <-- ¡ASEGÚRATE DE ESTA LÍNEA!
-                                "/api/chatbot/**",
-                                "/api/upload/image",
-                                "/api/files/upload",
-                                "/api/servicios/categoria/**",
-                                "/api/categorias",
-                                "/api/categorias/**",
-                                "/api/pago/**",
-                                "/v3/api-docs/**",
-                                "/error",
-                                "/favicon.ico",
-                                "/resources/**",
-                                "/api/categorias",
-                                "/api/categorias/**",
-                                "/swagger-ui/**", // <-- También es buena idea tener esto como público
-                                "/swagger-resources/**" // <-- Y esto
-                                "/resources/**"
+                                "/api/auth/**", "/api/upload/image", "/api/gallery/**",
+                                "/api/chatbot/**", "/api/files/upload", "/api/servicios/categoria/**",
+                                "/api/categorias/**", "/api/pago/**",
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
+                                "/error", "/favicon.ico", "/resources/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -104,21 +81,15 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-// Divide la cadena de origins por comas y la convierte en una lista.
-// Esto permite múltiples orígenes definidos en application.properties.
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+        CorsConfiguration config = new CorsConfiguration();
+        // soporta múltiples orígenes separados por coma
+        config.setAllowedOriginPatterns(List.of(allowedOrigins.split(",")));
+        config.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
