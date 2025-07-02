@@ -11,7 +11,7 @@ public class DetalleFacDto {
     private String hora;
     private String fecha;
     private BigDecimal subtotalItem;
-    private Integer factura;
+    private Integer factura; // This might be used as fkidNino or a temporary order ID
     private Integer servicio;
     private String observaciones;
     private String descripcion;
@@ -38,6 +38,10 @@ public class DetalleFacDto {
         this.nombreCliente = nombreCliente;
         this.telefonoCliente = telefonoCliente;
         this.emailCliente = emailCliente;
+    }
+
+    // Default constructor added for convenience if needed for deserialization
+    public DetalleFacDto() {
     }
 
     public Integer getCodDetalle() {

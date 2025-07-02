@@ -66,7 +66,7 @@ public class FacturaController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarFactura(
-            @Parameter(description = "ID de la factura a eliminar", example = "1")
+            @Parameter(description = "ID del detalle a eliminar", example = "1")
             @PathVariable Integer id) {
 
         if (facturaService.eliminarFactura(id)) {

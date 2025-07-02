@@ -53,10 +53,8 @@ public class FacturaServiceImpl implements FacturaService {
             Factura factura = facturaExistente.get();
             factura.setFecha(facturaActualizada.getFecha());
             factura.setSubtotal(facturaActualizada.getSubtotal());
-            factura.setDescuento(facturaActualizada.getDescuento());
             factura.setImpuestos(facturaActualizada.getImpuestos());
             factura.setValorTotal(facturaActualizada.getValorTotal());
-            factura.setMetodoPago(facturaActualizada.getMetodoPago());
             factura.setEstado(facturaActualizada.getEstado());
             factura.setObservaciones(facturaActualizada.getObservaciones());
             factura.setNiño(facturaActualizada.getNiño());
