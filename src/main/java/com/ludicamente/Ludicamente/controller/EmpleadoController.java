@@ -33,6 +33,25 @@ public class EmpleadoController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Obtiene un empleado por su ID.
+     * Mapea a /api/empleados/{id}
+     *
+     * @param id El ID del empleado a buscar.
+     * @return ResponseEntity con el empleado si se encuentra, o 404 NOT FOUND si no.
+     */
+    @Operation(summary = "Obtener un empleado por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Empleado encontrado exitosamente"),
+            @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<Empleado> obtenerEmpleadoPorId(@PathVariable Integer id) {
+        Optional<Empleado> empleado = empleadoService.obtenerEmpleadoPorId(id);
+        return empleado.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     @Operation(summary = "Obtener un empleado por su correo electrónico")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Empleado encontrado exitosamente"),
