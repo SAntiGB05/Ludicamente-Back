@@ -1,4 +1,5 @@
 package com.ludicamente.Ludicamente.controller;
+import com.ludicamente.Ludicamente.dto.FacturaDto;
 import com.ludicamente.Ludicamente.model.Factura;
 import com.ludicamente.Ludicamente.service.FacturaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,6 +42,12 @@ public class FacturaController {
         List<Factura> facturas = facturaService.listarFacturas();
         return ResponseEntity.ok(facturas);
     }
+    @GetMapping("/dto")
+    public ResponseEntity<List<FacturaDto>> listarFacturasDto() {
+        List<FacturaDto> facturasDto = facturaService.obtenerFacturasDto();
+        return ResponseEntity.ok(facturasDto);
+    }
+
 
     // Actualizar una factura
     @Operation(summary = "Actualizar una factura existente")

@@ -13,12 +13,15 @@ public class FacturaDto {
     private Integer fkidNino;
     private Integer fkidEmpleado;
 
+    private String estado;       // Enum como string
+    private String metodoPago;
+
     // Constructor vacío
     public FacturaDto() {}
 
     // Constructor con parámetros
-    public FacturaDto(Integer codFactura, LocalDate fecha, BigDecimal subtotal, BigDecimal impuestos,
-                      BigDecimal valorTotal, Integer fkidNino, Integer fkidEmpleado) {
+
+    public FacturaDto(Integer codFactura, LocalDate fecha, BigDecimal subtotal, BigDecimal impuestos, BigDecimal valorTotal, Integer fkidNino, Integer fkidEmpleado, String estado, String metodoPago) {
         this.codFactura = codFactura;
         this.fecha = fecha;
         this.subtotal = subtotal;
@@ -26,9 +29,29 @@ public class FacturaDto {
         this.valorTotal = valorTotal;
         this.fkidNino = fkidNino;
         this.fkidEmpleado = fkidEmpleado;
+        this.estado = estado;
+        this.metodoPago = metodoPago;
     }
 
     // Getters y Setters
+
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getMetodoPago() {
+        return metodoPago;
+    }
+
+    public void setMetodoPago(String metodoPago) {
+        this.metodoPago = metodoPago;
+    }
+
     public Integer getCodFactura() {
         return codFactura;
     }

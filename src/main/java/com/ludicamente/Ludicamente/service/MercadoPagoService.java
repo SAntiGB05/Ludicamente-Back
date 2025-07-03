@@ -6,6 +6,7 @@ import com.mercadopago.exceptions.MPConfException;
 import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.Payment;
 import com.mercadopago.resources.Preference;
+import com.mercadopago.resources.datastructures.preference.BackUrls;
 import com.mercadopago.resources.datastructures.preference.Item;
 import com.mercadopago.resources.datastructures.preference.Payer;
 import jakarta.annotation.PostConstruct;
@@ -25,7 +26,16 @@ public class MercadoPagoService {
     @Value("${mercadopago.webhook.url}")
     private String webhookUrl;
 
-    // Simula almacenamiento temporal de ordenes pendientes
+    @Value("${frontend.url.success}")
+    private String successUrl;
+
+    @Value("${frontend.url.failure}")
+    private String failureUrl;
+
+    @Value("${frontend.url.pending}")
+    private String pendingUrl;
+
+    // Simula almacenamiento temporal de órdenes pendientes
     private final Map<String, DetalleFacDto> pendingOrders = new HashMap<>();
 
     @PostConstruct
@@ -47,7 +57,6 @@ public class MercadoPagoService {
      * @throws MPException Si ocurre un error con la API.
      */
     public Map<String, String> crearPreferencia(DetalleFacDto detalle) throws MPException {
-        // Validaciones básicas
         if (detalle.getCantidad() == null || detalle.getCantidad() <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor a cero.");
         }
@@ -73,14 +82,22 @@ public class MercadoPagoService {
                         ? detalle.getEmailCliente()
                         : "santigbttobi@gmail.com");
 
+        // URLs de redirección
+        BackUrls backUrls = new BackUrls()
+                .setSuccess(successUrl)
+                .setFailure(failureUrl)
+                .setPending(pendingUrl);
+
         // Crear preferencia
         Preference preference = new Preference()
                 .appendItem(item)
                 .setPayer(payer)
                 .setExternalReference(externalReference)
-                .setNotificationUrl(webhookUrl);
+                .setNotificationUrl(webhookUrl)
+                .setBackUrls(backUrls)
+                .setAutoReturn(Preference.AutoReturn.approved);
 
-        // Guardar preferencia y validar init_point
+        // Guardar preferencia
         preference.save();
         String initPoint = preference.getInitPoint();
 
@@ -91,7 +108,7 @@ public class MercadoPagoService {
 
         System.out.println("✅ Preferencia creada. Init_point: " + initPoint);
 
-        // Retornar datos al frontend
+        // Respuesta al frontend
         Map<String, String> response = new HashMap<>();
         response.put("init_point", initPoint);
         response.put("external_reference", externalReference);

@@ -1,5 +1,6 @@
 package com.ludicamente.Ludicamente.service.impl;
 
+import com.ludicamente.Ludicamente.dto.FacturaDto;
 import com.ludicamente.Ludicamente.model.Factura;
 import com.ludicamente.Ludicamente.repository.FacturaRepository;
 import com.ludicamente.Ludicamente.service.FacturaService;
@@ -10,6 +11,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,4 +80,47 @@ public class FacturaServiceImpl implements FacturaService {
         }
         return false;
     }
+
+
+
+    public FacturaDto convertirAFacturaDto(Factura factura) {
+        FacturaDto dto = new FacturaDto();
+        dto.setCodFactura(factura.getCodFactura());
+
+        // CONVERSIÓN de Date a LocalDate
+        if (factura.getFecha() != null) {
+            LocalDate localDate = factura.getFecha()
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            dto.setFecha(localDate);
+        }
+
+        // Continúa con el resto
+        dto.setEstado(factura.getEstado().name());
+        dto.setMetodoPago(factura.getMetodoPago().name());
+        dto.setSubtotal(factura.getSubtotal());
+        dto.setImpuestos(factura.getImpuestos());
+        dto.setValorTotal(factura.getValorTotal());
+
+        if (factura.getNiño() != null) {
+            dto.setFkidNino(factura.getNiño().getIdNiño());
+        }
+
+        if (factura.getEmpleado() != null) {
+            dto.setFkidEmpleado(factura.getEmpleado().getIdEmpleado());
+        }
+
+        return dto;
+    }
+
+
+    @Override
+    public List<FacturaDto> obtenerFacturasDto() {
+        List<Factura> facturas = facturaRepository.findAll();
+        return facturas.stream()
+                .map(this::convertirAFacturaDto)
+                .toList();
+    }
+
 }

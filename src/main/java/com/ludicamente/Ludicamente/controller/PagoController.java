@@ -33,37 +33,36 @@ public class PagoController {
     }
 
     @PostMapping("/webhook")
-    public ResponseEntity<Void> handleMercadoPagoWebhook(@RequestParam("topic") String topic, @RequestParam("id") String id) {
-        System.out.println("Webhook recibido: Topic=" + topic + ", ID=" + id);
+    public ResponseEntity<Void> handleMercadoPagoWebhook(
+            @RequestParam(value = "topic", required = false) String topic,
+            @RequestParam(value = "id", required = false) String id,
+            @RequestParam(value = "type", required = false) String type,
+            @RequestParam(value = "data.id", required = false) String dataId
+    ) {
+        String usadoTopic = topic != null ? topic : type;
+        String usadoId = id != null ? id : dataId;
 
-        if (Objects.equals(topic, "payment")) {
+        System.out.println("Webhook recibido: Topic=" + usadoTopic + ", ID=" + usadoId);
+
+        if ("payment".equalsIgnoreCase(usadoTopic)) {
             try {
-                Payment payment = mercadoPagoService.getPaymentDetails(id);
-
+                Payment payment = mercadoPagoService.getPaymentDetails(usadoId);
                 if (payment != null) {
                     String statusStr = String.valueOf(payment.getStatus()).trim();
-                    System.out.println("Estado recibido (raw): " + statusStr + " - clase: " + payment.getStatus().getClass());
-
                     if ("approved".equalsIgnoreCase(statusStr)) {
-                        System.out.println("Pago Aprobado: ID=" + payment.getId() + ", External Reference=" + payment.getExternalReference());
-
                         String externalReference = payment.getExternalReference();
                         if (externalReference == null || externalReference.isEmpty()) {
                             System.err.println("External reference is missing for approved payment: " + payment.getId());
                             return ResponseEntity.badRequest().build();
                         }
 
-                        System.out.println("Buscando detalles para externalReference: " + externalReference);
                         DetalleFacDto originalDetalle = mercadoPagoService.getPendingOrderDetails(externalReference);
-
                         if (originalDetalle != null) {
                             Factura createdFactura = invoiceCreationService.createInvoiceFromPayment(payment, originalDetalle);
-                            System.out.println("Factura y DetalleFactura creados para el pago ID: " + payment.getId());
-
                             mercadoPagoService.removePendingOrder(externalReference);
                             return ResponseEntity.ok().build();
                         } else {
-                            System.err.println("No se encontraron detalles de orden pendientes para la referencia externa: " + externalReference);
+                            System.err.println("No se encontraron detalles para la referencia: " + externalReference);
                             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                         }
                     } else {
@@ -71,20 +70,20 @@ public class PagoController {
                         return ResponseEntity.ok().build();
                     }
                 } else {
-                    System.out.println("No se encontró el pago con ID: " + id);
+                    System.out.println("No se encontró el pago con ID: " + usadoId);
                     return ResponseEntity.ok().build();
                 }
 
             } catch (MPException e) {
-                System.err.println("Error de Mercado Pago al procesar webhook: " + e.getMessage());
+                System.err.println("Error de Mercado Pago: " + e.getMessage());
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             } catch (Exception e) {
-                System.err.println("Error inesperado al procesar webhook: " + e.getMessage());
+                System.err.println("Error inesperado: " + e.getMessage());
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         }
 
-        return ResponseEntity.ok().build(); // Otros topics ignorados
+        return ResponseEntity.ok().build(); // Ignorar otros topics
     }
 }
