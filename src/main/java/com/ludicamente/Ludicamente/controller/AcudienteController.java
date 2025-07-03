@@ -120,4 +120,12 @@ public class AcudienteController {
     public void deleteAcudiente(@PathVariable Integer id) {
         acudienteService.eliminarAcudiente(id);
     }
+
+    @Operation(summary = "Contar acudientes (público)")
+    @GetMapping("/contar")
+    public ResponseEntity<Long> contarAcudientes() {
+        long total = acudienteService.contarAcudientes();
+        return ResponseEntity.ok(total);
+    }
+
 }

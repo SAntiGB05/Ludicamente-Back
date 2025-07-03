@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -129,4 +130,12 @@ public class NiñoController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @Operation(summary = "Contar niños por género (público)")
+    @GetMapping("/contar-por-genero")
+    public ResponseEntity<Map<String, Long>> contarNiñosPorGenero() {
+        Map<String, Long> conteo = niñoService.contarNiñosPorGenero();
+        return ResponseEntity.ok(conteo);
+    }
+
 }
