@@ -39,7 +39,7 @@ public class EmpleadoController {
             @ApiResponse(responseCode = "403", description = "Acceso denegado"),
             @ApiResponse(responseCode = "404", description = "Empleado no encontrado")
     })
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')") // Ajusta los roles según tu lógica de negocio
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STAFF')")
     @GetMapping("/correo/{correo}")
     public ResponseEntity<Empleado> getEmpleadoByCorreo(
             @PathVariable String correo,

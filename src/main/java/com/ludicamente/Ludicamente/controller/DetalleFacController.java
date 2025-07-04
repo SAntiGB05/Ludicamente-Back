@@ -68,4 +68,13 @@ public class DetalleFacController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @Operation(summary = "Obtener detalles por código de factura")
+    @GetMapping("/por-factura/{codFactura}")
+    public ResponseEntity<List<DetalleFactura>> obtenerDetallesPorFactura(
+            @PathVariable Integer codFactura) {
+        List<DetalleFactura> detalles = detalleFacturaService.obtenerPorFactura(codFactura);
+        return ResponseEntity.ok(detalles);
+    }
+
 }

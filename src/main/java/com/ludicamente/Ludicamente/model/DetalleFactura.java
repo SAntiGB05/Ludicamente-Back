@@ -43,6 +43,8 @@ public class DetalleFactura {
     @Column(name = "observaciones", columnDefinition = "TEXT")
     private String observaciones;
 
+
+
     // Constructor vacío
     public DetalleFactura() {}
 
