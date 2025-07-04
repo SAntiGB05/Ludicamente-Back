@@ -61,6 +61,8 @@ public class PagoController {
                             Factura createdFactura = invoiceCreationService.createInvoiceFromPayment(payment, originalDetalle);
                             mercadoPagoService.removePendingOrder(externalReference);
                             return ResponseEntity.ok().build();
+
+
                         } else {
                             System.err.println("No se encontraron detalles para la referencia: " + externalReference);
                             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

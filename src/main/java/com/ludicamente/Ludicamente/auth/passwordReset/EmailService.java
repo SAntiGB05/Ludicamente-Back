@@ -90,4 +90,22 @@ public class EmailService {
         return isValid;
     }
 
+    public void enviarCorreoReservaExitosa(String destino, String nombreCliente, String codReserva) {
+        String cancelLink = "https://tusitio.com/cancelar-reserva/" + codReserva;
+
+        String contenidoHtml = """
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="color: #A35E5E;">¡Hola %s!</h2>
+            <p>Tu reserva ha sido <strong>procesada exitosamente</strong>.</p>
+            <p><strong>Código de reserva:</strong> %s</p>
+            <p>Si deseas cancelar tu reserva, puedes hacerlo desde tu perfil o haciendo clic en el siguiente botón:</p>
+            <a href="%s" style="display: inline-block; padding: 10px 20px; background-color: #F76C6C; color: white; text-decoration: none; border-radius: 5px;">Cancelar Reserva</a>
+            <p style="margin-top: 20px;">Gracias por confiar en <strong>Ludicamente</strong>.</p>
+        </div>
+    """.formatted(nombreCliente, codReserva, cancelLink);
+
+        enviarCorreoHtml(destino, "Reserva Exitosa en Ludicamente", contenidoHtml);
+    }
+
+
 }

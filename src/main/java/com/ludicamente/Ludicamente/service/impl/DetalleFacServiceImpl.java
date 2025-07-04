@@ -75,4 +75,13 @@ public class DetalleFacServiceImpl implements DetalleFacService {
         }
         return false;
     }
+
+
+    @Override
+    public List<DetalleFactura> obtenerPorFactura(Integer codFactura) {
+        System.out.println("Buscando detalles de la factura: " + codFactura);
+        return detalleFacRepository.findByFactura_CodFactura(codFactura);
+    }
+
+
 }

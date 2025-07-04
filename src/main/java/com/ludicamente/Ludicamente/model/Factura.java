@@ -1,14 +1,17 @@
 package com.ludicamente.Ludicamente.model;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
+@Table(name = "factura")
 public class Factura {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cod_factura")
     private Integer codFactura;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -35,6 +38,7 @@ public class Factura {
     @Column(nullable = false)
     private EstadoFactura estado;
 
+    @Column
     private String observaciones;
 
     @ManyToOne
@@ -42,9 +46,10 @@ public class Factura {
     private Niño niño;
 
     @ManyToOne
-    @JoinColumn(name = "fkid_empleado", nullable = false)
+    @JoinColumn(name = "fkid_empleado", nullable = true)
     private Empleado empleado;
 
+    // Enums internos para método de pago y estado de la factura
     public enum MetodoPago {
         EFECTIVO, TARJETA, TRANSFERENCIA
     }
@@ -53,7 +58,7 @@ public class Factura {
         PENDIENTE, PAGADA, CANCELADA
     }
 
-    // Getters y setters...
+    // Getters y setters
 
     public Integer getCodFactura() {
         return codFactura;
