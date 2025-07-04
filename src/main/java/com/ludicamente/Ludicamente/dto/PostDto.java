@@ -95,4 +95,3 @@ public class PostDto {
         this.fkidEmpleado = fkidEmpleado;
     }
 }
-
