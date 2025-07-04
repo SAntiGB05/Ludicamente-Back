@@ -19,6 +19,6 @@ public interface FacturaService {
     Optional<FacturaConDetallesDto> obtenerFacturaConDetallesDto(Integer codFactura);
     Optional<Factura> actualizarFactura(Integer id, Factura facturaActualizada);
     boolean eliminarFactura(Integer id);
-    //FacturaDto crearFacturaConDetalles(FacturaConDetallesDto dto);
+    FacturaDto crearFacturaConDetalles(FacturaConDetallesDto dto);
 
 }

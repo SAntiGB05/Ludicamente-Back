@@ -119,6 +119,10 @@ public class FacturaController {
         }
         return ResponseEntity.notFound().build();
     }
-
+    @PostMapping("/completa")
+    public ResponseEntity<FacturaDto> crearFacturaCompleta(@RequestBody FacturaConDetallesDto dto) {
+        FacturaDto creada = facturaService.crearFacturaConDetalles(dto);
+        return ResponseEntity.status(201).body(creada);
+    }
 
 }

@@ -40,13 +40,6 @@ public class InvoiceCreationService {
         this.servicioRepository = servicioRepository;
     }
 
-    /**
-     * Crea una Factura y su respectivo DetalleFactura a partir de un pago exitoso.
-     *
-     * @param payment         Objeto de pago de MercadoPago.
-     * @param originalDetalle Detalles originales del servicio usado para crear la preferencia.
-     * @return La factura creada.
-     */
     public Factura createInvoiceFromPayment(Payment payment, DetalleFacDto originalDetalle) {
 
         // === 1. Buscar el Niño asociado si viene en el DTO ===
@@ -133,17 +126,19 @@ public class InvoiceCreationService {
         }
         detalle.setFecha(fechaSql);
 
-        // === Subtotal ===
+        // === Subtotal calculado si no viene ===
         BigDecimal subtotal = originalDetalle.getSubtotalItem();
-        if (subtotal == null) {
+        if (subtotal == null && originalDetalle.getPrecioUnitario() != null) {
             subtotal = originalDetalle.getPrecioUnitario().multiply(BigDecimal.valueOf(originalDetalle.getCantidad()));
         }
 
-        // === Otros campos ===
+        // === Set campos nuevos + comunes ===
         detalle.setObservaciones(originalDetalle.getObservaciones() != null
                 ? originalDetalle.getObservaciones()
                 : "Servicio pagado");
-
+        detalle.setNombreCliente(originalDetalle.getNombreCliente());
+        detalle.setEmailCliente(originalDetalle.getEmailCliente());
+        detalle.setTelefonoCliente(originalDetalle.getTelefonoCliente());
         detalle.setFactura(savedFactura);
         detalle.setServicio(servicio);
 

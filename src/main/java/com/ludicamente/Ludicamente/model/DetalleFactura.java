@@ -43,12 +43,19 @@ public class DetalleFactura {
     @Column(name = "observaciones", columnDefinition = "TEXT")
     private String observaciones;
 
+    @Column(name = "nombre_cliente")
+    private String nombreCliente;
 
+    @Column(name = "telefono_cliente")
+    private String telefonoCliente;
+
+    @Column(name = "email_cliente")
+    private String emailCliente;
 
     // Constructor vacío
     public DetalleFactura() {}
 
-    // Constructor con parámetros
+    // Constructor con parámetros (opcional, puedes actualizar si lo necesitas)
     public DetalleFactura(int cantidad, BigDecimal precioUnitario, BigDecimal descuentoUnitario,
                           Time horario, Date fecha, Factura factura, Servicio servicio) {
         this.cantidad = cantidad;
@@ -135,5 +142,29 @@ public class DetalleFactura {
 
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
+    }
+
+    public String getNombreCliente() {
+        return nombreCliente;
+    }
+
+    public void setNombreCliente(String nombreCliente) {
+        this.nombreCliente = nombreCliente;
+    }
+
+    public String getTelefonoCliente() {
+        return telefonoCliente;
+    }
+
+    public void setTelefonoCliente(String telefonoCliente) {
+        this.telefonoCliente = telefonoCliente;
+    }
+
+    public String getEmailCliente() {
+        return emailCliente;
+    }
+
+    public void setEmailCliente(String emailCliente) {
+        this.emailCliente = emailCliente;
     }
 }

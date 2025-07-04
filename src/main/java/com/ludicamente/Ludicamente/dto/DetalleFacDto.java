@@ -11,14 +11,20 @@ public class DetalleFacDto {
     private String hora;
     private String fecha;
     private BigDecimal subtotalItem;
-    private Integer factura; // This might be used as fkidNino or a temporary order ID
-    private Integer servicio;
+    private Integer factura; // ID de la factura asociada
+    private Integer servicio; // ID del servicio
     private String observaciones;
     private String descripcion;
+
+    // Nuevos campos del cliente
     private String nombreCliente;
     private String telefonoCliente;
     private String emailCliente;
 
+    // Constructor vacío (requerido para deserialización)
+    public DetalleFacDto() {}
+
+    // Constructor completo
     public DetalleFacDto(Integer codDetalle, Integer cantidad, BigDecimal precioUnitario,
                          BigDecimal descuentoUnitario, String hora, String fecha,
                          BigDecimal subtotalItem, Integer factura, Integer servicio,
@@ -40,9 +46,7 @@ public class DetalleFacDto {
         this.emailCliente = emailCliente;
     }
 
-    // Default constructor added for convenience if needed for deserialization
-    public DetalleFacDto() {
-    }
+    // Getters y Setters
 
     public Integer getCodDetalle() {
         return codDetalle;

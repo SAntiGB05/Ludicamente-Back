@@ -1,5 +1,7 @@
 package com.ludicamente.Ludicamente.dto;
 
+import jakarta.persistence.Column;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -15,13 +17,16 @@ public class FacturaDto {
     private String estado;       // Enum como string
     private String metodoPago;   // Enum como string
 
+    @Column(nullable = false)
+    private BigDecimal descuento;
+
     // Constructor vacío
     public FacturaDto() {}
 
     // Constructor con parámetros
     public FacturaDto(Integer codFactura, LocalDate fecha, BigDecimal subtotal, BigDecimal impuestos,
                       BigDecimal valorTotal, Integer fkidNino, Integer fkidEmpleado,
-                      String estado, String metodoPago) {
+                      String estado, String metodoPago,BigDecimal descuento) {
         this.codFactura = codFactura;
         this.fecha = fecha;
         this.subtotal = subtotal;
@@ -31,9 +36,11 @@ public class FacturaDto {
         this.fkidEmpleado = fkidEmpleado;
         this.estado = estado;
         this.metodoPago = metodoPago;
+        this.descuento =descuento;
     }
 
     // Getters y Setters
+
 
     public Integer getCodFactura() {
         return codFactura;
@@ -105,5 +112,13 @@ public class FacturaDto {
 
     public void setMetodoPago(String metodoPago) {
         this.metodoPago = metodoPago;
+    }
+
+    public BigDecimal getDescuento() {
+        return descuento;
+    }
+
+    public void setDescuento(BigDecimal descuento) {
+        this.descuento = descuento;
     }
 }
