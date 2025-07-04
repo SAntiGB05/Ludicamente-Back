@@ -155,4 +155,8 @@ public class AcudienteServiceImpl implements AcudienteService {
         acudiente.setNiños(niños);
         return acudienteRepository.save(acudiente); // Guardar acudiente y niños por cascade
     }
+
+    public long contarAcudientes() {
+        return acudienteRepository.count();
+    }
 }

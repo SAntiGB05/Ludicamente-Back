@@ -1,5 +1,5 @@
 package com.ludicamente.Ludicamente.config;
-// Importaciones necesarias
+
 import com.ludicamente.Ludicamente.auth.userdetails.CompositeUserDetailsService;
 import com.ludicamente.Ludicamente.config.JwtService;
 import com.ludicamente.Ludicamente.config.JwtAuthenticationFilter;
@@ -18,8 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsConfigurationSource;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,16 +29,23 @@ import java.util.List;
 public class SecurityConfig {
 
     private final CompositeUserDetailsService compositeUserDetailsService;
-    private final JwtService jwtService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
 
     public SecurityConfig(CompositeUserDetailsService compositeUserDetailsService, JwtService jwtService, JwtAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(
+            CompositeUserDetailsService compositeUserDetailsService,
+            JwtAuthenticationFilter jwtAuthenticationFilter
+    ) {
         this.compositeUserDetailsService = compositeUserDetailsService;
-        this.jwtService = jwtService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -77,12 +85,20 @@ public class SecurityConfig {
                                 "/api/categorias/**",
                                 "/swagger-ui/**",
                                 "/swagger-resources"
+=======
+                                "/api/auth/**", "/api/upload/image", "/api/gallery/**",
+                                "/api/chatbot/**", "/api/files/upload", "/api/servicios/categoria/**",
+                                "/api/categorias/**", "/api/pago/**",
+                                "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
+                                "/error", "/favicon.ico", "/resources/**",
+                                "/api/acudiente/contar",
+                                "/api/niños/contar-por-genero"
+                                "/error", "/favicon.ico", "/resources/**","/api/pagos/crear-preferencia", "/api/pagos/webhook"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -95,9 +111,15 @@ public class SecurityConfig {
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")); // Asegúrate de que PATCH también esté permitido
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
+        CorsConfiguration config = new CorsConfiguration();
+        // soporta múltiples orígenes separados por coma
+        config.setAllowedOriginPatterns(List.of(allowedOrigins.split(",")));
+        config.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 
