@@ -5,6 +5,7 @@ import com.ludicamente.Ludicamente.model.Niño;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface NiñoService {
@@ -17,6 +18,7 @@ public interface NiñoService {
     Optional<NiñoDto> actualizarNiño(Integer id, NiñoDto niñoActualizado);
     Optional<NiñoDto> obtenerNiñoPorId(Integer id);
     void actualizarFoto(Integer id, MultipartFile foto);
+    Map<String, Long> contarNiñosPorGenero();
 
 
 }

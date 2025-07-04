@@ -16,10 +16,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -197,4 +194,23 @@ public class NiñoServiceImpl implements NiñoService {
 
         return niño;
     }
+
+    @Override
+    public Map<String, Long> contarNiñosPorGenero() {
+        List<Niño> niños = niñoRepository.findAll(); // o una consulta directa si prefieres
+
+        Map<String, Long> conteo = niños.stream()
+                .filter(n -> n.getSexo() != null)
+                .collect(Collectors.groupingBy(
+                        niño -> niño.getSexo().toUpperCase(), // 'M' o 'F'
+                        Collectors.counting()
+                ));
+
+        // Asegurar que ambos géneros estén presentes aunque no haya ninguno en BD
+        conteo.putIfAbsent("M", 0L);
+        conteo.putIfAbsent("F", 0L);
+
+        return conteo;
+    }
+
 }

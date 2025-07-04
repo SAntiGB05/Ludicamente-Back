@@ -68,6 +68,9 @@ public class SecurityConfig {
                                 "/api/chatbot/**", "/api/files/upload", "/api/servicios/categoria/**",
                                 "/api/categorias/**", "/api/pago/**",
                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**",
+                                "/error", "/favicon.ico", "/resources/**",
+                                "/api/acudiente/contar",
+                                "/api/niños/contar-por-genero"
                                 "/error", "/favicon.ico", "/resources/**","/api/pagos/crear-preferencia", "/api/pagos/webhook"
                         ).permitAll()
                         .anyRequest().authenticated()

@@ -14,6 +14,7 @@ public interface AcudienteService {
     Acudiente actualizarAcudienteAdmin(Integer id, AcudienteDto acudienteDetails);
     void eliminarAcudiente(Integer id);
     AcudienteDto obtenerAcudienteAutenticado(String correo);
-
     Acudiente registrarAcudienteConNiños(RegisterAcudienteRequest request);
+    long contarAcudientes();
+
 }
