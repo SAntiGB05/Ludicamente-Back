@@ -20,14 +20,14 @@ public class Niño {
     @Column(nullable = false, length = 50)
     private String nombre;
 
-    @Column(name = "n_identificacion", nullable = false, unique = true)
+    @Column(name = "n_identificacion", unique = true)
     private String nIdentificacion;
 
     @Column(nullable = false, length = 10)
     private String sexo;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_nacimiento", nullable = false)
+    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
     @Column(nullable = false)

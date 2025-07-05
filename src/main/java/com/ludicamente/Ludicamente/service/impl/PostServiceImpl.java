@@ -50,6 +50,8 @@ public class PostServiceImpl implements PostService {
         boolean isAdmin = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
 
+        // Comprueba si el post tiene un empleado asociado y si el ID del empleado coincide
+        // O si el usuario autenticado es un ADMIN.
         return isAdmin || (post.getEmpleado() != null && post.getEmpleado().getIdEmpleado().equals(authenticatedEmployeeId));
     }
 
@@ -67,7 +69,7 @@ public class PostServiceImpl implements PostService {
         post.setPlantilla(postCreateDTO.getPlantilla() != null ?
                 postCreateDTO.getPlantilla() :
                 Post.PlantillaPost.PLANTILLA1);
-        post.setEmpleado(empleado);
+        post.setEmpleado(empleado); // Asigna el objeto Empleado completo al post
 
         // Campos con valores por defecto
         post.setFechaPublicacion(LocalDateTime.now());
@@ -90,6 +92,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Optional<Post> actualizarPost(Integer id, PostUpdateDTO postUpdateDTO) {
         return postRepository.findById(id).map(post -> {
+            // Verificar autorización antes de actualizar
             if (!isAuthorizedToModify(post)) {
                 throw new RuntimeException("No autorizado para modificar este post.");
             }
@@ -116,6 +119,7 @@ public class PostServiceImpl implements PostService {
             if (postUpdateDTO.getEtiquetas() != null) {
                 post.setEtiquetas(postUpdateDTO.getEtiquetas());
             }
+            // Solo actualiza visitas si viene un valor explícito
             if (postUpdateDTO.getVisitas() != null) {
                 post.setVisitas(postUpdateDTO.getVisitas());
             }
@@ -130,6 +134,7 @@ public class PostServiceImpl implements PostService {
         Optional<Post> postOptional = postRepository.findById(id);
         if (postOptional.isPresent()) {
             Post post = postOptional.get();
+            // Verificar autorización antes de eliminar
             if (!isAuthorizedToModify(post)) {
                 throw new RuntimeException("No autorizado para eliminar este post.");
             }
@@ -149,8 +154,11 @@ public class PostServiceImpl implements PostService {
         if ((titulo == null || titulo.trim().isEmpty()) &&
                 (contenido == null || contenido.trim().isEmpty()) &&
                 (etiquetas == null || etiquetas.trim().isEmpty())) {
+            // Si todos los parámetros de búsqueda están vacíos, devuelve todos los posts.
+            // Considera si este es el comportamiento deseado para una "búsqueda vacía".
             return postRepository.findAll();
         }
+        // Usamos null-coalescing para evitar NullPointerExceptions en el repositorio
         return postRepository.findByTituloContainingIgnoreCaseOrContenidoContainingIgnoreCaseOrEtiquetasContainingIgnoreCase(
                 titulo != null ? titulo : "",
                 contenido != null ? contenido : "",
@@ -160,12 +168,15 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> buscarPorIdEmpleado(Integer idEmpleado) {
+        // Asumiendo que Post tiene una relación @ManyToOne con Empleado
+        // y que tienes un método findByEmpleado_IdEmpleado en PostRepository
         return postRepository.findByEmpleado_IdEmpleado(idEmpleado);
     }
 
     @Override
     public Optional<Post> updatePostStatus(Integer postId, Post.EstadoPost newStatus) {
         return postRepository.findById(postId).map(post -> {
+            // Verificar autorización antes de cambiar el estado
             if (!isAuthorizedToModify(post)) {
                 throw new RuntimeException("No autorizado para cambiar el estado de este post.");
             }
@@ -178,6 +189,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public Optional<Post> cambiarPlantillaPost(Integer postId, Post.PlantillaPost nuevaPlantilla) {
         return postRepository.findById(postId).map(post -> {
+            // Verificar autorización antes de cambiar la plantilla
             if (!isAuthorizedToModify(post)) {
                 throw new RuntimeException("No autorizado para cambiar la plantilla de este post.");
             }
