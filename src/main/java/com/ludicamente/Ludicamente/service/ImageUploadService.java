@@ -1,9 +1,9 @@
-// src/main/java/com/ludicamente/Ludicamente/service/ImageUploadService.java
 package com.ludicamente.Ludicamente.service;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.Search; // Importa la clase Search
-import com.cloudinary.api.ApiResponse; // Importa ApiResponse
+import com.cloudinary.Search;
+import com.cloudinary.api.ApiResponse;
+import com.cloudinary.utils.ObjectUtils; // Import this for Cloudinary upload options
 import com.ludicamente.Ludicamente.model.GaleriaImagen;
 import com.ludicamente.Ludicamente.repository.GaleriaImagenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList; // Necesario para construir la lista de URLs
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,17 +27,27 @@ public class ImageUploadService {
     @Autowired
     private GaleriaImagenRepository galeriaImagenRepository;
 
+    // Sobrecarga 1: Método original, ahora con un folder por defecto
     public String uploadImage(MultipartFile multipartFile) throws IOException {
+        // Por defecto, sube a ludicamente_uploads si no se especifica una carpeta
+        System.out.println("Subiendo imagen a folder por defecto: ludicamente_uploads"); // Depuración
+        return uploadImage(multipartFile, "ludicamente_uploads");
+    }
+
+    // Sobrecarga 2: Nuevo método para subir imagen a un folder específico
+    public String uploadImage(MultipartFile multipartFile, String folderName) throws IOException {
         try {
             Map<String, Object> options = new HashMap<>();
-            options.put("folder", "ludicamente_uploads");
-            options.put("resource_type", "auto");
+            options.put("folder", folderName); // <--- CORRECCIÓN CLAVE AQUÍ: La clave es "folder"
+            options.put("resource_type", "auto"); // Cloudinary detectará el tipo de recurso
+            options.put("unique_filename", false); // Puedes ajustar esto a 'true' si quieres nombres únicos generados por Cloudinary
 
+            System.out.println("Preparando subida a Cloudinary en folder: " + folderName); // Depuración
             Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(), options);
             String secureUrl = (String) uploadResult.get("secure_url");
+            System.out.println("Imagen subida a Cloudinary. URL: " + secureUrl); // Depuración
 
-            // Opcional: Si quieres registrar TODAS las imágenes en tu DB, incluso las que ya existían antes
-            // Puedes buscar si ya existe para evitar duplicados en tu DB si la subida fue manual o externa.
+            // Opcional: Registrar la URL en tu base de datos local si no existe
             Optional<GaleriaImagen> existingImage = galeriaImagenRepository.findByUrlImagen(secureUrl);
             if (!existingImage.isPresent()) {
                 GaleriaImagen galeriaImagen = new GaleriaImagen();
@@ -45,55 +55,61 @@ public class ImageUploadService {
                 galeriaImagen.setFechaSubida(LocalDateTime.now());
                 galeriaImagen.setVisible(true); // Siempre visible al subir
                 galeriaImagenRepository.save(galeriaImagen);
+                System.out.println("Imagen registrada en la base de datos."); // Depuración
+            } else {
+                System.out.println("La imagen ya existe en la base de datos: " + secureUrl); // Depuración
             }
 
             return secureUrl;
         } catch (IOException e) {
-            System.err.println("Error al subir imagen a Cloudinary: " + e.getMessage());
+            System.err.println("Error al subir imagen a Cloudinary en folder '" + folderName + "': " + e.getMessage()); // Depuración
             throw new IOException("No se pudo subir la imagen a Cloudinary", e);
         }
     }
 
-    // Añade esto a ImageUploadService.java
+    // --- Métodos de la Galería (Restaurados) ---
+
     public GaleriaImagen importImageFromCloudinary(String imageUrl) {
-        // Primero, verifica si ya existe en tu DB para evitar duplicados
         Optional<GaleriaImagen> existingImage = galeriaImagenRepository.findByUrlImagen(imageUrl);
         if (existingImage.isPresent()) {
-            System.out.println("La imagen ya existe en la base de datos: " + imageUrl);
-            return existingImage.get(); // Retorna la imagen existente
+            System.out.println("La imagen ya existe en la base de datos: " + imageUrl); // Depuración
+            return existingImage.get();
         }
 
         GaleriaImagen newImage = new GaleriaImagen();
         newImage.setUrlImagen(imageUrl);
-        newImage.setFechaSubida(LocalDateTime.now()); // O puedes poner un valor por defecto o nulo
-        newImage.setVisible(true); // Por defecto, se importa como visible
-        return galeriaImagenRepository.save(newImage);
+        newImage.setFechaSubida(LocalDateTime.now());
+        newImage.setVisible(true);
+        GaleriaImagen savedImage = galeriaImagenRepository.save(newImage);
+        System.out.println("Imagen importada y guardada en DB: " + savedImage.getUrlImagen()); // Depuración
+        return savedImage;
     }
 
     public List<String> getAllImageUrls() {
-        return galeriaImagenRepository.findByVisibleTrue()
+        List<String> urls = galeriaImagenRepository.findByVisibleTrue()
                 .stream()
                 .map(GaleriaImagen::getUrlImagen)
                 .toList();
+        System.out.println("Método getAllImageUrls llamado. " + urls.size() + " URLs encontradas."); // Depuración
+        return urls;
     }
 
     public List<String> getHiddenImageUrls() {
-        return galeriaImagenRepository.findByVisibleFalse()
+        List<String> urls = galeriaImagenRepository.findByVisibleFalse()
                 .stream()
                 .map(GaleriaImagen::getUrlImagen)
                 .toList();
+        System.out.println("Método getHiddenImageUrls llamado. " + urls.size() + " URLs encontradas."); // Depuración
+        return urls;
     }
 
-    // --- ¡NUEVO MÉTODO! Para obtener todas las imágenes directamente de Cloudinary ---
     public List<String> getAllImagesFromCloudinary() throws Exception {
         List<String> imageUrls = new ArrayList<>();
+        System.out.println("Iniciando la búsqueda de todas las imágenes en Cloudinary..."); // Depuración
         try {
-            // Usa el API de administración de Cloudinary para buscar recursos
-            // `expression("resource_type:image")` filtra solo imágenes
-            // `max_results` es el número de resultados por página, máximo 500 por defecto
             ApiResponse result = cloudinary.search()
                     .expression("resource_type:image")
-                    .maxResults(500) // Puedes ajustar este número o implementar paginación
+                    .maxResults(500) // Puedes ajustar el número de resultados máximos
                     .execute();
 
             List<Map<String, Object>> resources = (List<Map<String, Object>>) result.get("resources");
@@ -103,32 +119,39 @@ public class ImageUploadService {
                     imageUrls.add((String) resource.get("secure_url"));
                 }
             }
+            System.out.println("Búsqueda en Cloudinary finalizada. " + imageUrls.size() + " URLs encontradas."); // Depuración
         } catch (Exception e) {
-            System.err.println("Error al listar imágenes de Cloudinary: " + e.getMessage());
+            System.err.println("Error al listar imágenes de Cloudinary en el servicio: " + e.getMessage()); // Depuración
             throw new Exception("No se pudieron obtener las imágenes de Cloudinary: " + e.getMessage(), e);
         }
         return imageUrls;
     }
 
     public boolean hideImage(String imageUrl) {
+        System.out.println("Intentando ocultar imagen: " + imageUrl); // Depuración
         Optional<GaleriaImagen> optionalImage = galeriaImagenRepository.findByUrlImagen(imageUrl);
         if (optionalImage.isPresent()) {
             GaleriaImagen imagen = optionalImage.get();
             imagen.setVisible(false);
             galeriaImagenRepository.save(imagen);
-            return true;
+            System.out.println("Imagen oculta con éxito: " + imageUrl); // Depuración
+            return true; // Retorna true si la imagen fue encontrada y oculta
         }
-        return false;
+        System.out.println("Imagen no encontrada para ocultar: " + imageUrl); // Depuración
+        return false; // Retorna false si la imagen no fue encontrada
     }
 
     public boolean showImage(String imageUrl) {
+        System.out.println("Intentando mostrar imagen: " + imageUrl); // Depuración
         Optional<GaleriaImagen> optionalImage = galeriaImagenRepository.findByUrlImagen(imageUrl);
         if (optionalImage.isPresent()) {
             GaleriaImagen imagen = optionalImage.get();
             imagen.setVisible(true);
             galeriaImagenRepository.save(imagen);
-            return true;
+            System.out.println("Imagen mostrada con éxito: " + imageUrl); // Depuración
+            return true; // Retorna true si la imagen fue encontrada y mostrada
         }
-        return false;
+        System.out.println("Imagen no encontrada para mostrar: " + imageUrl); // Depuración
+        return false; // Retorna false si la imagen no fue encontrada
     }
 }

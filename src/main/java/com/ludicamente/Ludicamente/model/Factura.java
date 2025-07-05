@@ -1,5 +1,6 @@
 package com.ludicamente.Ludicamente.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference; // Importar esta anotación
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -43,10 +44,14 @@ public class Factura {
 
     @ManyToOne
     @JoinColumn(name = "fkid_niño", nullable = false)
+    // Asumiendo que Niño tiene una relación OneToMany con Factura,
+    // y Niño tendrá @JsonManagedReference("niño-facturas")
+    @JsonBackReference("niño-facturas") // Añadida esta línea
     private Niño niño;
 
     @ManyToOne
     @JoinColumn(name = "fkid_empleado", nullable = true)
+    @JsonBackReference("empleado-facturas") // Añadida esta línea
     private Empleado empleado;
 
     // Enums internos para método de pago y estado de la factura

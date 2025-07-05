@@ -7,7 +7,7 @@ import com.ludicamente.Ludicamente.repository.AcudienteRepository;
 import com.ludicamente.Ludicamente.repository.BitacoraRepository;
 import com.ludicamente.Ludicamente.repository.NiñoRepository;
 import com.ludicamente.Ludicamente.service.NiñoService;
-import jakarta.transaction.Transactional;
+import jakarta.transaction.Transactional; // Ojo: Usar org.springframework.transaction.annotation.Transactional si usas Spring
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.ZoneId;
+import java.time.ZoneId; // No parece usarse
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,16 +32,33 @@ public class NiñoServiceImpl implements NiñoService {
     private BitacoraRepository bitacoraRepository;
 
     @Override
+    @Transactional
     public NiñoDto crearNiño(NiñoDto niñoDto) {
-        Niño niño = convertirADominio(niñoDto);
+        // 1. Validación explícita antes de intentar buscar el acudiente
+        if (niñoDto.getIdAcudiente() == null) {
+            throw new IllegalArgumentException("El ID del acudiente es obligatorio para crear un niño.");
+        }
+
+        // Buscar el Acudiente. Si no se encuentra, lanzar una excepción.
+        // Esto asegura que 'niño.setAcudiente(acudiente);' siempre tendrá un objeto no nulo.
+        Acudiente acudiente = acudienteRepository.findById(niñoDto.getIdAcudiente())
+                .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con ID: " + niñoDto.getIdAcudiente()));
+
+        Niño niño = convertirADominio(niñoDto); // Tu método convertirADominio ahora se encargará de otros mapeos
+
+        // Asignar el acudiente encontrado
+        niño.setAcudiente(acudiente); // <--- ¡Aseguramos que el acudiente siempre se asigna aquí!
+
         Niño niñoGuardado = niñoRepository.save(niño);
 
+        // Crear y guardar la bitácora inicial
         Bitacora bitacoraInicial = new Bitacora();
         bitacoraInicial.setTitulo("Bitácora inicial");
         bitacoraInicial.setEstado(true); // activa
         bitacoraInicial.setNiño(niñoGuardado);
-        bitacoraInicial.setFechaCreacion(LocalDate.now()); // Asegúrate de tener este campo en la entidad
+        bitacoraInicial.setFechaCreacion(LocalDate.now());
         bitacoraRepository.save(bitacoraInicial);
+
         return convertirADto(niñoGuardado);
     }
 
@@ -66,7 +83,9 @@ public class NiñoServiceImpl implements NiñoService {
     public List<NiñoDto> listarNiñosPorCorreoAcudiente(String correoAcudiente) {
         Optional<Acudiente> acudienteOpt = acudienteRepository.findByCorreo(correoAcudiente);
         if (acudienteOpt.isEmpty()) {
-            return List.of(); // O podrías lanzar una excepción personalizada
+            // Considera lanzar una excepción NotFound si la ausencia del acudiente es un error
+            // o simplemente devolver una lista vacía, dependiendo de tu lógica de negocio.
+            return List.of();
         }
         Acudiente acudiente = acudienteOpt.get();
         List<Niño> niños = niñoRepository.findByAcudienteIdAcudiente(acudiente.getIdAcudiente());
@@ -74,6 +93,7 @@ public class NiñoServiceImpl implements NiñoService {
                 .map(this::convertirADto)
                 .collect(Collectors.toList());
     }
+
     @Override
     @Transactional
     public void actualizarFoto(Integer id, MultipartFile foto) {
@@ -93,6 +113,7 @@ public class NiñoServiceImpl implements NiñoService {
     }
 
     @Override
+    @Transactional // Agrega @Transactional para operaciones de actualización
     public Optional<NiñoDto> actualizarNiño(Integer id, NiñoDto niñoDto) {
         Optional<Niño> niñoExistente = niñoRepository.findById(id);
         if (niñoExistente.isPresent()) {
@@ -102,11 +123,27 @@ public class NiñoServiceImpl implements NiñoService {
             niño.setSexo(niñoDto.getSexo());
             niño.setFechaNacimiento(niñoDto.getFechaNacimiento());
             niño.setEdad(calcularEdad(niñoDto.getFechaNacimiento()));
-            niño.setFoto(niñoDto.getFoto());
+            // Solo actualiza la foto si se proporciona una URL no nula y no vacía
+            if (niñoDto.getFoto() != null && !niñoDto.getFoto().isEmpty()) {
+                niño.setFoto(niñoDto.getFoto());
+            }
 
+
+            // Actualizar el acudiente si el ID proporcionado es diferente o el acudiente actual es nulo
             if (niñoDto.getIdAcudiente() != null) {
-                acudienteRepository.findById(niñoDto.getIdAcudiente())
-                        .ifPresent(niño::setAcudiente);
+                if (niño.getAcudiente() == null || !niño.getAcudiente().getIdAcudiente().equals(niñoDto.getIdAcudiente())) {
+                    Acudiente nuevoAcudiente = acudienteRepository.findById(niñoDto.getIdAcudiente())
+                            .orElseThrow(() -> new RuntimeException("Acudiente no encontrado con ID: " + niñoDto.getIdAcudiente()));
+                    niño.setAcudiente(nuevoAcudiente);
+                }
+            } else {
+                // Si idAcudiente es null en el DTO de actualización y tu columna es not-nullable,
+                // esto podría causar un error. Considera qué quieres hacer en este caso:
+                // - Mantener el acudiente existente si idAcudiente es null
+                // - Lanzar un error
+                // - Permitir cambiar el acudiente a null (si tu DB lo permite)
+                // Por ahora, asumimos que si es null, no se debe cambiar el acudiente.
+                // Si la columna es nullable=false, NO permitas que se establezca a null.
             }
 
             Niño actualizado = niñoRepository.save(niño);
@@ -126,7 +163,10 @@ public class NiñoServiceImpl implements NiñoService {
     }
 
     private int calcularEdad(LocalDate fechaNacimiento) {
-        // Si fechaNacimiento ya es LocalDate, no necesitas convertirla de Date
+        if (fechaNacimiento == null) {
+            // Podrías lanzar una excepción si la fecha de nacimiento es obligatoria
+            return 0;
+        }
         return Period.between(fechaNacimiento, LocalDate.now()).getYears();
     }
 
@@ -176,7 +216,7 @@ public class NiñoServiceImpl implements NiñoService {
 
     private Niño convertirADominio(NiñoDto dto) {
         Niño niño = new Niño();
-        niño.setIdNiño(dto.getIdNiño());
+        niño.setIdNiño(dto.getIdNiño()); // Solo si es para actualización
         niño.setNombre(dto.getNombre());
         niño.setnIdentificacion(dto.getnIdentificacion());
         niño.setSexo(dto.getSexo());
@@ -184,11 +224,14 @@ public class NiñoServiceImpl implements NiñoService {
         niño.setFoto(dto.getFoto());
         niño.setEdad(calcularEdad(dto.getFechaNacimiento()));
 
-
-        if (dto.getIdAcudiente() != null) {
-            acudienteRepository.findById(dto.getIdAcudiente())
-                    .ifPresent(niño::setAcudiente);
-        }
+        // ¡IMPORTANTE!: No intentes asignar el Acudiente aquí en 'convertirADominio'
+        // para el caso de creación. Se hará explícitamente en 'crearNiño' después de buscarlo.
+        // Si este método se usa para actualizar, la lógica para el acudiente se maneja
+        // en 'actualizarNiño'.
+        // if (dto.getIdAcudiente() != null) {
+        //     acudienteRepository.findById(dto.getIdAcudiente())
+        //             .ifPresent(niño::setAcudiente);
+        // }
 
         return niño;
     }
@@ -205,8 +248,8 @@ public class NiñoServiceImpl implements NiñoService {
                 ));
 
         // Asegurar que ambos géneros estén presentes aunque no haya ninguno en BD
-        conteo.putIfAbsent("M", 0L);
-        conteo.putIfAbsent("F", 0L);
+        conteo.putIfAbsent("MASCULINO", 0L); // Asumiendo que guardas "Masculino" y "Femenino" completos
+        conteo.putIfAbsent("FEMENINO", 0L);
 
         return conteo;
     }

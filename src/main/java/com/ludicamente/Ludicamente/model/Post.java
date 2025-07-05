@@ -1,6 +1,6 @@
 package com.ludicamente.Ludicamente.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference; // Para manejar relaciones bidireccionales en JSON
+import com.fasterxml.jackson.annotation.JsonBackReference; // <-- Cambiar a JsonBackReference
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -48,7 +48,7 @@ public class Post {
     // Relación Many-to-One con la entidad Empleado
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fkid_empleado", nullable = false) // Columna de clave foránea
-    @JsonManagedReference("empleado-posts") // Nombre de referencia para evitar ciclos infinitos
+    @JsonBackReference("empleado-posts") // <-- CORREGIDO: Debe ser JsonBackReference
     private Empleado empleado;
 
 

@@ -20,14 +20,14 @@ public class Niño {
     @Column(nullable = false, length = 50)
     private String nombre;
 
-    @Column(name = "n_identificacion", nullable = false, unique = true)
+    @Column(name = "n_identificacion", unique = true)
     private String nIdentificacion;
 
     @Column(nullable = false, length = 10)
     private String sexo;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_nacimiento", nullable = false)
+    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
     @Column(nullable = false)
@@ -42,9 +42,12 @@ public class Niño {
     private Acudiente acudiente;
 
     @OneToMany(mappedBy = "niño", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference // emparejado con @JsonBackReference en Bitacora
+    @JsonManagedReference("niño-bitacoras") // emparejado con @JsonBackReference en Bitacora
     private List<Bitacora> bitacoras = new ArrayList<>();
 
+    @OneToMany(mappedBy = "niño", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("niño-facturas") // <-- Añade esto
+    private List<Factura> facturas;
     // === Constructores ===
 
     public Niño() {

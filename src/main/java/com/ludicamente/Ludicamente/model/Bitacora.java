@@ -1,6 +1,6 @@
 package com.ludicamente.Ludicamente.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonBackReference; // Ya estaba importada y usada
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -50,12 +50,13 @@ public class Bitacora {
     private Boolean estado;
 
     @ManyToOne
-    @JoinColumn(name = "id_niño", nullable = false)
-    @JsonBackReference
+    @JoinColumn(name = "id_niño", nullable = false) // O el nombre de tu columna de clave foránea
+    @JsonBackReference("niño-bitacoras") // <-- ESTO es CLAVE: el mismo nombre de la referencia
     private Niño niño;
 
     @ManyToOne
     @JoinColumn(name = "fkid_empleado", referencedColumnName = "id_empleado")
+    @JsonBackReference("empleado-bitacoras") // Añadida esta línea
     private Empleado empleado;
 
     // === Getters y Setters ===

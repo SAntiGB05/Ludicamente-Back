@@ -37,12 +37,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/v3/api-docs/**",
             "/api/chatbot/**",
             "/api/upload/image",
+            "/api/upload/image-to-folder", // <-- AGREGAR ESTA LÍNEA AQUÍ
             "/api/gallery/images",
             "/api/gallery/hide-image",
             "/api/gallery/show-image",
             "/api/gallery/hidden-images",
-            "/api/gallery/all-cloudinary-images", // <-- ¡CORREGIDO! ANTES FALTABA /api/
-            "/api/gallery/import-image",          // <-- ¡CORREGIDO! ANTES FALTABA /api/
+            "/api/gallery/all-cloudinary-images",
+            "/api/gallery/import-image",
             "/error",
             "/favicon.ico",
             "/resources/**",
@@ -50,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/swagger-resources/**",
             "/api/servicios/categoria/**",
             "/api/posts",
-            "/api/categorias" // Ya estaba, pero lo reconfirmo
+            "/api/categorias"
     );
 
     public JwtAuthenticationFilter(
@@ -79,6 +80,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = extractTokenFromRequest(request);
 
+            // Si el token es nulo y la solicitud NO es a un endpoint público, lanza un error de autenticación
+            // o si el token es válido pero no hay autenticación en el contexto (lo que indica que el filtro anterior lo manejó)
             if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 authenticateWithToken(token);
             }
