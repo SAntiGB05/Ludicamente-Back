@@ -29,7 +29,7 @@ public class AcudienteController {
     private AcudienteService acudienteService;
 
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
-    @Operation(summary = "Listar acudientes con información completa")
+    @Operation(summary = "Listar acudientes con información completa (sin contraseña)")
     @GetMapping("/listado")
     public List<AcudienteDto> listarAcudientes() {
         return acudienteService.listarAcudientes().stream()
@@ -38,67 +38,98 @@ public class AcudienteController {
                         a.getCedula(),
                         a.getNombre(),
                         a.getCorreo(),
+                        a.getContraseña(),
                         a.getTelefono(),
-                        a.getParentesco()
+                        a.getParentesco(),
+                        a.getDireccion()
+                        // Si no tienes constructor de 6 argumentos, usarías el de 8 y pasarías null para contraseña y dirección
+                        // a.getIdAcudiente(), a.getCedula(), a.getNombre(), a.getCorreo(), null, a.getTelefono(), a.getParentesco(), null
                 ))
                 .toList();
     }
 
-
-
     @PreAuthorize("hasRole('ADMIN')") // Solo para ADMIN
+    @Operation(summary = "Obtener un acudiente por su cédula (solo para admins)")
     @GetMapping("/cedula/{cedula}")
-    public ResponseEntity<Acudiente> getAcudienteByCedula(@PathVariable String cedula) {
+    public ResponseEntity<AcudienteDto> getAcudienteByCedula(@PathVariable String cedula) {
         try {
-            Acudiente acudiente = acudienteService.obtenerAcudientePorCedula(cedula); // Necesitas implementar este método en el servicio
-            return ResponseEntity.ok(acudiente);
+            // Se asume que obtenerAcudientePorCedula devuelve Acudiente
+            Acudiente acudiente = acudienteService.obtenerAcudientePorCedula(cedula);
+            // Mapeamos a DTO antes de devolver, sin exponer la contraseña
+            AcudienteDto acudienteDto = new AcudienteDto(
+                    acudiente.getIdAcudiente(),
+                    acudiente.getCedula(),
+                    acudiente.getNombre(),
+                    acudiente.getCorreo(),
+                    null, // No se expone la contraseña
+                    acudiente.getTelefono(),
+                    acudiente.getParentesco(),
+                    acudiente.getDireccion()
+            );
+            return ResponseEntity.ok(acudienteDto);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).build(); // 404 Not Found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
         }
     }
 
     @PreAuthorize("hasRole('ACUDIENTE')")
+    @Operation(summary = "Obtener los datos del acudiente autenticado")
     @GetMapping("/auth")
     public ResponseEntity<AcudienteDto> getAcudienteAutenticado(@AuthenticationPrincipal AcudienteUserDetails userDetails) {
+        // acudienteService.obtenerAcudienteAutenticado ya devuelve un AcudienteDto
         AcudienteDto dto = acudienteService.obtenerAcudienteAutenticado(userDetails.getUsername());
         return ResponseEntity.ok(dto);
     }
 
-
-
     @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Actualizar un acudiente (por ID) (solo para admins)")
     @PutMapping("/{id}")
     public ResponseEntity<Acudiente> updateAcudienteByAdmin(@PathVariable Integer id, @Valid @RequestBody AcudienteDto acudienteDetails) {
         Acudiente actualizado = acudienteService.actualizarAcudienteAdmin(id, acudienteDetails);
         return ResponseEntity.ok(actualizado);
     }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'ACUDIENTE')")
-    @PutMapping
+    @Operation(summary = "Actualizar los datos del acudiente autenticado")
+    @PutMapping("/perfil") // Cambiado el endpoint para mayor claridad
     public ResponseEntity<Acudiente> updateAcudienteAuthenticated(@RequestBody Acudiente acudienteDetails) throws AccessDeniedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication.getPrincipal() instanceof AcudienteUserDetails acudienteUserDetails) {
             Acudiente acudiente = acudienteUserDetails.getAcudiente();
+            // Asegurarse de que el ID en la URL no pueda ser manipulado
             Acudiente actualizado = acudienteService.actualizarAcudiente(acudiente.getIdAcudiente(), acudienteDetails);
             return ResponseEntity.ok(actualizado);
         } else {
-            return ResponseEntity.status(403).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 403 Forbidden
         }
     }
 
-
     @PreAuthorize("hasAnyRole('ADMIN', 'ACUDIENTE')")
+    @Operation(summary = "Obtener un acudiente por su correo (autenticado)")
     @GetMapping("/correo/{correo}")
-    public ResponseEntity<Acudiente> getAcudienteByCorreo(@PathVariable String correo, Authentication authentication) {
+    public ResponseEntity<AcudienteDto> getAcudienteByCorreo(@PathVariable String correo, Authentication authentication) {
         // Verificar que el correo solicitado coincide con el usuario autenticado
         if (!correo.equals(authentication.getName())) {
-            return ResponseEntity.status(403).build(); // 403 Forbidden
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // 403 Forbidden
         }
 
         try {
+            // Se asume que obtenerAcudientePorCorreo devuelve Acudiente
             Acudiente acudiente = acudienteService.obtenerAcudientePorCorreo(correo);
-            return ResponseEntity.ok(acudiente);
+            // Mapeamos a DTO antes de devolver, sin exponer la contraseña
+            AcudienteDto acudienteDto = new AcudienteDto(
+                    acudiente.getIdAcudiente(),
+                    acudiente.getCedula(),
+                    acudiente.getNombre(),
+                    acudiente.getCorreo(),
+                    null, // No se expone la contraseña
+                    acudiente.getTelefono(),
+                    acudiente.getParentesco(),
+                    acudiente.getDireccion() // La dirección sí puede ser relevante aquí
+            );
+            return ResponseEntity.ok(acudienteDto);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(404).build(); // 404 Not Found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // 404 Not Found
         }
     }
 
@@ -108,24 +139,29 @@ public class AcudienteController {
     public ResponseEntity<?> registrarAcudienteConNiños(@RequestBody @Valid RegisterAcudienteRequest request) {
         try {
             Acudiente acudiente = acudienteService.registrarAcudienteConNiños(request);
-            return ResponseEntity.ok("Acudiente y niños registrados exitosamente");
+            return ResponseEntity.status(HttpStatus.CREATED).body("Acudiente y niños registrados exitosamente. ID del acudiente: " + acudiente.getIdAcudiente());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
-    @Operation(summary = "Eliminar un acudiente")
+    @Operation(summary = "Eliminar un acudiente por ID")
     @DeleteMapping("/{id}")
-    public void deleteAcudiente(@PathVariable Integer id) {
-        acudienteService.eliminarAcudiente(id);
+    public ResponseEntity<Void> deleteAcudiente(@PathVariable Integer id) {
+        try {
+            acudienteService.eliminarAcudiente(id);
+            return ResponseEntity.noContent().build(); // 204 No Content
+        } catch (RuntimeException e) {
+            // Si el acudiente no existe para eliminar
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // O un error 500 si la excepción es más general
+        }
     }
 
-    @Operation(summary = "Contar acudientes (público)")
+    @Operation(summary = "Contar acudientes registrados (público)")
     @GetMapping("/contar")
     public ResponseEntity<Long> contarAcudientes() {
         long total = acudienteService.contarAcudientes();
         return ResponseEntity.ok(total);
     }
-
 }

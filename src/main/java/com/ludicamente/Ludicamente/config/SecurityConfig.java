@@ -87,6 +87,7 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/error",
                                 "/favicon.ico",
+                                "/api/posts",
                                 "/resources/**"
                         ).permitAll()
                         .anyRequest().authenticated()

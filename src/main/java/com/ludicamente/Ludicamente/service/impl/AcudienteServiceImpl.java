@@ -5,12 +5,11 @@ import com.ludicamente.Ludicamente.dto.AcudienteDto;
 import com.ludicamente.Ludicamente.model.Acudiente;
 import com.ludicamente.Ludicamente.model.Niño;
 import com.ludicamente.Ludicamente.repository.AcudienteRepository;
-
 import com.ludicamente.Ludicamente.repository.EmpleadoRepository;
-import com.ludicamente.Ludicamente.repository.NiñoRepository;
+import com.ludicamente.Ludicamente.repository.NiñoRepository; // Mantener si es necesario para otros métodos, de lo contrario, eliminar
 import jakarta.transaction.Transactional;
 
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationManager; // Mantener si es necesario, de lo contrario, eliminar
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,23 +18,42 @@ import java.util.stream.Collectors;
 
 import com.ludicamente.Ludicamente.auth.RegisterAcudienteRequest;
 import com.ludicamente.Ludicamente.service.AcudienteService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired; // @Autowired en campos se puede eliminar con inyección por constructor
 
 @Service
 public class AcudienteServiceImpl implements AcudienteService {
 
-    @Autowired
+    // Se eliminó @Autowired de las declaraciones de campo ya que la inyección por constructor es preferida
     private final EmpleadoRepository empleadoRepository;
     private final AcudienteRepository acudienteRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // Opcional: Si NiñoRepository, JwtService y AuthenticationManager NO se usan directamente
+    // dentro de este servicio, puedes eliminarlos del constructor para un código más limpio.
+    // Sin embargo, si otras partes de tu aplicación dependen implícitamente de que se inyecten aquí,
+    // asegúrate de que se manejen correctamente. Por ahora, mostraré cómo incluirlos y asignarlos
+    // si *debes* mantenerlos en el constructor.
+    private final NiñoRepository niñoRepository; // Declarado si es necesario
+    private final JwtService jwtService; // Declarado si es necesario
+    private final AuthenticationManager authenticationManager; // Declarado si es necesario
 
-    @Autowired
 
-    public AcudienteServiceImpl(EmpleadoRepository empleadoRepository, AcudienteRepository acudienteRepository, NiñoRepository niñoRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+    // Inyección de constructor preferida. No es necesario @Autowired en el constructor si es el único.
+    public AcudienteServiceImpl(
+            EmpleadoRepository empleadoRepository,
+            AcudienteRepository acudienteRepository,
+            NiñoRepository niñoRepository, // Mantener si NiñoRepository se usa realmente en este servicio
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService, // Mantener si JwtService se usa realmente en este servicio
+            AuthenticationManager authenticationManager // Mantener si AuthenticationManager se usa realmente en este servicio
+    ) {
         this.empleadoRepository = empleadoRepository;
         this.acudienteRepository = acudienteRepository;
         this.passwordEncoder = passwordEncoder;
+        // Asignar estos si están presentes en el constructor y se usan en esta clase
+        this.niñoRepository = niñoRepository;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -67,15 +85,16 @@ public class AcudienteServiceImpl implements AcudienteService {
         acudiente.setNombre(acudienteDetails.getNombre());
         acudiente.setCedula(acudienteDetails.getCedula());
         acudiente.setCorreo(acudienteDetails.getCorreo());
-        acudiente.setContraseña(acudienteDetails.getContraseña());
+        // CORRECCIÓN DE SEGURIDAD: Solo actualiza y codifica la contraseña si se proporciona
+        if (acudienteDetails.getContraseña() != null && !acudienteDetails.getContraseña().isEmpty()) {
+            acudiente.setContraseña(passwordEncoder.encode(acudienteDetails.getContraseña()));
+        }
         acudiente.setTelefono(acudienteDetails.getTelefono());
         acudiente.setParentesco(acudienteDetails.getParentesco());
         acudiente.setDireccion(acudienteDetails.getDireccion());
 
         return acudienteRepository.save(acudiente);
     }
-
-
 
     @Override
     @Transactional
@@ -90,6 +109,14 @@ public class AcudienteServiceImpl implements AcudienteService {
         acudiente.setCorreo(acudienteDetails.getCorreo());
         acudiente.setTelefono(acudienteDetails.getTelefono());
         acudiente.setParentesco(acudienteDetails.getParentesco());
+        // Si AcudienteDto para actualizaciones de administrador incluye la contraseña, codifícala
+        if (acudienteDetails.getContraseña() != null && !acudienteDetails.getContraseña().isEmpty()) {
+            acudiente.setContraseña(passwordEncoder.encode(acudienteDetails.getContraseña()));
+        }
+        // Si AcudienteDto para actualizaciones de administrador incluye la dirección
+        if (acudienteDetails.getDireccion() != null && !acudienteDetails.getDireccion().isEmpty()){
+            acudiente.setDireccion(acudienteDetails.getDireccion());
+        }
 
         // Guardar los cambios
         return acudienteRepository.save(acudiente);
@@ -105,16 +132,19 @@ public class AcudienteServiceImpl implements AcudienteService {
         Acudiente acudiente = acudienteRepository.findByCorreo(correo)
                 .orElseThrow(() -> new RuntimeException("Acudiente no encontrado"));
 
+        // MODIFICADO: Usando el constructor de 8 argumentos y pasando null para contraseña y dirección.
+        // Esto evita modificar AcudienteDto.
         return new AcudienteDto(
                 acudiente.getIdAcudiente(),
                 acudiente.getCedula(),
                 acudiente.getNombre(),
                 acudiente.getCorreo(),
+                null, // Pasar null o una cadena vacía para contraseña (buenas prácticas de seguridad para respuestas GET)
                 acudiente.getTelefono(),
-                acudiente.getParentesco()
+                acudiente.getParentesco(),
+                null  // Pasar null o una cadena vacía para dirección si no es necesaria aquí
         );
     }
-
 
     @Override
     @Transactional
@@ -153,7 +183,7 @@ public class AcudienteServiceImpl implements AcudienteService {
         }).collect(Collectors.toList());
 
         acudiente.setNiños(niños);
-        return acudienteRepository.save(acudiente); // Guardar acudiente y niños por cascade
+        return acudienteRepository.save(acudiente); // Guardar acudiente y niños por cascada
     }
 
     public long contarAcudientes() {
