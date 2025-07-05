@@ -66,11 +66,18 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/posts").hasAnyRole("ADMIN", "STAFF") // <--- CAMBIO AQUÍ
+                        .requestMatchers(HttpMethod.PUT, "/api/posts/**").hasAnyRole("ADMIN", "STAFF") // <--- CAMBIO AQUÍ
+                        .requestMatchers(HttpMethod.DELETE, "/api/posts/**").hasAnyRole("ADMIN", "STAFF") // <--- CAMBIO AQUÍ
+                        .requestMatchers(HttpMethod.PATCH, "/api/posts/**").hasAnyRole("ADMIN", "STAFF") // <--- CAMBIO AQUÍ
+                        .requestMatchers(HttpMethod.GET, "/api/posts").permitAll() // Si quieres que el GET sea público
+                        // Si tienes otros endpoints GET a /api/posts que quieres proteger, añádelos aquí.
+
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/chatbot/**",
                                 "/api/upload/image",
-                                "/api/upload/image-to-folder", // <-- AGREGAR ESTA LÍNEA AQUÍ
+                                "/api/upload/image-to-folder",
                                 "/api/gallery/images",
                                 "/api/gallery/hide-image",
                                 "/api/gallery/show-image",
@@ -90,7 +97,6 @@ public class SecurityConfig {
                                 "/swagger-resources/**",
                                 "/error",
                                 "/favicon.ico",
-                                "/api/posts",
                                 "/resources/**"
                         ).permitAll()
                         .anyRequest().authenticated()

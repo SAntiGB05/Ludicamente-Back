@@ -39,23 +39,18 @@ public class PostController {
         dto.setEtiquetas(post.getEtiquetas());
         dto.setVisitas(post.getVisitas());
 
-        // *** CORRECCIÓN AQUÍ ***
-        // Accede al ID del empleado a través del objeto Empleado asociado al Post
-        // Asegúrate de que post.getEmpleado() no sea nulo antes de acceder a su ID.
         if (post.getEmpleado() != null) {
             dto.setFkidEmpleado(post.getEmpleado().getIdEmpleado());
         } else {
-            // Manejar el caso donde no hay un empleado asociado (ej. asignar null o un valor por defecto)
-            dto.setFkidEmpleado(null); // O 0, o lanzar una excepción, dependiendo de tu lógica
+            dto.setFkidEmpleado(null);
         }
-        // *********************
 
         dto.setPlantilla(post.getPlantilla());
         return dto;
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')") // <--- CAMBIO AQUÍ
     public ResponseEntity<PostResponseDTO> createPost(@RequestBody PostCreateDTO postCreateDTO) {
         Post createdPost = postService.crearPost(postCreateDTO);
         return new ResponseEntity<>(mapToDto(createdPost), HttpStatus.CREATED);
@@ -79,7 +74,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')") // <--- CAMBIO AQUÍ
     public ResponseEntity<PostResponseDTO> updatePost(@PathVariable Integer id, @RequestBody PostUpdateDTO postUpdateDTO) {
         return postService.actualizarPost(id, postUpdateDTO)
                 .map(this::mapToDto)
@@ -88,7 +83,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')") // <--- CAMBIO AQUÍ
     public ResponseEntity<Void> deletePost(@PathVariable Integer id) {
         boolean deleted = postService.eliminarPost(id);
         if (deleted) {
@@ -99,7 +94,7 @@ public class PostController {
     }
 
     @PatchMapping("/{postId}/estado")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')") // <--- CAMBIO AQUÍ
     public ResponseEntity<PostResponseDTO> updatePostStatus(@PathVariable Integer postId, @RequestParam Post.EstadoPost newStatus) {
         return postService.updatePostStatus(postId, newStatus)
                 .map(this::mapToDto)
@@ -108,7 +103,7 @@ public class PostController {
     }
 
     @PatchMapping("/{postId}/plantilla")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')") // <--- CAMBIO AQUÍ
     public ResponseEntity<PostResponseDTO> updatePostTemplate(@PathVariable Integer postId, @RequestParam Post.PlantillaPost nuevaPlantilla) {
         return postService.cambiarPlantillaPost(postId, nuevaPlantilla)
                 .map(this::mapToDto)
