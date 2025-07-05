@@ -39,20 +39,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/upload/image",
             "/api/gallery/images",
             "/api/gallery/hide-image",
-            "/api/gallery/show-image",    // <-- ¡ASEGÚRATE DE ESTA LÍNEA!
-            "/api/gallery/hidden-images", // <-- ¡ASEGÚRATE DE ESTA LÍNEA!
+            "/api/gallery/show-image",
+            "/api/gallery/hidden-images",
+            "/api/gallery/all-cloudinary-images", // <-- ¡CORREGIDO! ANTES FALTABA /api/
+            "/api/gallery/import-image",          // <-- ¡CORREGIDO! ANTES FALTABA /api/
             "/error",
             "/favicon.ico",
             "/resources/**",
-            "/api/upload/image", // <-- ¡AÑADIR ESTA LÍNEA!
-            "/error",             // <-- ¡AÑADIR ESTA LÍNEA!
-            "/favicon.ico",       // <-- ¡AÑADIR ESTA LÍNEA!
-            "/resources/**",       // <-- ¡AÑADIR ESTA LÍNEA!// <-- Asegúrate de que esto esté aquí si quieres que el filtro lo omita
             "/swagger-ui/**",
             "/swagger-resources/**",
             "/api/servicios/categoria/**",
             "/api/posts",
-            "/api/categorias"
+            "/api/categorias" // Ya estaba, pero lo reconfirmo
     );
 
     public JwtAuthenticationFilter(

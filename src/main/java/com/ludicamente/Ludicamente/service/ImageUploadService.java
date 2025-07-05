@@ -2,6 +2,8 @@
 package com.ludicamente.Ludicamente.service;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Search; // Importa la clase Search
+import com.cloudinary.api.ApiResponse; // Importa ApiResponse
 import com.ludicamente.Ludicamente.model.GaleriaImagen;
 import com.ludicamente.Ludicamente.repository.GaleriaImagenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList; // Necesario para construir la lista de URLs
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,12 +36,16 @@ public class ImageUploadService {
             Map uploadResult = cloudinary.uploader().upload(multipartFile.getBytes(), options);
             String secureUrl = (String) uploadResult.get("secure_url");
 
-            GaleriaImagen galeriaImagen = new GaleriaImagen();
-            galeriaImagen.setUrlImagen(secureUrl);
-            galeriaImagen.setFechaSubida(LocalDateTime.now());
-            galeriaImagen.setVisible(true); // Siempre visible al subir
-
-            galeriaImagenRepository.save(galeriaImagen);
+            // Opcional: Si quieres registrar TODAS las imágenes en tu DB, incluso las que ya existían antes
+            // Puedes buscar si ya existe para evitar duplicados en tu DB si la subida fue manual o externa.
+            Optional<GaleriaImagen> existingImage = galeriaImagenRepository.findByUrlImagen(secureUrl);
+            if (!existingImage.isPresent()) {
+                GaleriaImagen galeriaImagen = new GaleriaImagen();
+                galeriaImagen.setUrlImagen(secureUrl);
+                galeriaImagen.setFechaSubida(LocalDateTime.now());
+                galeriaImagen.setVisible(true); // Siempre visible al subir
+                galeriaImagenRepository.save(galeriaImagen);
+            }
 
             return secureUrl;
         } catch (IOException e) {
@@ -47,19 +54,29 @@ public class ImageUploadService {
         }
     }
 
+    // Añade esto a ImageUploadService.java
+    public GaleriaImagen importImageFromCloudinary(String imageUrl) {
+        // Primero, verifica si ya existe en tu DB para evitar duplicados
+        Optional<GaleriaImagen> existingImage = galeriaImagenRepository.findByUrlImagen(imageUrl);
+        if (existingImage.isPresent()) {
+            System.out.println("La imagen ya existe en la base de datos: " + imageUrl);
+            return existingImage.get(); // Retorna la imagen existente
+        }
+
+        GaleriaImagen newImage = new GaleriaImagen();
+        newImage.setUrlImagen(imageUrl);
+        newImage.setFechaSubida(LocalDateTime.now()); // O puedes poner un valor por defecto o nulo
+        newImage.setVisible(true); // Por defecto, se importa como visible
+        return galeriaImagenRepository.save(newImage);
+    }
+
     public List<String> getAllImageUrls() {
-        // Este método sigue devolviendo solo las imágenes visibles para la galería pública.
         return galeriaImagenRepository.findByVisibleTrue()
                 .stream()
                 .map(GaleriaImagen::getUrlImagen)
                 .toList();
     }
 
-    /**
-     * ¡NUEVO MÉTODO!
-     * Obtiene las URLs de las imágenes que están marcadas como NO visibles.
-     * @return Una lista de URLs de imágenes ocultas.
-     */
     public List<String> getHiddenImageUrls() {
         return galeriaImagenRepository.findByVisibleFalse()
                 .stream()
@@ -67,31 +84,51 @@ public class ImageUploadService {
                 .toList();
     }
 
+    // --- ¡NUEVO MÉTODO! Para obtener todas las imágenes directamente de Cloudinary ---
+    public List<String> getAllImagesFromCloudinary() throws Exception {
+        List<String> imageUrls = new ArrayList<>();
+        try {
+            // Usa el API de administración de Cloudinary para buscar recursos
+            // `expression("resource_type:image")` filtra solo imágenes
+            // `max_results` es el número de resultados por página, máximo 500 por defecto
+            ApiResponse result = cloudinary.search()
+                    .expression("resource_type:image")
+                    .maxResults(500) // Puedes ajustar este número o implementar paginación
+                    .execute();
+
+            List<Map<String, Object>> resources = (List<Map<String, Object>>) result.get("resources");
+
+            if (resources != null) {
+                for (Map<String, Object> resource : resources) {
+                    imageUrls.add((String) resource.get("secure_url"));
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error al listar imágenes de Cloudinary: " + e.getMessage());
+            throw new Exception("No se pudieron obtener las imágenes de Cloudinary: " + e.getMessage(), e);
+        }
+        return imageUrls;
+    }
+
     public boolean hideImage(String imageUrl) {
         Optional<GaleriaImagen> optionalImage = galeriaImagenRepository.findByUrlImagen(imageUrl);
         if (optionalImage.isPresent()) {
             GaleriaImagen imagen = optionalImage.get();
-            imagen.setVisible(false); // Cambia el estado a no visible
+            imagen.setVisible(false);
             galeriaImagenRepository.save(imagen);
             return true;
         }
         return false;
     }
 
-    /**
-     * ¡NUEVO MÉTODO!
-     * Marca una imagen como visible (la "muestra" de nuevo) por su URL.
-     * @param imageUrl La URL de la imagen a mostrar.
-     * @return true si la imagen fue encontrada y mostrada, false de lo contrario.
-     */
     public boolean showImage(String imageUrl) {
         Optional<GaleriaImagen> optionalImage = galeriaImagenRepository.findByUrlImagen(imageUrl);
         if (optionalImage.isPresent()) {
             GaleriaImagen imagen = optionalImage.get();
-            imagen.setVisible(true); // Cambia el estado a visible
+            imagen.setVisible(true);
             galeriaImagenRepository.save(imagen);
             return true;
         }
-        return false; // La imagen no fue encontrada
+        return false;
     }
 }
