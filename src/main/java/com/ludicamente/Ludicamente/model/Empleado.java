@@ -1,26 +1,27 @@
 // Archivo: src/main/java/com/ludicamente/Ludicamente/model/Empleado.java
-// Descripción: Modelo de la entidad Empleado, mapeado a la tabla 'empleado' en la base de datos.
 
 package com.ludicamente.Ludicamente.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference; // Para manejar relaciones bidireccionales en JSON
-import com.fasterxml.jackson.annotation.JsonIgnore;       // Para ignorar la contraseña en la serialización
-import com.fasterxml.jackson.annotation.JsonFormat;      // Para el formato de fecha en JSON
-import jakarta.persistence.*; // Anotaciones JPA
-import java.math.BigDecimal; // Para salario
-import java.time.LocalDate;  // Para fechaContratacion
+// CAMBIAR A ESTA IMPORTACIÓN:
+import com.fasterxml.jackson.annotation.JsonManagedReference; // Para manejar relaciones bidireccionales en JSON
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;    // Para equals/hashCode (buena práctica)
+import java.util.Objects;
 
 
 @Entity
-@Table(name = "empleado") // Nombre exacto de la tabla en tu base de datos
+@Table(name = "empleado")
 public class Empleado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_empleado") // Mapea a la columna 'id_empleado' en la BD
-    private Integer idEmpleado; // Tipo Integer, consistente con tu DDL
+    @Column(name = "id_empleado")
+    private Integer idEmpleado;
 
     @Column(name = "cedula_empleado", nullable = false, length = 20, unique = true)
     private String cedulaEmpleado;
@@ -31,7 +32,7 @@ public class Empleado {
     @Column(name = "correo", nullable = false, length = 100, unique = true)
     private String correo;
 
-    @JsonIgnore // Oculta la contraseña cuando se serializa el objeto a JSON
+    @JsonIgnore
     @Column(name = "contraseña", nullable = false, length = 255)
     private String contraseña;
 
@@ -42,7 +43,7 @@ public class Empleado {
     private String direccion;
 
     @Column(name = "fecha_contratacion", nullable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd") // Para asegurar el formato correcto al serializar/deserializar JSON
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate fechaContratacion;
 
     @Column(name = "salario", nullable = false, precision = 10, scale = 2)
@@ -54,33 +55,33 @@ public class Empleado {
     @Column(name = "nivel_acceso", nullable = false)
     private Integer nivelAcceso;
 
-    @Enumerated(EnumType.STRING) // Almacena el Enum como String ('activo', 'inactivo') en la BD
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
-    private EstadoEmpleado estado = EstadoEmpleado.activo; // Valor por defecto si se desea
+    private EstadoEmpleado estado = EstadoEmpleado.activo;
 
-    // Define el Enum directamente dentro de la clase Empleado
     public enum EstadoEmpleado {
         activo,
         inactivo
     }
 
     // --- Relaciones con otras entidades ---
-    // Asegúrate de que las clases Factura, Bitacora, Post existan en tu paquete model
-    // y que tengan la relación @ManyToOne hacia Empleado.
+    // ¡CORREGIDO: DEBE SER @JsonManagedReference en el lado OneToMany!
 
-    @JsonBackReference("empleado-facturas") // Nombre de referencia para evitar ciclos infinitos
+    @JsonManagedReference("empleado-facturas") // <-- CORREGIDO
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Factura> facturas;
 
-    @JsonBackReference("empleado-bitacoras") // Nombre de referencia para evitar ciclos infinitos
+    @JsonManagedReference("empleado-bitacoras") // <-- CORREGIDO
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Bitacora> bitacoras;
 
-    @JsonBackReference("empleado-posts") // Nombre de referencia para evitar ciclos infinitos
+    @JsonManagedReference("empleado-posts") // <-- CORREGIDO
     @OneToMany(mappedBy = "empleado", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Post> posts;
 
-    // --- Constructor vacío (necesario para JPA) ---
+    // --- Resto del código de la clase Empleado (constructores, builder, getters y setters) ---
+    // ... (sin cambios en el resto del código que no sean las anotaciones de Jackson en las relaciones)
+    // Asegúrate de que el resto de tu clase Empleado sea el que tienes.
     public Empleado(){
     }
 

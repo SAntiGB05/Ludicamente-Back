@@ -42,9 +42,12 @@ public class Niño {
     private Acudiente acudiente;
 
     @OneToMany(mappedBy = "niño", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JsonManagedReference // emparejado con @JsonBackReference en Bitacora
+    @JsonManagedReference("niño-bitacoras") // emparejado con @JsonBackReference en Bitacora
     private List<Bitacora> bitacoras = new ArrayList<>();
 
+    @OneToMany(mappedBy = "niño", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference("niño-facturas") // <-- Añade esto
+    private List<Factura> facturas;
     // === Constructores ===
 
     public Niño() {
