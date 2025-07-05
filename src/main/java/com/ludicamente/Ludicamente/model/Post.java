@@ -1,6 +1,7 @@
 package com.ludicamente.Ludicamente.model;
-import jakarta.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference; // Para manejar relaciones bidireccionales en JSON
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,7 +27,7 @@ public class Post {
 
     @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
-    private EstadoPost estado = EstadoPost.BORRADOR;
+    private EstadoPost estado = EstadoPost.BORRADOR; // Valor por defecto
 
     @Column(name = "imagen_destacada", length = 255)
     private String imagenDestacada;
@@ -38,11 +39,18 @@ public class Post {
     private String etiquetas;
 
     @Column(name = "visitas")
-    private Integer visitas = 0;
+    private Integer visitas = 0; // Valor por defecto
 
+    @Column(name = "plantilla", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PlantillaPost plantilla = PlantillaPost.PLANTILLA1; // Valor por defecto
+
+    // Relación Many-to-One con la entidad Empleado
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fkid_empleado", nullable = false)
+    @JoinColumn(name = "fkid_empleado", nullable = false) // Columna de clave foránea
+    @JsonManagedReference("empleado-posts") // Nombre de referencia para evitar ciclos infinitos
     private Empleado empleado;
+
 
     public enum EstadoPost {
         BORRADOR,
@@ -50,8 +58,26 @@ public class Post {
         ARCHIVADO
     }
 
+    public enum PlantillaPost {
+        PLANTILLA1,
+        PLANTILLA2,
+        PLANTILLA3,
+        PLANTILLA4
+    }
+
+    // Constructor vacío. Se inicializa fechaPublicacion aquí.
     public Post() {
         this.fechaPublicacion = LocalDateTime.now();
+    }
+
+    // Getters y Setters
+
+    public PlantillaPost getPlantilla() {
+        return plantilla;
+    }
+
+    public void setPlantilla(PlantillaPost plantilla) {
+        this.plantilla = plantilla;
     }
 
     public Integer getIdPost() {

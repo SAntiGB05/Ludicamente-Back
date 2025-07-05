@@ -7,18 +7,22 @@ import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Pattern;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class EmpleadoUpdateDto {
 
     @NotBlank(message = "La cédula es obligatoria")
-    @Size(max = 20, message = "La cédula no puede exceder los 20 caracteres")
+    @Size(max = 10, message = "La cédula no debe exceder los 10 dígitos")
+    @Pattern(regexp = "^\\d{1,10}$", message = "La cédula debe contener solo números y tener un máximo de 10 dígitos")
     private String cedulaEmpleado;
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 50, message = "El nombre no puede exceder los 50 caracteres")
+    @Pattern(regexp = "^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\\s]+$", message = "El nombre solo puede contener letras y espacios")
     private String nombre;
 
     @Email(message = "El correo electrónico no es válido")
@@ -26,12 +30,9 @@ public class EmpleadoUpdateDto {
     @Size(max = 100, message = "El correo no puede exceder los 100 caracteres")
     private String correo;
 
-    // *** AQUI NO INCLUYES LA CONTRASEÑA, O LA HACES OPCIONAL SIN @NotBlank ***
-    // private String contraseña; // NO INCLUIR para PUT si no la vas a actualizar
-
     @NotBlank(message = "El teléfono es obligatorio")
-    @Pattern(regexp = "\\d{7,15}", message = "El teléfono debe contener entre 7 y 15 dígitos numéricos")
     @Size(max = 15, message = "El teléfono no puede exceder los 15 caracteres")
+    @Pattern(regexp = "^\\d{7,15}$", message = "El teléfono debe contener solo dígitos numéricos (entre 7 y 15)")
     private String telefono;
 
     @NotBlank(message = "La dirección es obligatoria")
@@ -44,6 +45,8 @@ public class EmpleadoUpdateDto {
 
     @NotNull(message = "El salario es obligatorio")
     @Min(value = 0, message = "El salario no puede ser negativo")
+    // ELIMINAR O COMENTAR LA LÍNEA SIGUIENTE:
+    // @Pattern(regexp = "^\\d+(\\.\\d{1,2})?$", message = "El salario debe ser un número válido (ej. 1000.00 o 1500)")
     private BigDecimal salario;
 
     @NotBlank(message = "El horario es obligatorio")
@@ -59,12 +62,8 @@ public class EmpleadoUpdateDto {
     @Pattern(regexp = "activo|inactivo", message = "El estado debe ser 'activo' o 'inactivo'")
     private String estado;
 
-    // Constructor vacío
+    // ... (rest of your class)
     public EmpleadoUpdateDto() {}
-
-    // Getters y Setters
-    // (Generar todos los getters y setters para los campos anteriores)
-
     public String getCedulaEmpleado() { return cedulaEmpleado; }
     public void setCedulaEmpleado(String cedulaEmpleado) { this.cedulaEmpleado = cedulaEmpleado; }
     public String getNombre() { return nombre; }
