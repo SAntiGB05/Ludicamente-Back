@@ -156,6 +156,8 @@ public class AuthenticationService {
                 empleadoRepository.findByCorreo(email).isPresent();
     }
 
+
+
     public AuthResponse authenticateWithGoogle(String email) {
         // Intentar encontrar primero al acudiente
         Optional<Acudiente> acudienteOpt = acudienteRepository.findByCorreo(email);

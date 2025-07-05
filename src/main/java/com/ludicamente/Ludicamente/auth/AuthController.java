@@ -120,6 +120,17 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/check-email")
+    public ResponseEntity<?> checkIfEmailExists(@RequestParam String email) {
+        boolean exists = authenticationService.checkIfUserExistsByEmail(email);
+        if (exists) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya está registrado");
+        } else {
+            return ResponseEntity.ok().build();
+        }
+    }
+
+
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
         String token = request.get("token");
