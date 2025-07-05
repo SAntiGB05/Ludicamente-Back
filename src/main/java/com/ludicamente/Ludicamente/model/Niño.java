@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
+@Table(name = "niño")
 public class Niño {
 
     @Id
@@ -25,29 +27,33 @@ public class Niño {
 
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha_nacimiento", nullable = false)
-    private LocalDate fechaNacimiento;
+    private Date fechaNacimiento;
 
     @Column(nullable = false)
     private Integer edad;
 
-    @Column(name = "foto", columnDefinition = "TEXT") // o LONGTEXT si esperas imágenes más grandes
+    @Column(name = "foto", columnDefinition = "TEXT")
     private String foto;
 
     @ManyToOne
-    @JsonManagedReference
+    @JsonBackReference // evita ciclo infinito al serializar Acudiente → Niño → Acudiente...
     @JoinColumn(name = "fkid_acudiente", nullable = false)
     private Acudiente acudiente;
 
+    @OneToMany(mappedBy = "niño", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JsonManagedReference // emparejado con @JsonBackReference en Bitacora
+    private List<Bitacora> bitacoras = new ArrayList<>();
+
+    // === Constructores ===
+
+    public Niño() {
+    }
 
     public Niño(Integer idNiño) {
         this.idNiño = idNiño;
     }
-    public Niño() {
 
-    }
     // === Getters y Setters ===
-
-
 
     public Integer getIdNiño() {
         return idNiño;
@@ -81,11 +87,11 @@ public class Niño {
         this.sexo = sexo;
     }
 
-    public LocalDate getFechaNacimiento() {
+    public Date getFechaNacimiento() {
         return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+    public void setFechaNacimiento(Date fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
 
@@ -111,5 +117,13 @@ public class Niño {
 
     public void setAcudiente(Acudiente acudiente) {
         this.acudiente = acudiente;
+    }
+
+    public List<Bitacora> getBitacoras() {
+        return bitacoras;
+    }
+
+    public void setBitacoras(List<Bitacora> bitacoras) {
+        this.bitacoras = bitacoras;
     }
 }

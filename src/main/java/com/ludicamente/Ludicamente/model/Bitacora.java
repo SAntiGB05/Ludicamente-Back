@@ -1,9 +1,9 @@
 package com.ludicamente.Ludicamente.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bitacora")
@@ -15,7 +15,7 @@ public class Bitacora {
     private Integer codBitacora;
 
     @Column(name = "titulo", columnDefinition = "TEXT")
-    private  String titulo;
+    private String titulo;
 
     @Column(name = "descripcion_general", columnDefinition = "TEXT")
     private String descripcionGeneral;
@@ -48,24 +48,17 @@ public class Bitacora {
     private String historialActividad;
 
     private Boolean estado;
+
     @ManyToOne
-    @JoinColumn(name = "id_niño")
+    @JoinColumn(name = "id_niño", nullable = false)
+    @JsonBackReference
     private Niño niño;
 
     @ManyToOne
     @JoinColumn(name = "fkid_empleado", referencedColumnName = "id_empleado")
     private Empleado empleado;
 
-    // Getters y Setters
-
-
-    public LocalDate getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(LocalDate fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
+    // === Getters y Setters ===
 
     @PrePersist
     public void prePersist() {
@@ -74,14 +67,13 @@ public class Bitacora {
         }
     }
 
-    public Niño getNiño() {
-        return niño;
+    public Integer getCodBitacora() {
+        return codBitacora;
     }
 
-    public void setNiño(Niño niño) {
-        this.niño = niño;
+    public void setCodBitacora(Integer codBitacora) {
+        this.codBitacora = codBitacora;
     }
-
 
     public String getTitulo() {
         return titulo;
@@ -89,21 +81,6 @@ public class Bitacora {
 
     public void setTitulo(String titulo) {
         this.titulo = titulo;
-    }
-    public Boolean getEstado() {
-        return estado;
-    }
-
-    public void setEstado(Boolean estado) {
-        this.estado = estado;
-    }
-
-    public Integer getCodBitacora() {
-        return codBitacora;
-    }
-
-    public void setCodBitacora(Integer codBitacora) {
-        this.codBitacora = codBitacora;
     }
 
     public String getDescripcionGeneral() {
@@ -162,6 +139,14 @@ public class Bitacora {
         this.habilidades = habilidades;
     }
 
+    public LocalDate getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(LocalDate fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
     public String getSeguimiento() {
         return seguimiento;
     }
@@ -176,6 +161,22 @@ public class Bitacora {
 
     public void setHistorialActividad(String historialActividad) {
         this.historialActividad = historialActividad;
+    }
+
+    public Boolean getEstado() {
+        return estado;
+    }
+
+    public void setEstado(Boolean estado) {
+        this.estado = estado;
+    }
+
+    public Niño getNiño() {
+        return niño;
+    }
+
+    public void setNiño(Niño niño) {
+        this.niño = niño;
     }
 
     public Empleado getEmpleado() {
