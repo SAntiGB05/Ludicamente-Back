@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +28,7 @@ public class Niño {
 
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha_nacimiento", nullable = false)
-    private Date fechaNacimiento;
+    private LocalDate fechaNacimiento;
 
     @Column(nullable = false)
     private Integer edad;
@@ -87,11 +88,11 @@ public class Niño {
         this.sexo = sexo;
     }
 
-    public Date getFechaNacimiento() {
+    public LocalDate getFechaNacimiento() {
         return fechaNacimiento;
     }
 
-    public void setFechaNacimiento(Date fechaNacimiento) {
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
         this.fechaNacimiento = fechaNacimiento;
     }
 
