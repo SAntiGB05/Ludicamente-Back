@@ -47,47 +47,51 @@ public class PasswordResetService {
         if (empleadoOpt.isPresent()) {
             Empleado empleado = empleadoOpt.get();
             token.setUserId(empleado.getIdEmpleado());
-            token.setNivelAcceso(empleado.getNivelAcceso()); // O simplemente poner 1, 2, etc.
+            token.setNivelAcceso(empleado.getNivelAcceso());
         } else {
             Acudiente acudiente = acudienteOpt.get();
             token.setUserId(acudiente.getIdAcudiente());
-            token.setNivelAcceso(null); // Importante: dejarlo en null para identificar como Acudiente
+            token.setNivelAcceso(null);
         }
 
         tokenRepository.save(token);
 
-
-        // Crear el enlace
         String link = "http://localhost:5173/resetPassword?token=" + token.getToken();
 
-        // Crear HTML para el botón
-        String mensajeHtml = """
+        String mensajeHtml = String.format("""
             <html>
-              <body style="font-family: Arial, sans-serif;">
-                <p>Hola,</p>
-                <p>Haz clic en el siguiente botón para restablecer tu contraseña:</p>
-                <a href="%s" style="
-                    display: inline-block;
-                    padding: 10px 20px;
-                    margin-top: 10px;
-                    background-color: #cd7e4e;
-                    color: white;
-                    text-decoration: none;
-                    border-radius: 5px;
-                    font-weight: bold;
-                ">
-                  Cambiar contraseña
-                </a>
-                <p style="margin-top:20px;">Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
+              <head>
+                <meta charset="UTF-8">
+                <title>Restablecer contraseña</title>
+              </head>
+              <body style="background-color: #fef3c7; font-family: sans-serif; color: #333333; padding: 24px;">
+                <div style="max-width: 500px; margin: 0 auto; background-color: white; border-radius: 16px; border: 1px solid #d1d5db; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 24px;">
+
+                
+                  <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">Restablece tu contraseña</h2>
+                  <p style="font-size: 14px; margin-bottom: 16px;">
+                    Hemos recibido una solicitud para restablecer tu contraseña. Si fuiste tú, haz clic en el siguiente botón:
+                  </p>
+
+                  <div style="text-align: center; margin-bottom: 24px;">
+                    <a href="%s" style="background-color: #cd7e4e; color: #fff8dc; padding: 12px 24px; border-radius: 9999px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block;">
+                      Cambiar contraseña
+                    </a>
+                  </div>
+
+                  <p style="font-size: 14px; color: #4b5563; text-align: center;">
+                    Si no solicitaste este cambio, puedes ignorar este mensaje.<br />
+                    Este enlace es válido por 30 minutos.
+                  </p>
+
+                </div>
               </body>
             </html>
-        """.formatted(link);
+        """, link);
 
-        // Enviar el correo con formato HTML
-        emailService.enviarCorreoHtml(email, "Restablece tu contraseña", mensajeHtml);
+
 
         return token;
-
     }
 
     public void resetPassword(String tokenStr, String nuevaClave) {
