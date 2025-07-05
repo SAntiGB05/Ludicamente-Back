@@ -69,16 +69,17 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/chatbot/**",
-                                "/api/upload/image", // <-- Asegúrate de que esta esté aquí
-                                "/api/gallery/images", // <-- ¡Correcto ahora!
-                                "/api/gallery/hide-image", // <-- Correcto
-                                "/api/gallery/show-image", // <-- Correcto
-                                "/api/gallery/hidden-images", // <-- ¡Correcto ahora!
-                                "/api/gallery/all-cloudinary-images", // <-- ¡CORREGIDO! ANTES FALTABA /api/
-                                "/api/gallery/import-image", // <-- ¡CORREGIDO! ANTES FALTABA /api/
+                                "/api/upload/image",
+                                "/api/upload/image-to-folder", // <-- AGREGAR ESTA LÍNEA AQUÍ
+                                "/api/gallery/images",
+                                "/api/gallery/hide-image",
+                                "/api/gallery/show-image",
+                                "/api/gallery/hidden-images",
+                                "/api/gallery/all-cloudinary-images",
+                                "/api/gallery/import-image",
                                 "/api/files/upload",
                                 "/api/servicios/categoria/**",
-                                "/api/categorias/**", // Asumo que /api/categorias también es público
+                                "/api/categorias/**",
                                 "/api/pago/**",
                                 "/api/pagos/crear-preferencia",
                                 "/api/pagos/webhook",
