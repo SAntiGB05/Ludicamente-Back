@@ -71,6 +71,7 @@ public class SecurityConfig {
                                 "/error", "/favicon.ico", "/resources/**",
                                 "/api/acudiente/contar",
                                 "/api/niños/contar-por-genero"
+                                "/error", "/favicon.ico", "/resources/**","/api/pagos/crear-preferencia", "/api/pagos/webhook"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
