@@ -1,11 +1,11 @@
 package com.ludicamente.Ludicamente.model;
 
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,13 +40,11 @@ public class Acudiente {
     @Column(name = "direccion_acudiente", length = 50)
     private String direccion;
 
-    @JsonBackReference
-    @OneToMany(mappedBy = "acudiente", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Niño> niños;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "acudiente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Niño> niños = new ArrayList<>();
 
-    public Acudiente(){
-
-    }
+    public Acudiente() {}
 
     public Acudiente(Integer idAcudiente, List<Niño> niños, String direccion, String parentesco, String contraseña, String telefono, String correo, String nombre, String cedula) {
         this.idAcudiente = idAcudiente;
@@ -60,8 +58,6 @@ public class Acudiente {
         this.cedula = cedula;
     }
 
-
-    // Constructor privado para el Builder
     private Acudiente(Builder builder) {
         this.idAcudiente = builder.idAcudiente;
         this.cedula = builder.cedula;
@@ -74,12 +70,10 @@ public class Acudiente {
         this.niños = builder.niños;
     }
 
-    // Método estático para crear el Builder
     public static Builder builder() {
         return new Builder();
     }
 
-    // Clase Builder interna
     public static final class Builder {
         private Integer idAcudiente;
         private String cedula;
