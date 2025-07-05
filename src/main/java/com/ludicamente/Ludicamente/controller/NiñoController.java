@@ -1,7 +1,6 @@
 package com.ludicamente.Ludicamente.controller;
 
 import com.ludicamente.Ludicamente.auth.AuthenticationService;
-import com.ludicamente.Ludicamente.dto.NiñoDto;
 import com.ludicamente.Ludicamente.model.Niño;
 import com.ludicamente.Ludicamente.service.NiñoService;
 import com.ludicamente.Ludicamente.dto.NiñoDto; // <--- Importa el NiñoDto

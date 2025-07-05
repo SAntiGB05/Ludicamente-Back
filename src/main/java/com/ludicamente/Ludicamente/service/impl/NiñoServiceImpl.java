@@ -125,11 +125,9 @@ public class NiñoServiceImpl implements NiñoService {
         return false;
     }
 
-    private int calcularEdad(Date fechaNacimiento) {
-        LocalDate fecha = fechaNacimiento.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
-        return Period.between(fecha, LocalDate.now()).getYears();
+    private int calcularEdad(LocalDate fechaNacimiento) {
+        // Si fechaNacimiento ya es LocalDate, no necesitas convertirla de Date
+        return Period.between(fechaNacimiento, LocalDate.now()).getYears();
     }
 
     private NiñoDto convertirADto(Niño niño) {
