@@ -1,9 +1,9 @@
 package com.ludicamente.Ludicamente.service;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.Search;
+import com.cloudinary.Search; // Asegúrate de que esta importación esté presente
 import com.cloudinary.api.ApiResponse;
-import com.cloudinary.utils.ObjectUtils; // Import this for Cloudinary upload options
+import com.cloudinary.utils.ObjectUtils;
 import com.ludicamente.Ludicamente.model.GaleriaImagen;
 import com.ludicamente.Ludicamente.repository.GaleriaImagenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class ImageUploadService {
     public String uploadImage(MultipartFile multipartFile, String folderName) throws IOException {
         try {
             Map<String, Object> options = new HashMap<>();
-            options.put("folder", folderName); // <--- CORRECCIÓN CLAVE AQUÍ: La clave es "folder"
+            options.put("folder", folderName); // La clave es "folder" para especificar la carpeta de subida
             options.put("resource_type", "auto"); // Cloudinary detectará el tipo de recurso
             options.put("unique_filename", false); // Puedes ajustar esto a 'true' si quieres nombres únicos generados por Cloudinary
 
@@ -103,13 +103,16 @@ public class ImageUploadService {
         return urls;
     }
 
+    // --- MODIFICACIÓN CLAVE AQUÍ ---
+    // Este método ahora filtrará para obtener solo las imágenes del folder 'ludicamente_uploads'
     public List<String> getAllImagesFromCloudinary() throws Exception {
         List<String> imageUrls = new ArrayList<>();
-        System.out.println("Iniciando la búsqueda de todas las imágenes en Cloudinary..."); // Depuración
+        System.out.println("Iniciando la búsqueda de imágenes en Cloudinary para el folder 'ludicamente_uploads'..."); // Depuración
         try {
             ApiResponse result = cloudinary.search()
-                    .expression("resource_type:image")
-                    .maxResults(500) // Puedes ajustar el número de resultados máximos
+                    // La expresión de búsqueda ahora incluye el filtro por carpeta
+                    .expression("resource_type:image AND folder:ludicamente_uploads") // <-- ¡CAMBIO CLAVE AQUÍ!
+                    .maxResults(500) // Puedes ajustar el número de resultados máximos según tus necesidades
                     .execute();
 
             List<Map<String, Object>> resources = (List<Map<String, Object>>) result.get("resources");
@@ -119,7 +122,7 @@ public class ImageUploadService {
                     imageUrls.add((String) resource.get("secure_url"));
                 }
             }
-            System.out.println("Búsqueda en Cloudinary finalizada. " + imageUrls.size() + " URLs encontradas."); // Depuración
+            System.out.println("Búsqueda en Cloudinary finalizada. " + imageUrls.size() + " URLs encontradas en 'ludicamente_uploads'."); // Depuración
         } catch (Exception e) {
             System.err.println("Error al listar imágenes de Cloudinary en el servicio: " + e.getMessage()); // Depuración
             throw new Exception("No se pudieron obtener las imágenes de Cloudinary: " + e.getMessage(), e);
@@ -135,10 +138,10 @@ public class ImageUploadService {
             imagen.setVisible(false);
             galeriaImagenRepository.save(imagen);
             System.out.println("Imagen oculta con éxito: " + imageUrl); // Depuración
-            return true; // Retorna true si la imagen fue encontrada y oculta
+            return true;
         }
         System.out.println("Imagen no encontrada para ocultar: " + imageUrl); // Depuración
-        return false; // Retorna false si la imagen no fue encontrada
+        return false;
     }
 
     public boolean showImage(String imageUrl) {
@@ -149,9 +152,9 @@ public class ImageUploadService {
             imagen.setVisible(true);
             galeriaImagenRepository.save(imagen);
             System.out.println("Imagen mostrada con éxito: " + imageUrl); // Depuración
-            return true; // Retorna true si la imagen fue encontrada y mostrada
+            return true;
         }
         System.out.println("Imagen no encontrada para mostrar: " + imageUrl); // Depuración
-        return false; // Retorna false si la imagen no fue encontrada
+        return false;
     }
 }
