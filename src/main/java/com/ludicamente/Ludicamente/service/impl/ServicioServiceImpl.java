@@ -1,7 +1,10 @@
 package com.ludicamente.Ludicamente.service.impl;
 
 import com.ludicamente.Ludicamente.dto.ServicioDto;
+import com.ludicamente.Ludicamente.mapper.ServicioMapper;
+import com.ludicamente.Ludicamente.model.Categoria;
 import com.ludicamente.Ludicamente.model.Servicio;
+import com.ludicamente.Ludicamente.repository.CategoriaRepository;
 import com.ludicamente.Ludicamente.repository.ServicioRepository;
 import com.ludicamente.Ludicamente.service.ServicioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +18,12 @@ import java.util.stream.Collectors;
 public class ServicioServiceImpl implements ServicioService {
 
     private final ServicioRepository servicioRepository;
+    private final CategoriaRepository categoriaRepository;
 
     @Autowired
-    public ServicioServiceImpl(ServicioRepository servicioRepository) {
+    public ServicioServiceImpl(ServicioRepository servicioRepository, CategoriaRepository categoriaRepository) {
         this.servicioRepository = servicioRepository;
+        this.categoriaRepository = categoriaRepository;
     }
 
     @Override
@@ -30,28 +35,8 @@ public class ServicioServiceImpl implements ServicioService {
     public List<ServicioDto> listarServicios() {
         return servicioRepository.findAll()
                 .stream()
-                .map(this::mapToDto)
+                .map(ServicioMapper::toDto)
                 .collect(Collectors.toList());
-    }
-
-    private ServicioDto mapToDto(Servicio servicio) {
-        ServicioDto dto = new ServicioDto();
-        dto.setCodServicio(servicio.getCodServicio());
-        dto.setNombreServicio(servicio.getNombreServicio());
-        dto.setDescripcion(servicio.getDescripcion());
-        dto.setCosto(servicio.getCosto());
-        dto.setDuracionMinutos(servicio.getDuracionMinutos());
-        dto.setCapacidadMaxima(servicio.getCapacidadMaxima());
-        dto.setRequisitos(servicio.getRequisitos());
-        dto.setEstado(servicio.getEstado() != null ? servicio.getEstado().toString() : null);
-
-        if (servicio.getCategoria() != null) {
-            dto.setFkcodCategoria(servicio.getCategoria().getCodCategoria());
-        } else {
-            dto.setFkcodCategoria(null);
-        }
-
-        return dto;
     }
 
     @Override
@@ -60,19 +45,30 @@ public class ServicioServiceImpl implements ServicioService {
     }
 
     @Override
-    public Optional<Servicio> actualizarServicio(Integer id, Servicio servicioActualizado) {
+    public Optional<ServicioDto> actualizarServicio(Integer id, ServicioDto dto) {
         return servicioRepository.findById(id).map(servicioExistente -> {
-            servicioExistente.setNombreServicio(servicioActualizado.getNombreServicio());
-            servicioExistente.setDescripcion(servicioActualizado.getDescripcion());
-            servicioExistente.setCosto(servicioActualizado.getCosto());
-            servicioExistente.setDuracionMinutos(servicioActualizado.getDuracionMinutos());
-            servicioExistente.setCapacidadMaxima(servicioActualizado.getCapacidadMaxima());
-            servicioExistente.setCategoria(servicioActualizado.getCategoria());
-            servicioExistente.setRequisitos(servicioActualizado.getRequisitos());
-            servicioExistente.setEstado(servicioActualizado.getEstado());
-            return Optional.of(servicioRepository.save(servicioExistente));
-        }).orElse(Optional.empty());
+            Categoria categoria = categoriaRepository.findById(dto.getFkcodCategoria())
+                    .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada con ID: " + dto.getFkcodCategoria()));
+
+            servicioExistente.setNombreServicio(dto.getNombreServicio());
+            servicioExistente.setDescripcion(dto.getDescripcion());
+            servicioExistente.setCosto(dto.getCosto());
+            servicioExistente.setDuracionMinutos(dto.getDuracionMinutos());
+            servicioExistente.setCapacidadMaxima(dto.getCapacidadMaxima());
+            servicioExistente.setRequisitos(dto.getRequisitos());
+            servicioExistente.setCategoria(categoria);
+
+            switch (dto.getEstado().trim().toUpperCase()) {
+                case "ACTIVO" -> servicioExistente.setEstado(Servicio.EstadoServicio.disponible);
+                case "INACTIVO" -> servicioExistente.setEstado(Servicio.EstadoServicio.no_disponible);
+                default -> throw new IllegalArgumentException("Estado inválido: " + dto.getEstado());
+            }
+
+            Servicio actualizado = servicioRepository.save(servicioExistente);
+            return ServicioMapper.toDto(actualizado); // 👈 este ya es el ServicioDto, no Optional<>
+        });
     }
+
 
     @Override
     public List<Servicio> listarPorCategoria(Integer idCategoria) {

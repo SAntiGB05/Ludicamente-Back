@@ -67,8 +67,6 @@ public class ServicioController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-
     @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
     @Operation(summary = "Actualizar un servicio existente")
     @ApiResponses(value = {
@@ -77,20 +75,11 @@ public class ServicioController {
     })
     @PutMapping("/{id}")
     public ResponseEntity<ServicioDto> actualizarServicio(
-            @Parameter(description = "ID del servicio a actualizar", example = "1")
             @PathVariable Integer id,
             @Valid @RequestBody ServicioDto dto) {
-
-        Optional<Categoria> categoriaOpt = categoriaService.obtenerPorId(dto.getFkcodCategoria());
-        if (categoriaOpt.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Servicio servicioActualizado = ServicioMapper.toEntity(dto, categoriaOpt.get());
-        Optional<Servicio> actualizado = servicioService.actualizarServicio(id, servicioActualizado);
-
+        Optional<ServicioDto> actualizado = servicioService.actualizarServicio(id, dto);
         return actualizado
-                .map(servicio -> ResponseEntity.ok(ServicioMapper.toDto(servicio)))
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -103,7 +92,6 @@ public class ServicioController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(servicios);
     }
-
 
     @PreAuthorize("hasAnyRole('ROL_ADMIN','ROL_STAFF')")
     @Operation(summary = "Eliminar un servicio")

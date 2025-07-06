@@ -12,7 +12,7 @@ public interface ServicioService {
     Servicio crearServicio(Servicio servicio);
     List<ServicioDto> listarServicios(); // Cambiado a DTO
     Optional<Servicio> obtenerServicioPorId(Integer id);
-    Optional<Servicio> actualizarServicio(Integer id, Servicio servicioActualizado);
+    Optional<ServicioDto> actualizarServicio(Integer id, ServicioDto dto);
     boolean eliminarServicio(Integer id);
     List<Servicio> listarPorCategoria(Integer idCategoria);
     Optional<Servicio> obtenerPorId(Integer id);
