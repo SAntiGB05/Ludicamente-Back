@@ -248,7 +248,7 @@ public class NiñoServiceImpl implements NiñoService {
                 ));
 
         // Asegurar que ambos géneros estén presentes aunque no haya ninguno en BD
-        conteo.putIfAbsent("MASCULINO", 0L); // Asumiendo que guardas "Masculino" y "Femenino" completos
+        conteo.putIfAbsent("MASCULINO", 0L) ; // Asumiendo que guardas "Masculino" y "Femenino" completos
         conteo.putIfAbsent("FEMENINO", 0L);
 
         return conteo;
