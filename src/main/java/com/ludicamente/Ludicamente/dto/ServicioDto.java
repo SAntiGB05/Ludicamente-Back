@@ -12,11 +12,12 @@ public class ServicioDto {
     private Integer fkcodCategoria;
     private String requisitos;
     private String estado;
+    private String imageUrl; // <-- ¡NUEVO CAMPO!
     public ServicioDto() {}
 
     public ServicioDto(Integer codServicio, String nombreServicio, String descripcion,
                        BigDecimal costo, Integer duracionMinutos, Integer capacidadMaxima,
-                       Integer fkcodCategoria, String requisitos, String estado) {
+                       Integer fkcodCategoria, String requisitos, String estado, String imageUrl) { // <-- Constructor actualizado
         this.codServicio = codServicio;
         this.nombreServicio = nombreServicio;
         this.descripcion = descripcion;
@@ -26,6 +27,7 @@ public class ServicioDto {
         this.fkcodCategoria = fkcodCategoria;
         this.requisitos = requisitos;
         this.estado = estado;
+        this.imageUrl = imageUrl; // <-- Asignación
     }
 
     public Integer getCodServicio() {
@@ -98,5 +100,12 @@ public class ServicioDto {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+    public String getImageUrl() { // <-- Nuevo Getter
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) { // <-- Nuevo Setter
+        this.imageUrl = imageUrl;
     }
 }

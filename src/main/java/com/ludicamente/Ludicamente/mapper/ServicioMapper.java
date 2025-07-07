@@ -26,7 +26,8 @@ public final class ServicioMapper {
                 servicio.getCapacidadMaxima(),
                 servicio.getCategoria() != null ? servicio.getCategoria().getCodCategoria() : null,
                 servicio.getRequisitos(),
-                estadoString
+                estadoString,
+                servicio.getImageUrl() // <-- ¡Añadido al DTO!
         );
     }
 
@@ -49,7 +50,8 @@ public final class ServicioMapper {
                 dto.getCapacidadMaxima(),
                 categoria,
                 dto.getRequisitos(),
-                estadoEnum
+                estadoEnum,
+                dto.getImageUrl() // <-- ¡Añadido a la entidad!
         );
     }
 }

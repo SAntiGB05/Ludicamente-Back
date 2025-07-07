@@ -57,6 +57,7 @@ public class ServicioServiceImpl implements ServicioService {
             servicioExistente.setCapacidadMaxima(dto.getCapacidadMaxima());
             servicioExistente.setRequisitos(dto.getRequisitos());
             servicioExistente.setCategoria(categoria);
+            servicioExistente.setImageUrl(dto.getImageUrl()); // <-- ¡AÑADIDO AQUÍ!
 
             switch (dto.getEstado().trim().toUpperCase()) {
                 case "ACTIVO" -> servicioExistente.setEstado(Servicio.EstadoServicio.disponible);
@@ -65,10 +66,9 @@ public class ServicioServiceImpl implements ServicioService {
             }
 
             Servicio actualizado = servicioRepository.save(servicioExistente);
-            return ServicioMapper.toDto(actualizado); // 👈 este ya es el ServicioDto, no Optional<>
+            return ServicioMapper.toDto(actualizado);
         });
     }
-
 
     @Override
     public List<Servicio> listarPorCategoria(Integer idCategoria) {
