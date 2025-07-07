@@ -1,6 +1,7 @@
 package com.ludicamente.Ludicamente.controller;
 
 import com.ludicamente.Ludicamente.service.ImageUploadService;
+import com.ludicamente.Ludicamente.model.MessageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Map;
 
@@ -87,37 +89,39 @@ public class ImageUploadController {
 
     // Endpoint para ocultar una imagen
     @PutMapping("/gallery/hide-image")
-    public ResponseEntity<String> hideImage(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<MessageResponse> hideImage(@RequestBody Map<String, String> payload) {
         String imageUrl = payload.get("imageUrl");
+
         if (imageUrl == null || imageUrl.isEmpty()) {
-            System.err.println("URL de imagen no proporcionada para ocultar."); // Depuración
-            return new ResponseEntity<>("URL de imagen no proporcionada.", HttpStatus.BAD_REQUEST);
+            System.err.println("URL de imagen no proporcionada para ocultar.");
+            return new ResponseEntity<>(new MessageResponse("URL de imagen no proporcionada.", false), HttpStatus.BAD_REQUEST);
         }
         boolean success = imageUploadService.hideImage(imageUrl);
         if (success) {
-            System.out.println("Imagen oculta exitosamente: " + imageUrl); // Depuración
-            return new ResponseEntity<>("Imagen oculta exitosamente.", HttpStatus.OK);
+            System.out.println("Imagen oculta exitosamente: " + imageUrl);
+            return new ResponseEntity<>(new MessageResponse("Imagen oculta exitosamente."), HttpStatus.OK);
         } else {
-            System.err.println("Imagen no encontrada o no se pudo ocultar: " + imageUrl); // Depuración
-            return new ResponseEntity<>("Imagen no encontrada o no se pudo ocultar.", HttpStatus.NOT_FOUND);
+            System.err.println("Imagen no encontrada o no se pudo ocultar: " + imageUrl);
+            return new ResponseEntity<>(new MessageResponse("Imagen no encontrada o no se pudo ocultar.", false), HttpStatus.NOT_FOUND);
         }
     }
 
     // Endpoint para mostrar una imagen
     @PutMapping("/gallery/show-image")
-    public ResponseEntity<String> showImage(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<MessageResponse> showImage(@RequestBody Map<String, String> payload) {
         String imageUrl = payload.get("imageUrl");
+
         if (imageUrl == null || imageUrl.isEmpty()) {
-            System.err.println("URL de imagen no proporcionada para mostrar."); // Depuración
-            return new ResponseEntity<>("URL de imagen no proporcionada.", HttpStatus.BAD_REQUEST);
+            System.err.println("URL de imagen no proporcionada para mostrar.");
+            return new ResponseEntity<>(new MessageResponse("URL de imagen no proporcionada.", false), HttpStatus.BAD_REQUEST);
         }
         boolean success = imageUploadService.showImage(imageUrl);
         if (success) {
-            System.out.println("Imagen mostrada exitosamente: " + imageUrl); // Depuración
-            return new ResponseEntity<>("Imagen mostrada exitosamente.", HttpStatus.OK);
+            System.out.println("Imagen mostrada exitosamente: " + imageUrl);
+            return new ResponseEntity<>(new MessageResponse("Imagen mostrada exitosamente."), HttpStatus.OK);
         } else {
-            System.err.println("Imagen no encontrada o no se pudo mostrar: " + imageUrl); // Depuración
-            return new ResponseEntity<>("Imagen no encontrada o no se pudo mostrar.", HttpStatus.NOT_FOUND);
+            System.err.println("Imagen no encontrada o no se pudo mostrar: " + imageUrl);
+            return new ResponseEntity<>(new MessageResponse("Imagen no encontrada o no se pudo mostrar.", false), HttpStatus.NOT_FOUND);
         }
     }
 
