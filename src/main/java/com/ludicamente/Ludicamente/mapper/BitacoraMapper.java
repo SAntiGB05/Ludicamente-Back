@@ -38,7 +38,7 @@ public class BitacoraMapper {
         b.setHistorialActividad(dto.getHistorialActividad());
         b.setEstado(true); // por defecto activa
         b.setTitulo(dto.getTitulo());
-        b.setFechaCreacion(dto.getFechaCreacion());
+
         return b;
     }
 }

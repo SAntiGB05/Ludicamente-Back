@@ -126,7 +126,10 @@ public class BitacoraServiceImpl implements BitacoraService {
             throw new IllegalArgumentException("No se puede cambiar el empleado asociado a esta bitácora.");
         }
 
-        // Solo actualiza si no es null
+        if (bitacoraActualizada.getTitulo() != null) {
+            existente.setTitulo(bitacoraActualizada.getTitulo());
+        }
+
         if (bitacoraActualizada.getEstado() != null) {
             existente.setEstado(bitacoraActualizada.getEstado());
         }
