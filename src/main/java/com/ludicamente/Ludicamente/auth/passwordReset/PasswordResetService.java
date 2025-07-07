@@ -30,7 +30,7 @@ public class PasswordResetService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private EmailService emailService;
+    private EmailService emailService; // Ya está inyectado
 
     public PasswordResetToken enviarToken(String email) {
         Optional<Empleado> empleadoOpt = empleadoRepository.findByCorreo(email);
@@ -44,6 +44,7 @@ public class PasswordResetService {
         token.setToken(UUID.randomUUID().toString());
         token.setExpiryDate(LocalDateTime.now().plusMinutes(30));
 
+        // Determinar el userId y nivelAcceso basado en el tipo de usuario
         if (empleadoOpt.isPresent()) {
             Empleado empleado = empleadoOpt.get();
             token.setUserId(empleado.getIdEmpleado());
@@ -51,7 +52,7 @@ public class PasswordResetService {
         } else {
             Acudiente acudiente = acudienteOpt.get();
             token.setUserId(acudiente.getIdAcudiente());
-            token.setNivelAcceso(null);
+            token.setNivelAcceso(null); // Acudientes no tienen nivelAcceso en tu modelo
         }
 
         tokenRepository.save(token);
@@ -67,7 +68,6 @@ public class PasswordResetService {
               <body style="background-color: #fef3c7; font-family: sans-serif; color: #333333; padding: 24px;">
                 <div style="max-width: 500px; margin: 0 auto; background-color: white; border-radius: 16px; border: 1px solid #d1d5db; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); padding: 24px;">
 
-                
                   <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 12px;">Restablece tu contraseña</h2>
                   <p style="font-size: 14px; margin-bottom: 16px;">
                     Hemos recibido una solicitud para restablecer tu contraseña. Si fuiste tú, haz clic en el siguiente botón:
@@ -89,7 +89,8 @@ public class PasswordResetService {
             </html>
         """, link);
 
-
+        // AQUI ESTA LA LINEA FALTANTE PARA ENVIAR EL CORREO
+        emailService.enviarCorreoHtml(email, "Restablece tu contraseña - Lúdicamente", mensajeHtml);
 
         return token;
     }
@@ -100,7 +101,7 @@ public class PasswordResetService {
             throw new RuntimeException("Token inválido o expirado.");
         }
 
-        if (token.getNivelAcceso() != null) {
+        if (token.getNivelAcceso() != null) { // Asume que si nivelAcceso es null, es un Acudiente
             Empleado empleado = empleadoRepository.findById(token.getUserId())
                     .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
             empleado.setContraseña(passwordEncoder.encode(nuevaClave));

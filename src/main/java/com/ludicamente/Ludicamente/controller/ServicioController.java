@@ -71,7 +71,7 @@ public class ServicioController {
     @Operation(summary = "Actualizar un servicio existente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Servicio actualizado exitosamente"),
-            @ApiResponse(responseCode = "404", description = "Servicio o categoría no encontrada")
+            @ApiResponse(responseCode = "404", description = "Servicio o categorÃ­a no encontrada")
     })
     @PutMapping("/{id}")
     public ResponseEntity<ServicioDto> actualizarServicio(

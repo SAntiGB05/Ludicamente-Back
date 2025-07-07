@@ -1,6 +1,8 @@
 package com.ludicamente.Ludicamente.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference; // <-- Cambiar a JsonBackReference
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonCreator; // <-- ¡NUEVA IMPORTACIÓN!
+import com.fasterxml.jackson.annotation.JsonValue;   // <-- ¡NUEVA IMPORTACIÓN!
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -25,9 +27,10 @@ public class Post {
     @Column(name = "fecha_actualizacion")
     private LocalDateTime fechaActualizacion;
 
+    // Asegúrate de que @Enumerated(EnumType.STRING) esté presente, lo cual ya tienes.
     @Column(name = "estado", nullable = false)
     @Enumerated(EnumType.STRING)
-    private EstadoPost estado = EstadoPost.BORRADOR; // Valor por defecto
+    private EstadoPost estado = EstadoPost.BORRADOR;
 
     @Column(name = "imagen_destacada", length = 255)
     private String imagenDestacada;
@@ -39,38 +42,75 @@ public class Post {
     private String etiquetas;
 
     @Column(name = "visitas")
-    private Integer visitas = 0; // Valor por defecto
+    private Integer visitas = 0;
 
     @Column(name = "plantilla", nullable = false)
     @Enumerated(EnumType.STRING)
-    private PlantillaPost plantilla = PlantillaPost.PLANTILLA1; // Valor por defecto
+    private PlantillaPost plantilla = PlantillaPost.PLANTILLA1;
 
-    // Relación Many-to-One con la entidad Empleado
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "fkid_empleado", nullable = false) // Columna de clave foránea
-    @JsonBackReference("empleado-posts") // <-- CORREGIDO: Debe ser JsonBackReference
+    @JoinColumn(name = "fkid_empleado", nullable = false)
+    @JsonBackReference("empleado-posts")
     private Empleado empleado;
 
-
+    // --- MODIFICACIÓN DE ENUM EstadoPost ---
     public enum EstadoPost {
         BORRADOR,
-        PUBLICADO,
-        ARCHIVADO
+        PUBLICADO, // Los nombres de las constantes siguen en MAYÚSCULAS en Java
+        ARCHIVADO;
+
+        // Método para que Jackson sepa cómo convertir una cadena (ej. "publicado")
+        // a una constante del enum (ej. PUBLICADO).
+        @JsonCreator
+        public static EstadoPost fromString(String value) {
+            for (EstadoPost estado : EstadoPost.values()) {
+                // Comparamos ignorando mayúsculas/minúsculas
+                if (estado.name().equalsIgnoreCase(value)) {
+                    return estado;
+                }
+            }
+            throw new IllegalArgumentException("Valor de EstadoPost inválido: " + value);
+        }
+
+        // Método para que Jackson sepa cómo convertir una constante del enum (ej. PUBLICADO)
+        // a una cadena para el JSON de salida (ej. "publicado").
+        @JsonValue
+        public String toValue() {
+            // Convertimos el nombre de la constante a minúsculas para que coincida con la DB
+            return this.name().toLowerCase();
+        }
     }
 
+    // --- MODIFICACIÓN DE ENUM PlantillaPost (opcional, pero buena práctica si tu DB usa minúsculas) ---
     public enum PlantillaPost {
         PLANTILLA1,
         PLANTILLA2,
         PLANTILLA3,
-        PLANTILLA4
+        PLANTILLA4;
+
+        @JsonCreator
+        public static PlantillaPost fromString(String value) {
+            for (PlantillaPost plantilla : PlantillaPost.values()) {
+                if (plantilla.name().equalsIgnoreCase(value)) {
+                    return plantilla;
+                }
+            }
+            throw new IllegalArgumentException("Valor de PlantillaPost inválido: " + value);
+        }
+
+        @JsonValue
+        public String toValue() {
+            // Si tu base de datos espera "PLANTILLA1", déjalo como this.name();
+            // Si espera "plantilla1", cámbialo a this.name().toLowerCase();
+            return this.name();
+        }
     }
 
-    // Constructor vacío. Se inicializa fechaPublicacion aquí.
     public Post() {
         this.fechaPublicacion = LocalDateTime.now();
     }
 
-    // Getters y Setters
+    // ... Resto de Getters y Setters (ya los tienes correctamente) ...
 
     public PlantillaPost getPlantilla() {
         return plantilla;

@@ -16,7 +16,4 @@ public interface ServicioService {
     boolean eliminarServicio(Integer id);
     List<Servicio> listarPorCategoria(Integer idCategoria);
     Optional<Servicio> obtenerPorId(Integer id);
-
-
-
 }
