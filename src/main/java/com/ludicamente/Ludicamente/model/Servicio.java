@@ -37,14 +37,18 @@ public class Servicio {
     @Column(name = "requisitos")
     private String requisitos;
 
+    @Column(name = "imageUrl", length = 255) // <-- ¡NUEVO CAMPO MAPPEADO!
+    private String imageUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", columnDefinition = "ENUM('DISPONIBLE', 'NO_DISPONIBLE') DEFAULT 'DISPONIBLE'")
     private EstadoServicio estado;
 
     public Servicio() {}
 
-    public Servicio(String nombreServicio, String descripcion, BigDecimal  costo, int duracionMinutos,
-                    Integer capacidadMaxima, Categoria categoria, String requisitos, EstadoServicio estado) {
+    public Servicio(String nombreServicio, String descripcion, BigDecimal costo,
+                    Integer duracionMinutos, Integer capacidadMaxima, Categoria categoria,
+                    String requisitos, EstadoServicio estado, String imageUrl) { // <-- Constructor actualizado
         this.nombreServicio = nombreServicio;
         this.descripcion = descripcion;
         this.costo = costo;
@@ -53,12 +57,20 @@ public class Servicio {
         this.categoria = categoria;
         this.requisitos = requisitos;
         this.estado = estado;
+        this.imageUrl = imageUrl; // <-- Asignación
     }
 
     public Servicio(Integer idServicio) {
         this.codServicio = idServicio;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
     public int getCodServicio() {
         return codServicio;
